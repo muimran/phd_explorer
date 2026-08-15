@@ -135,7 +135,7 @@ def main():
 
     # Filter to unscored (unless --rescore)
     if not args.rescore:
-        to_score = [v for v in relevant if v.get("llm_score") is None]
+        to_score = [v for v in relevant if v.get("llm_score") is None or v.get("llm_score", 0) < 0]
         print(f"  {len(to_score)} not yet LLM-scored")
     else:
         to_score = relevant
