@@ -292,8 +292,14 @@ def generate_site(scored: list[dict]):
 
     def vacancy_card(v):
         score = v["score"]
-        llm_score = v.get("llm_score")
-        llm_reason = v.get("llm_reason", "")
+        gemini_score = v.get("gemini_score")
+        gemini_reason = v.get("gemini_reason", "")
+        groq_score = v.get("groq_score")
+        groq_reason = v.get("groq_reason", "")
+        # Migration: old llm_score → gemini_score
+        if gemini_score is None and v.get("llm_score") is not None:
+            gemini_score = v.get("llm_score")
+            gemini_reason = v.get("llm_reason", "")
         terms = ", ".join(v["matched_terms"][:8])
         families = v.get("match_families", {})
 
@@ -314,17 +320,20 @@ def generate_site(scored: list[dict]):
         if v.get("employer"):
             employer_html = f'{v["employer"]}'
 
-        # LLM score badge (only if scored)
-        llm_html = ""
-        if llm_score is not None and llm_score >= 0:
-            llm_html = f'<div class="llm-score" title="{llm_reason}">AI {llm_score}</div>'
+        # LLM score badges
+        llm_parts = []
+        if gemini_score is not None and gemini_score >= 0:
+            llm_parts.append(f'<span class="llm-badge" title="{gemini_reason}">G {gemini_score}</span>')
+        if groq_score is not None and groq_score >= 0:
+            llm_parts.append(f'<span class="llm-badge" title="{groq_reason}">L {groq_score}</span>')
+        llm_html = " ".join(llm_parts)
 
         return f"""
         <div class="card" data-id="{v['id']}">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score">{score}</div>
-                    {llm_html}
+                    <div class="llm-scores">{llm_html}</div>
                 </div>
                 <div class="card-body">
                     <h3><a href="{v['url']}" target="_blank" rel="noopener">{v['title']}</a></h3>
@@ -429,8 +438,11 @@ body {{
     font-size: 0.8rem; font-weight: 600; color: var(--accent);
     text-align: center;
 }}
-.llm-score {{
-    font-size: 0.65rem; color: var(--muted); white-space: nowrap;
+.llm-scores {{
+    display: flex; gap: 0.25rem; justify-content: center;
+}}
+.llm-badge {{
+    font-size: 0.6rem; color: var(--muted); white-space: nowrap;
     cursor: default;
 }}
 .card-body {{ flex: 1; min-width: 0; }}
