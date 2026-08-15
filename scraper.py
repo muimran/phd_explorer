@@ -292,6 +292,8 @@ def generate_site(scored: list[dict]):
 
     def vacancy_card(v):
         score = v["score"]
+        llm_score = v.get("llm_score")
+        llm_reason = v.get("llm_reason", "")
         terms = ", ".join(v["matched_terms"][:8])
         families = v.get("match_families", {})
 
@@ -312,10 +314,18 @@ def generate_site(scored: list[dict]):
         if v.get("employer"):
             employer_html = f'{v["employer"]}'
 
+        # LLM score badge (only if scored)
+        llm_html = ""
+        if llm_score is not None and llm_score >= 0:
+            llm_html = f'<div class="llm-score" title="{llm_reason}">AI {llm_score}</div>'
+
         return f"""
         <div class="card" data-id="{v['id']}">
             <div class="card-top">
-                <div class="score">{score}</div>
+                <div class="score-col">
+                    <div class="score">{score}</div>
+                    {llm_html}
+                </div>
                 <div class="card-body">
                     <h3><a href="{v['url']}" target="_blank" rel="noopener">{v['title']}</a></h3>
                     <div class="meta">{employer_html}</div>
@@ -411,10 +421,17 @@ body {{
 .card:last-child {{ border-bottom: none; }}
 .card.dismissed {{ opacity: 0; height: 0; overflow: hidden; padding: 0; border: none; }}
 .card-top {{ display: flex; align-items: flex-start; gap: 1rem; }}
+.score-col {{
+    display: flex; flex-direction: column; align-items: center;
+    gap: 0.2rem; min-width: 36px; padding-top: 0.15rem;
+}}
 .score {{
     font-size: 0.8rem; font-weight: 600; color: var(--accent);
-    min-width: 28px; text-align: center;
-    padding-top: 0.15rem;
+    text-align: center;
+}}
+.llm-score {{
+    font-size: 0.65rem; color: var(--muted); white-space: nowrap;
+    cursor: default;
 }}
 .card-body {{ flex: 1; min-width: 0; }}
 .card h3 {{ font-size: 0.95rem; font-weight: 500; line-height: 1.4; margin-bottom: 0.2rem; }}
