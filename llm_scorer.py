@@ -57,6 +57,18 @@ SCORING RULES:
 - 20-39: Weak fit — only superficial keyword overlap
 - 0-19: Not relevant
 
+CALIBRATION EXAMPLES (score 0 — these are NOT relevant despite passing keyword filters):
+- "PhD Candidate in Mechanism-Informed World Models and Agents" → 0
+- "PhD in Optimization of Sustainable Agri-Food Supply Chains under Climate Risk" → 0
+- "PhD Candidate: DONOR-PROTECT" → 0
+- "PhD in Computational Imaging for High-Throughput Applications" → 0
+- "PhD in Multi-Aperture Ultrasound Imaging for Abdominal Aortic Aneurysm" → 0
+- "MSCA-DN PhD position: brain large axial field of view PET/CT" → 0
+- "PhD position on Restoring Communicative Agency: Human-centered AI smart glasses for people with speech impairments" → 0
+Be aggressive about scoring 0 for positions in medical imaging, supply chain, robotics,
+biomedical engineering, agricultural science, or clinical research — even if they mention
+AI, data science, or Python. The candidate's "computational" focus is about media/society, not hardware/biology.
+
 RESPONSE FORMAT:
 Return ONLY a JSON object with these fields:
 {{"score": <int 0-100>, "reason": "<one sentence explaining the score>"}}
