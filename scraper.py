@@ -173,6 +173,13 @@ def score_vacancy(vacancy: dict) -> dict:
             score += len(set(matched)) * WEIGHTS[family_name]
     score = min(score, 100)
 
+    # Bonus: journalism terms are what make a vacancy truly relevant.
+    # A PhD with lots of tech/adjacent matches but ZERO journalism/media
+    # connection is probably not your field — halve its score.
+    has_journalism = bool(matches["journalism_media"])
+    if not has_journalism and score > 0:
+        score = score // 2
+
     # Recommendation bucket
     if score >= 50:
         rec = "APPLY"
