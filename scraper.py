@@ -146,9 +146,16 @@ def hard_exclude(vacancy: dict) -> bool:
 
 def score_vacancy(vacancy: dict) -> dict:
     """Score a vacancy using weighted keyword matching. Returns enriched dict."""
-    text = (vacancy["title"] + " " + vacancy["description"]).lower()
+    title_text = vacancy["title"].lower()
+    desc_text = vacancy["description"].lower()
+    full_text = title_text + " " + desc_text
+
+    # Title multiplier: a keyword in the title is worth 3× a keyword in the body.
+    TITLE_BONUS = 3
 
     matches = {"journalism_media": [], "tech_data": [], "journalism_adjacent": [], "your_skills": []}
+    term_in_title = set()   # track which terms appeared in the title
+
     families = [
         ("journalism_media", JOURNALISM_MEDIA),
         ("tech_data", TECH_DATA),
@@ -158,19 +165,30 @@ def score_vacancy(vacancy: dict) -> dict:
 
     for family_name, terms in families:
         for term in terms:
-            if term.lower() in text:
+            low = term.lower()
+            if low in full_text:
                 matches[family_name].append(term)
+                if low in title_text:
+                    term_in_title.add(term)
 
     # Regex-based skill matching (for short terms like R, NLP, etc.)
+    full_raw = vacancy["title"] + " " + vacancy["description"]
     for pattern in REGEX_SKILLS:
-        if re.search(pattern, vacancy["title"] + " " + vacancy["description"]):
+        if re.search(pattern, full_raw):
             matches["your_skills"].append(pattern)
+            if re.search(pattern, vacancy["title"]):
+                term_in_title.add(pattern)
 
-    # Score: sum of (unique matches per family × weight), capped at 100
+    # Score: each unique match contributes its family weight.
+    # Terms found in the title get an extra TITLE_BONUS multiplier.
     score = 0
     for family_name, matched in matches.items():
-        if matched:
-            score += len(set(matched)) * WEIGHTS[family_name]
+        for term in set(matched):
+            base = WEIGHTS[family_name]
+            if term in term_in_title:
+                score += base * TITLE_BONUS
+            else:
+                score += base
     score = min(score, 100)
 
     # Bonus: journalism terms are what make a vacancy truly relevant.

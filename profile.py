@@ -19,6 +19,8 @@ JOURNALISM_MEDIA = [
     "political communication", "media communication",
     "public interest media", "the press", "broadcasting",
     "journalistic", "journalism studies",
+    "news recommendation", "news algorithms",
+    "computational communication",
 ]
 
 TECH_DATA = [
@@ -33,6 +35,9 @@ TECH_DATA = [
     "digital methods", "digital humanities",
     "text mining", "text analysis", "sentiment analysis",
     "topic modeling", "topic modelling",
+    "digital trace data", "text-as-data", "text as data",
+    "recommender system", "recommendation system",
+    "synthetic media", "deepfake",
 ]
 
 JOURNALISM_ADJACENT = [
@@ -60,6 +65,7 @@ JOURNALISM_ADJACENT = [
     "surveillance", "privacy", "data protection",
     "public value", "public values",
     "digital sovereignty", "digital inclusion",
+    "data justice", "open government data",
 ]
 
 YOUR_SKILLS = [
