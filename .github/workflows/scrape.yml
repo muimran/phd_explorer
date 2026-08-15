@@ -41,4 +41,4 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftps
           local-dir: ./docs/
-          server-dir: /domains/muhammadimran.com/public_html/phd-explorer/
+          server-dir: /public_html/phd-explorer/
