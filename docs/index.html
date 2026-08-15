@@ -131,7 +131,7 @@ body {
 
 <div class="header">
     <h1>PhD Radar</h1>
-    <div class="updated">Last scraped 15 August 2026, 13:39</div>
+    <div class="updated">Last scraped 15 August 2026, 13:46</div>
 </div>
 
 <div class="stats">
@@ -481,6 +481,34 @@ body {
 </div>
 
 <script>
+// Calculate days remaining for each deadline
+document.querySelectorAll('.deadline-date').forEach(el => {
+    const raw = el.dataset.deadline;  // e.g. "22 Aug '26" or "22 Aug 2026"
+    if (!raw) return;
+    // Parse: "22 Aug '26" → "22 Aug 2026"
+    const normalized = raw.replace(/'(\d{2})/, '20$1');
+    const deadline = new Date(normalized);
+    if (isNaN(deadline)) return;
+    const now = new Date();
+    now.setHours(0,0,0,0);
+    deadline.setHours(0,0,0,0);
+    const diff = Math.ceil((deadline - now) / (1000 * 60 * 60 * 24));
+    if (diff < 0) {
+        el.textContent = 'Expired';
+        el.style.color = '#999';
+    } else if (diff === 0) {
+        el.textContent = 'Today!';
+        el.style.color = 'var(--accent)';
+        el.style.fontWeight = '600';
+    } else if (diff <= 7) {
+        el.textContent = diff + (diff === 1 ? ' day left' : ' days left');
+        el.style.color = 'var(--accent)';
+        el.style.fontWeight = '600';
+    } else {
+        el.textContent = diff + ' days left · ' + raw;
+    }
+});
+
 const serverDismissed = new Set([]);
 let sessionDismissed = new Set();
 
