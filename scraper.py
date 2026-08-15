@@ -230,10 +230,12 @@ def load_dismissed() -> set[str]:
 
 
 def generate_site(scored: list[dict]):
-    """Generate a static HTML site in /docs for GitHub Pages."""
+    """Generate a static HTML site in /docs."""
     SITE_DIR.mkdir(exist_ok=True)
 
+    now = datetime.now()
     today = date.today().isoformat()
+    updated_str = now.strftime("%d %B %Y, %H:%M")
     dismissed = load_dismissed()
 
     # Filter out dismissed vacancies
@@ -249,48 +251,60 @@ def generate_site(scored: list[dict]):
         families = v.get("match_families", {})
 
         if score >= 50:
-            badge_color = "#d32f2f"
-            badge_label = "Apply"
+            badge_class = "badge-strong"
+            badge_label = "Strong match"
         else:
-            badge_color = "#f57c00"
+            badge_class = "badge-investigate"
             badge_label = "Investigate"
 
         family_badges = ""
         if families.get("journalism_media"):
-            family_badges += '<span class="fam fam-j">journalism</span>'
+            family_badges += '<span class="fam fam-j">Journalism</span>'
         if families.get("tech_data"):
-            family_badges += '<span class="fam fam-t">tech/data</span>'
+            family_badges += '<span class="fam fam-t">Tech & Data</span>'
         if families.get("journalism_adjacent"):
-            family_badges += '<span class="fam fam-a">adjacent</span>'
+            family_badges += '<span class="fam fam-a">Adjacent</span>'
 
         deadline_html = ""
         if v.get("deadline"):
-            deadline_html = f'<div class="deadline">Deadline: {v["deadline"]}</div>'
+            deadline_html = f'<div class="meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>{v["deadline"]}</div>'
+
+        employer_html = ""
+        if v.get("employer"):
+            employer_html = f'<div class="meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/></svg>{v["employer"]}</div>'
 
         return f"""
         <div class="card" data-id="{v['id']}">
-            <div class="card-header">
-                <span class="badge" style="background:{badge_color}">{badge_label} · {score}</span>
-                {family_badges}
-                <button class="dismiss-btn" onclick="dismiss('{v['id']}')" title="Not relevant">✕</button>
+            <div class="card-top">
+                <div class="badges">
+                    <span class="badge {badge_class}">{badge_label} · {score}</span>
+                    {family_badges}
+                </div>
+                <button class="dismiss-btn" onclick="dismiss('{v['id']}')" title="Not relevant">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
             </div>
             <h3><a href="{v['url']}" target="_blank" rel="noopener">{v['title']}</a></h3>
-            <div class="employer">{v['employer']}</div>
-            {deadline_html}
-            <div class="terms">Matched: {terms}</div>
+            <div class="card-meta">
+                {employer_html}
+                {deadline_html}
+            </div>
+            <div class="terms">{terms}</div>
         </div>"""
 
     cards_html = ""
     if apply_list:
-        cards_html += '<h2 id="apply">🔴 Strong matches</h2>\n'
+        cards_html += f'<div class="section-header"><h2>Strong matches</h2><span class="section-count">{len(apply_list)}</span></div>\n'
         for v in apply_list:
             cards_html += vacancy_card(v)
     if investigate_list:
-        cards_html += '<h2 id="investigate">🟠 Worth investigating</h2>\n'
+        cards_html += f'<div class="section-header"><h2>Worth investigating</h2><span class="section-count">{len(investigate_list)}</span></div>\n'
         for v in investigate_list:
             cards_html += vacancy_card(v)
 
-    # Embed the already-dismissed IDs so JS can merge with localStorage
+    if not apply_list and not investigate_list:
+        cards_html = '<div class="empty">No matching vacancies right now. Check back in 3 days.</div>'
+
     dismissed_json = json.dumps(sorted(dismissed))
 
     html = f"""<!DOCTYPE html>
@@ -298,99 +312,246 @@ def generate_site(scored: list[dict]):
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PhD Radar — {today}</title>
+<title>PhD Radar</title>
 <style>
 :root {{
-    --bg: #fafafa; --fg: #222; --card-bg: #fff; --card-border: #e0e0e0;
-    --link: #1565c0; --muted: #666;
+    --bg: #f8f8fc;
+    --fg: #1a1a2e;
+    --card-bg: #ffffff;
+    --card-border: #e8e8f0;
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+    --card-hover: 0 4px 12px rgba(0,0,0,0.08);
+    --accent: #673ab7;
+    --accent-light: #ede7f6;
+    --accent-text: #4a148c;
+    --link: #673ab7;
+    --muted: #6b7280;
+    --muted-light: #9ca3af;
+    --green-bg: #e8f5e9; --green-fg: #2e7d32;
+    --blue-bg: #e3f2fd; --blue-fg: #1565c0;
+    --orange-bg: #fff3e0; --orange-fg: #e65100;
+    --red: #e53935;
+    --red-light: #ffebee;
+    --amber: #f57c00;
+    --amber-light: #fff8e1;
+    --radius: 12px;
+    --radius-sm: 8px;
 }}
 @media (prefers-color-scheme: dark) {{
     :root {{
-        --bg: #181a1b; --fg: #d4d4d4; --card-bg: #242628;
-        --card-border: #3a3a3a; --link: #64b5f6; --muted: #999;
+        --bg: #0f0f1a;
+        --fg: #e0e0e8;
+        --card-bg: #1a1a2e;
+        --card-border: #2a2a40;
+        --card-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        --card-hover: 0 4px 12px rgba(0,0,0,0.4);
+        --accent: #b39ddb;
+        --accent-light: #1a1030;
+        --accent-text: #ce93d8;
+        --link: #b39ddb;
+        --muted: #9ca3af;
+        --muted-light: #6b7280;
+        --green-bg: #1b3a1b; --green-fg: #a5d6a7;
+        --blue-bg: #0d2847; --blue-fg: #90caf9;
+        --orange-bg: #3e1a00; --orange-fg: #ffcc80;
+        --red: #ef5350;
+        --red-light: #2a1215;
+        --amber: #ffb74d;
+        --amber-light: #2a2000;
     }}
 }}
 * {{ margin: 0; padding: 0; box-sizing: border-box; }}
-body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-       background: var(--bg); color: var(--fg); max-width: 800px;
-       margin: 0 auto; padding: 1rem; line-height: 1.5; }}
-h1 {{ margin-bottom: 0.25rem; }}
-.subtitle {{ color: var(--muted); margin-bottom: 1.5rem; }}
-h2 {{ margin: 2rem 0 1rem; }}
-.card {{ background: var(--card-bg); border: 1px solid var(--card-border);
-         border-radius: 8px; padding: 1rem; margin-bottom: 1rem;
-         transition: opacity 0.3s, max-height 0.3s; }}
-.card.dismissed {{ opacity: 0.3; max-height: 0; overflow: hidden; padding: 0; margin: 0;
-                   border: none; }}
-.card h3 {{ margin: 0.5rem 0 0.25rem; font-size: 1.1rem; }}
+body {{
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+    background: var(--bg); color: var(--fg);
+    line-height: 1.6; -webkit-font-smoothing: antialiased;
+}}
+.container {{ max-width: 720px; margin: 0 auto; padding: 2rem 1.25rem 6rem; }}
+
+/* Header */
+.header {{ margin-bottom: 2rem; }}
+.header h1 {{
+    font-size: 1.75rem; font-weight: 700; letter-spacing: -0.02em;
+    margin-bottom: 0.25rem;
+}}
+.header h1 span {{ color: var(--accent); }}
+.updated {{
+    font-size: 0.85rem; color: var(--muted);
+    display: flex; align-items: center; gap: 0.4rem;
+}}
+.updated svg {{ opacity: 0.5; }}
+
+/* Stats row */
+.stats {{
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;
+    margin-bottom: 2rem;
+}}
+.stat-card {{
+    background: var(--card-bg); border: 1px solid var(--card-border);
+    border-radius: var(--radius); padding: 1.25rem 1rem;
+    text-align: center; box-shadow: var(--card-shadow);
+}}
+.stat-num {{ font-size: 2rem; font-weight: 700; line-height: 1; margin-bottom: 0.25rem; }}
+.stat-num.strong {{ color: var(--accent); }}
+.stat-num.investigate {{ color: var(--amber); }}
+.stat-label {{ font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; }}
+
+/* Section headers */
+.section-header {{
+    display: flex; align-items: center; gap: 0.75rem;
+    margin: 2rem 0 1rem; padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--card-border);
+}}
+.section-header h2 {{ font-size: 1.1rem; font-weight: 600; }}
+.section-count {{
+    background: var(--accent-light); color: var(--accent-text);
+    font-size: 0.75rem; font-weight: 600; padding: 2px 10px;
+    border-radius: 100px;
+}}
+
+/* Cards */
+.card {{
+    background: var(--card-bg); border: 1px solid var(--card-border);
+    border-radius: var(--radius); padding: 1.25rem;
+    margin-bottom: 0.75rem; box-shadow: var(--card-shadow);
+    transition: box-shadow 0.2s, opacity 0.3s, transform 0.3s;
+}}
+.card:hover {{ box-shadow: var(--card-hover); }}
+.card.dismissed {{
+    opacity: 0; transform: scale(0.95); max-height: 0;
+    overflow: hidden; padding: 0; margin: 0; border: none;
+}}
+.card-top {{ display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }}
+.badges {{ display: flex; gap: 0.4rem; flex-wrap: wrap; }}
+.badge {{
+    font-size: 0.7rem; font-weight: 600; padding: 3px 10px;
+    border-radius: 100px; text-transform: uppercase; letter-spacing: 0.03em;
+}}
+.badge-strong {{ background: var(--accent-light); color: var(--accent-text); }}
+.badge-investigate {{ background: var(--amber-light); color: var(--amber); }}
+.card h3 {{ font-size: 1rem; font-weight: 600; line-height: 1.4; margin-bottom: 0.5rem; }}
 .card a {{ color: var(--link); text-decoration: none; }}
 .card a:hover {{ text-decoration: underline; }}
-.card-header {{ display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }}
-.badge {{ color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }}
-.dismiss-btn {{ margin-left: auto; background: none; border: 1px solid var(--card-border);
-                border-radius: 4px; color: var(--muted); cursor: pointer; padding: 2px 8px;
-                font-size: 0.8rem; }}
-.dismiss-btn:hover {{ background: #d32f2f; color: #fff; border-color: #d32f2f; }}
-.fam {{ font-size: 0.7rem; padding: 2px 6px; border-radius: 3px; }}
-.fam-j {{ background: #e8f5e9; color: #2e7d32; }}
-.fam-t {{ background: #e3f2fd; color: #1565c0; }}
-.fam-a {{ background: #fff3e0; color: #e65100; }}
-@media (prefers-color-scheme: dark) {{
-    .fam-j {{ background: #1b5e20; color: #a5d6a7; }}
-    .fam-t {{ background: #0d47a1; color: #90caf9; }}
-    .fam-a {{ background: #bf360c; color: #ffcc80; }}
+.card-meta {{ display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.5rem; }}
+.meta-item {{
+    display: flex; align-items: center; gap: 0.3rem;
+    font-size: 0.8rem; color: var(--muted);
 }}
-.employer {{ color: var(--muted); }}
-.deadline {{ color: var(--muted); font-size: 0.9rem; }}
-.terms {{ font-size: 0.85rem; color: var(--muted); margin-top: 0.5rem; }}
-.stats {{ background: var(--card-bg); border: 1px solid var(--card-border);
-          border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;
-          display: flex; gap: 2rem; flex-wrap: wrap; }}
-.stat {{ text-align: center; }}
-.stat-num {{ font-size: 1.8rem; font-weight: 700; }}
-.stat-label {{ font-size: 0.8rem; color: var(--muted); }}
-#sync-bar {{ display: none; position: fixed; bottom: 0; left: 0; right: 0;
-             background: var(--card-bg); border-top: 2px solid #d32f2f;
-             padding: 0.75rem 1rem; text-align: center; z-index: 100; }}
-#sync-bar button {{ background: #d32f2f; color: #fff; border: none; border-radius: 4px;
-                    padding: 0.5rem 1rem; cursor: pointer; font-size: 0.9rem; margin: 0 0.5rem; }}
-#sync-bar button:hover {{ background: #b71c1c; }}
-#sync-bar button.secondary {{ background: var(--card-border); color: var(--fg); }}
-#sync-bar button.secondary:hover {{ background: var(--muted); color: #fff; }}
-#sync-bar .count {{ font-weight: 600; }}
+.terms {{
+    font-size: 0.78rem; color: var(--muted-light);
+    padding-top: 0.5rem; border-top: 1px solid var(--card-border);
+}}
+.dismiss-btn {{
+    background: none; border: none; color: var(--muted-light);
+    cursor: pointer; padding: 4px; border-radius: 6px;
+    transition: all 0.15s; display: flex; align-items: center;
+}}
+.dismiss-btn:hover {{ background: var(--red-light); color: var(--red); }}
+
+/* Family badges */
+.fam {{
+    font-size: 0.65rem; font-weight: 500; padding: 2px 8px;
+    border-radius: 100px; text-transform: uppercase; letter-spacing: 0.03em;
+}}
+.fam-j {{ background: var(--green-bg); color: var(--green-fg); }}
+.fam-t {{ background: var(--blue-bg); color: var(--blue-fg); }}
+.fam-a {{ background: var(--orange-bg); color: var(--orange-fg); }}
+
+/* Empty state */
+.empty {{
+    text-align: center; padding: 3rem 1rem; color: var(--muted);
+    background: var(--card-bg); border-radius: var(--radius);
+    border: 1px dashed var(--card-border);
+}}
+
+/* Sync bar */
+#sync-bar {{
+    display: none; position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--card-bg); border-top: 1px solid var(--card-border);
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+    padding: 0.75rem 1rem; text-align: center; z-index: 100;
+}}
+#sync-bar .inner {{
+    max-width: 720px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: center; gap: 0.75rem;
+    font-size: 0.85rem; color: var(--muted);
+}}
+.sync-btn {{
+    background: var(--accent); color: #fff; border: none;
+    border-radius: var(--radius-sm); padding: 0.5rem 1.25rem;
+    cursor: pointer; font-size: 0.85rem; font-weight: 500;
+    transition: opacity 0.15s;
+}}
+.sync-btn:hover {{ opacity: 0.85; }}
+.sync-btn.secondary {{
+    background: transparent; color: var(--muted); border: 1px solid var(--card-border);
+}}
+.sync-btn.secondary:hover {{ background: var(--card-border); }}
+.count {{ font-weight: 600; color: var(--fg); }}
+
+/* Footer */
+.footer {{
+    margin-top: 3rem; padding-top: 1.5rem;
+    border-top: 1px solid var(--card-border);
+    font-size: 0.78rem; color: var(--muted-light); text-align: center;
+}}
+.footer a {{ color: var(--muted-light); text-decoration: none; }}
+.footer a:hover {{ color: var(--accent); }}
+
+@media (max-width: 480px) {{
+    .stats {{ grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }}
+    .stat-card {{ padding: 0.75rem 0.5rem; }}
+    .stat-num {{ font-size: 1.5rem; }}
+    .container {{ padding: 1.25rem 1rem 6rem; }}
+}}
 </style>
 </head>
 <body>
-<h1>PhD Radar</h1>
-<p class="subtitle">Last updated: {today} · Profile: {PROFILE_SUMMARY}</p>
+<div class="container">
+
+<div class="header">
+    <h1>PhD <span>Radar</span></h1>
+    <div class="updated">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        Last updated: {updated_str}
+    </div>
+</div>
 
 <div class="stats">
-    <div class="stat"><div class="stat-num">{len(scored)}</div><div class="stat-label">Scanned</div></div>
-    <div class="stat"><div class="stat-num" style="color:#d32f2f">{len(apply_list)}</div><div class="stat-label">Strong</div></div>
-    <div class="stat"><div class="stat-num" style="color:#f57c00">{len(investigate_list)}</div><div class="stat-label">Investigate</div></div>
+    <div class="stat-card">
+        <div class="stat-num">{len(scored)}</div>
+        <div class="stat-label">Total</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-num strong">{len(apply_list)}</div>
+        <div class="stat-label">Strong</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-num investigate">{len(investigate_list)}</div>
+        <div class="stat-label">Investigate</div>
+    </div>
 </div>
 
 {cards_html}
 
 <div id="sync-bar">
-    <span class="count" id="dismiss-count">0</span> dismissed this session ·
-    <button onclick="syncDismissals()">Save to GitHub</button>
-    <button class="secondary" onclick="undoAll()">Undo all</button>
+    <div class="inner">
+        <span><span class="count" id="dismiss-count">0</span> dismissed</span>
+        <button class="sync-btn" onclick="syncDismissals()">Save to GitHub</button>
+        <button class="sync-btn secondary" onclick="undoAll()">Undo</button>
+    </div>
 </div>
 
-<footer style="margin-top:3rem;padding-bottom:4rem;color:var(--muted);font-size:0.8rem;">
-Source: <a href="https://www.academictransfer.com" style="color:var(--muted)">AcademicTransfer</a>
-· Generated by <a href="https://github.com" style="color:var(--muted)">PhD Explorer</a>
-</footer>
+<div class="footer">
+    Source: <a href="https://www.academictransfer.com">AcademicTransfer</a> · Updates every 3 days
+</div>
+
+</div>
 
 <script>
-// Already-dismissed IDs (from data/dismissed.json, baked in at build time)
 const serverDismissed = new Set({dismissed_json});
-
-// Session dismissals (not yet saved to GitHub)
 let sessionDismissed = new Set();
 
-// On load: hide any cards dismissed in localStorage (from a previous unsaved session)
 const stored = JSON.parse(localStorage.getItem('phd_dismissed') || '[]');
 stored.forEach(id => {{
     const card = document.querySelector(`.card[data-id="${{id}}"]`);
@@ -428,27 +589,19 @@ function updateBar() {{
 }}
 
 async function syncDismissals() {{
-    // Merge server + session dismissed IDs
     const all = [...new Set([...serverDismissed, ...sessionDismissed])].sort();
     const content = JSON.stringify(all, null, 2);
-
-    // Try GitHub API if token is configured
     let token = localStorage.getItem('phd_github_token');
     let repo = localStorage.getItem('phd_github_repo');
 
     if (!token || !repo) {{
-        // First time: ask for config
         const setup = prompt(
-            'To save dismissals to GitHub, enter: owner/repo,your_personal_access_token\\n' +
-            '(The token needs "contents" write permission.\\n' +
-            'This is stored in your browser only — never sent anywhere else.)\\n\\n' +
-            'Or press Cancel to copy the JSON to clipboard instead.'
+            'To save dismissals, enter: owner/repo,your_personal_access_token\\n' +
+            '(Token needs "contents" write permission. Stored in your browser only.)\\n\\n' +
+            'Or press Cancel to copy JSON to clipboard.'
         );
         if (!setup) {{
-            // Fallback: copy to clipboard
-            navigator.clipboard.writeText(content).then(() => {{
-                alert('Copied! Paste this into data/dismissed.json in your repo.');
-            }});
+            navigator.clipboard.writeText(content).then(() => alert('Copied! Paste into data/dismissed.json.'));
             return;
         }}
         const parts = setup.split(',');
@@ -460,53 +613,33 @@ async function syncDismissals() {{
     }}
 
     try {{
-        // Get current file SHA (needed for updates)
         const getResp = await fetch(
             `https://api.github.com/repos/${{repo}}/contents/data/dismissed.json`,
             {{ headers: {{ 'Authorization': `Bearer ${{token}}` }} }}
         );
         let sha = null;
-        if (getResp.ok) {{
-            const data = await getResp.json();
-            sha = data.sha;
-        }}
+        if (getResp.ok) {{ sha = (await getResp.json()).sha; }}
 
-        // Write file
-        const body = {{
-            message: `Dismiss ${{sessionDismissed.size}} vacancies`,
-            content: btoa(content),
-        }};
+        const body = {{ message: `Dismiss ${{sessionDismissed.size}} vacancies`, content: btoa(content) }};
         if (sha) body.sha = sha;
 
         const putResp = await fetch(
             `https://api.github.com/repos/${{repo}}/contents/data/dismissed.json`,
-            {{
-                method: 'PUT',
-                headers: {{
-                    'Authorization': `Bearer ${{token}}`,
-                    'Content-Type': 'application/json',
-                }},
-                body: JSON.stringify(body),
-            }}
+            {{ method: 'PUT', headers: {{ 'Authorization': `Bearer ${{token}}`, 'Content-Type': 'application/json' }}, body: JSON.stringify(body) }}
         );
 
         if (putResp.ok) {{
             localStorage.removeItem('phd_dismissed');
             sessionDismissed.clear();
             updateBar();
-            alert('✓ Saved to GitHub! Dismissed vacancies will be hidden on the next build.');
+            alert('Saved! Dismissed vacancies will be hidden on the next build.');
         }} else {{
-            const err = await putResp.json();
-            throw new Error(err.message || putResp.statusText);
+            throw new Error((await putResp.json()).message || putResp.statusText);
         }}
     }} catch (e) {{
-        // If GitHub fails, fall back to clipboard
-        if (confirm(`GitHub save failed: ${{e.message}}\\n\\nCopy JSON to clipboard instead?`)) {{
-            navigator.clipboard.writeText(content).then(() => {{
-                alert('Copied! Paste into data/dismissed.json in your repo.');
-            }});
+        if (confirm(`Save failed: ${{e.message}}\\n\\nCopy JSON to clipboard instead?`)) {{
+            navigator.clipboard.writeText(content).then(() => alert('Copied!'));
         }}
-        // Clear stored credentials if auth failed
         if (e.message.includes('Bad credentials')) {{
             localStorage.removeItem('phd_github_token');
             localStorage.removeItem('phd_github_repo');
