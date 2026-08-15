@@ -142,7 +142,7 @@ body {
 
 <div class="header">
     <h1>PhD Radar</h1>
-    <div class="updated">Last scraped 15 August 2026, 14:19</div>
+    <div class="updated">Last scraped 15 August 2026, 16:24</div>
 </div>
 
 <div class="stats">
@@ -574,7 +574,7 @@ body {
 document.querySelectorAll('.countdown').forEach(el => {
     const raw = el.dataset.deadline;
     if (!raw) return;
-    const normalized = raw.replace(/'(\d{2})/, '20$1');
+    const normalized = raw.replace(/['‘’](\d{2})/, '20$1');
     const deadline = new Date(normalized);
     if (isNaN(deadline)) return;
     const now = new Date();

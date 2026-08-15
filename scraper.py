@@ -501,7 +501,7 @@ body {{
 document.querySelectorAll('.countdown').forEach(el => {{
     const raw = el.dataset.deadline;
     if (!raw) return;
-    const normalized = raw.replace(/'(\d{{2}})/, '20$1');
+    const normalized = raw.replace(/['‘’](\\d{{2}})/, '20$1');
     const deadline = new Date(normalized);
     if (isNaN(deadline)) return;
     const now = new Date();
