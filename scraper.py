@@ -34,7 +34,7 @@ SITEMAP_URL = "https://www.academictransfer.com/sitemap-vacancies.xml"
 CRAWL_DELAY = int(__import__('os').environ.get('CRAWL_DELAY', '10'))  # seconds, per robots.txt
 
 HEADERS = {
-    "User-Agent": "Claude-User (PhD opportunity research tool)",
+    "User-Agent": "PhD-Explorer/1.0 (academic opportunity research tool)",
     "Accept": "text/html,application/xhtml+xml",
     "Accept-Language": "en-US,en;q=0.9,nl;q=0.8",
 }
