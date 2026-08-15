@@ -32,3 +32,12 @@ jobs:
           git add data/ docs/
           git diff --cached --quiet || git commit -m "📡 PhD Radar update $(date -u +%Y-%m-%d)"
           git push
+
+      - name: Deploy to Hostinger via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: 212.1.208.34
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./docs/
+          server-dir: /domains/muhammadimran.com/public_html/phd-explorer/
