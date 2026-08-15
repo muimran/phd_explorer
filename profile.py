@@ -66,6 +66,11 @@ JOURNALISM_ADJACENT = [
     "public value", "public values",
     "digital sovereignty", "digital inclusion",
     "data justice", "open government data",
+    # Security, law & society
+    "rule of law", "extremism", "radicalization", "radicalisation",
+    "violent extremism", "terrorism", "counterterrorism",
+    "human rights", "civil liberties", "social justice",
+    "public safety", "security studies", "criminology",
 ]
 
 YOUR_SKILLS = [
