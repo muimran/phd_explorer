@@ -227,15 +227,21 @@ def score_vacancy(vacancy: dict) -> dict:
     if not has_journalism and score > 0:
         score = score // 2
 
-    # Engineering penalty: if research field is "Engineering", these are
-    # typically hardcore science/civil/mechanical PhDs that happen to mention
-    # Python or data science. Kill the score UNLESS our core keywords appear
-    # in the title (meaning the position is genuinely about our field).
+    # Engineering filter: if the ONLY research field is "Engineering", these
+    # are typically hardcore science/civil/mechanical PhDs that happen to
+    # mention Python or data science. Kill the score UNLESS our keywords
+    # appear in the title (meaning the position is genuinely about our field).
+    # If the field lists Engineering + something else (e.g. "Engineering;
+    # Social Sciences"), keep it — the other field signals relevance.
     fields = vacancy.get("research_fields", "").lower()
     if "engineering" in fields:
-        has_title_match = bool(term_in_title - {p for p in REGEX_SKILLS})  # ignore regex skill matches
-        if not has_title_match:
-            score = 0
+        # Check if engineering is the ONLY field (strip out "engineering" and see what's left)
+        other_fields = fields.replace("engineering", "").strip("; ,")
+        if not other_fields:
+            # Pure engineering — only keep if title has our keywords
+            has_title_match = bool(term_in_title - {p for p in REGEX_SKILLS})
+            if not has_title_match:
+                score = 0
 
     # Recommendation bucket
     if score >= 50:
