@@ -19,7 +19,7 @@ JOURNALISM_MEDIA = [
     "political communication", "media communication",
     "public interest media", "the press", "broadcasting",
     "journalistic", "journalism studies",
-    "news recommendation", "news algorithms",
+    "news recommendation", "news algorithms", "news analysis",
     "computational communication",
 ]
 
