@@ -122,6 +122,22 @@ def scrape_vacancy(url: str) -> dict | None:
         if dd:
             metadata[dt.get_text(strip=True).lower().rstrip(":")] = dd.get_text(strip=True)
 
+    # Deadline — extract from the "Deadline..." span on AcademicTransfer pages
+    deadline = metadata.get("deadline", metadata.get("closing date", ""))
+    for span in soup.find_all("span"):
+        t = span.get_text(strip=True)
+        if t.startswith("Deadline"):
+            deadline = t.replace("Deadline", "").strip()
+            break
+
+    # Days remaining — extract from "X days remaining" element
+    days_remaining = ""
+    for div in soup.find_all("div", class_="whitespace-nowrap"):
+        t = div.get_text(strip=True)
+        if "remaining" in t.lower():
+            days_remaining = t
+            break
+
     return {
         "id": extract_id(url),
         "url": url,
@@ -129,7 +145,8 @@ def scrape_vacancy(url: str) -> dict | None:
         "employer": employer,
         "department": metadata.get("department", metadata.get("faculty", "")),
         "location": metadata.get("location", metadata.get("city", "")),
-        "deadline": metadata.get("deadline", metadata.get("closing date", "")),
+        "deadline": deadline,
+        "days_remaining": days_remaining,
         "description": description[:8000],
         "metadata": metadata,
         "scraped_at": datetime.now().isoformat(),
@@ -261,7 +278,7 @@ def generate_site(scored: list[dict]):
 
         deadline_html = ""
         if v.get("deadline"):
-            deadline_html = f' · {v["deadline"]}'
+            deadline_html = f' · <span class="deadline-date" data-deadline="{v["deadline"]}">{v["deadline"]}</span>'
 
         employer_html = ""
         if v.get("employer"):
@@ -466,6 +483,34 @@ body {{
 </div>
 
 <script>
+// Calculate days remaining for each deadline
+document.querySelectorAll('.deadline-date').forEach(el => {{
+    const raw = el.dataset.deadline;  // e.g. "22 Aug '26" or "22 Aug 2026"
+    if (!raw) return;
+    // Parse: "22 Aug '26" → "22 Aug 2026"
+    const normalized = raw.replace(/'(\d{{2}})/, '20$1');
+    const deadline = new Date(normalized);
+    if (isNaN(deadline)) return;
+    const now = new Date();
+    now.setHours(0,0,0,0);
+    deadline.setHours(0,0,0,0);
+    const diff = Math.ceil((deadline - now) / (1000 * 60 * 60 * 24));
+    if (diff < 0) {{
+        el.textContent = 'Expired';
+        el.style.color = '#999';
+    }} else if (diff === 0) {{
+        el.textContent = 'Today!';
+        el.style.color = 'var(--accent)';
+        el.style.fontWeight = '600';
+    }} else if (diff <= 7) {{
+        el.textContent = diff + (diff === 1 ? ' day left' : ' days left');
+        el.style.color = 'var(--accent)';
+        el.style.fontWeight = '600';
+    }} else {{
+        el.textContent = diff + ' days left · ' + raw;
+    }}
+}});
+
 const serverDismissed = new Set({dismissed_json});
 let sessionDismissed = new Set();
 
