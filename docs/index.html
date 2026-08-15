@@ -65,10 +65,17 @@ body {
 .card:last-child { border-bottom: none; }
 .card.dismissed { opacity: 0; height: 0; overflow: hidden; padding: 0; border: none; }
 .card-top { display: flex; align-items: flex-start; gap: 1rem; }
+.score-col {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 0.2rem; min-width: 36px; padding-top: 0.15rem;
+}
 .score {
     font-size: 0.8rem; font-weight: 600; color: var(--accent);
-    min-width: 28px; text-align: center;
-    padding-top: 0.15rem;
+    text-align: center;
+}
+.llm-score {
+    font-size: 0.65rem; color: var(--muted); white-space: nowrap;
+    cursor: default;
 }
 .card-body { flex: 1; min-width: 0; }
 .card h3 { font-size: 0.95rem; font-weight: 500; line-height: 1.4; margin-bottom: 0.2rem; }
@@ -142,7 +149,7 @@ body {
 
 <div class="header">
     <h1>PhD Radar</h1>
-    <div class="updated">Last scraped 15 August 2026, 15:56</div>
+    <div class="updated">Last scraped 15 August 2026, 16:13</div>
 </div>
 
 <div class="stats">
@@ -164,7 +171,10 @@ body {
 
         <div class="card" data-id="362433">
             <div class="card-top">
-                <div class="score">29</div>
+                <div class="score-col">
+                    <div class="score">29</div>
+                    
+                </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/362433/phd-position-negotiating-democracy-in-amsterdam/" target="_blank" rel="noopener">PhD Position Negotiating Democracy in Amsterdam</a></h3>
                     <div class="meta">University of Amsterdam (UvA)</div>
@@ -179,7 +189,10 @@ body {
         </div>
         <div class="card" data-id="362930">
             <div class="card-top">
-                <div class="score">29</div>
+                <div class="score-col">
+                    <div class="score">29</div>
+                    
+                </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/362930/phd-a-multimodal-analysis-of-emotion-narrative-and-migration-politics-online/" target="_blank" rel="noopener">PhD: A Multimodal Analysis of Emotion, Narrative, and Migration Politics Online</a></h3>
                     <div class="meta">Utrecht University</div>
@@ -194,7 +207,10 @@ body {
         </div>
         <div class="card" data-id="362431">
             <div class="card-top">
-                <div class="score">25</div>
+                <div class="score-col">
+                    <div class="score">25</div>
+                    
+                </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/362431/phd-position-the-rule-of-law-from-below/" target="_blank" rel="noopener">PhD Position The Rule of Law from Below</a></h3>
                     <div class="meta">University of Amsterdam (UvA)</div>
@@ -209,7 +225,10 @@ body {
         </div>
         <div class="card" data-id="362726">
             <div class="card-top">
-                <div class="score">24</div>
+                <div class="score-col">
+                    <div class="score">24</div>
+                    
+                </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/362726/phd-student-4-years-on-nihilistic-violent-extremist-groups/" target="_blank" rel="noopener">PhD student (4 years) on Nihilistic Violent Extremist Groups</a></h3>
                     <div class="meta">Vrije Universiteit Amsterdam (VU)</div>
@@ -224,7 +243,10 @@ body {
         </div>
         <div class="card" data-id="362819">
             <div class="card-top">
-                <div class="score">23</div>
+                <div class="score-col">
+                    <div class="score">23</div>
+                    
+                </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/362819/phd-computational-semantic-representations-a-multilingual-language-change-study/" target="_blank" rel="noopener">PhD Computational Semantic Representations: a Multilingual Language-Change Study</a></h3>
                     <div class="meta">Utrecht University</div>
@@ -239,7 +261,10 @@ body {
         </div>
         <div class="card" data-id="362200">
             <div class="card-top">
-                <div class="score">21</div>
+                <div class="score-col">
+                    <div class="score">21</div>
+                    
+                </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/362200/phd-media-and-democracy-in-the-1970s/" target="_blank" rel="noopener">PhD Media and Democracy in the 1970s</a></h3>
                     <div class="meta">Utrecht University</div>
@@ -254,7 +279,10 @@ body {
         </div>
         <div class="card" data-id="363228">
             <div class="card-top">
-                <div class="score">21</div>
+                <div class="score-col">
+                    <div class="score">21</div>
+                    
+                </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/363228/phd-position-on-restoring-communicative-agency-human-centered-ai-smart-glasses-for-people-with-speech-impairments/" target="_blank" rel="noopener">PhD position on ‘Restoring Communicative Agency: Human-centered AI smart glasses for people with speech impairments’</a></h3>
                     <div class="meta">The Open Universiteit (OU)</div>
@@ -269,7 +297,10 @@ body {
         </div>
         <div class="card" data-id="362430">
             <div class="card-top">
-                <div class="score">20</div>
+                <div class="score-col">
+                    <div class="score">20</div>
+                    
+                </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/362430/phd-position-local-democracy-and-underrepresented-communities-in-amsterdam/" target="_blank" rel="noopener">PhD Position Local Democracy and Underrepresented Communities in Amsterdam</a></h3>
                     <div class="meta">University of Amsterdam (UvA)</div>
@@ -284,7 +315,10 @@ body {
         </div>
         <div class="card" data-id="362666">
             <div class="card-top">
-                <div class="score">20</div>
+                <div class="score-col">
+                    <div class="score">20</div>
+                    
+                </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/362666/phd-fellow-governance-of-cybercrime/" target="_blank" rel="noopener">PhD Fellow Governance of Cybercrime</a></h3>
                     <div class="meta">Leiden University</div>
@@ -299,7 +333,10 @@ body {
         </div>
         <div class="card" data-id="362817">
             <div class="card-top">
-                <div class="score">17</div>
+                <div class="score-col">
+                    <div class="score">17</div>
+                    
+                </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/362817/phd-in-resilient-machine-learning-and-formal-methods/" target="_blank" rel="noopener">PhD in Resilient Machine Learning and Formal Methods</a></h3>
                     <div class="meta">Eindhoven University of Technology (TU/e)</div>
@@ -314,7 +351,10 @@ body {
         </div>
         <div class="card" data-id="362349">
             <div class="card-top">
-                <div class="score">15</div>
+                <div class="score-col">
+                    <div class="score">15</div>
+                    
+                </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/362349/phd-position-on-protest-and-political-speech-in-the-nordics-1930-1970/" target="_blank" rel="noopener">PhD position on protest and political speech in the Nordics, 1930-1970</a></h3>
                     <div class="meta">University of Amsterdam (UvA)</div>
@@ -329,7 +369,10 @@ body {
         </div>
         <div class="card" data-id="362253">
             <div class="card-top">
-                <div class="score">13</div>
+                <div class="score-col">
+                    <div class="score">13</div>
+                    
+                </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/362253/phd-candidate-in-mechanism-informed-world-models-and-agents/" target="_blank" rel="noopener">PhD Candidate in Mechanism-Informed World Models and Agents</a></h3>
                     <div class="meta">University of Amsterdam (UvA)</div>
@@ -344,7 +387,10 @@ body {
         </div>
         <div class="card" data-id="362632">
             <div class="card-top">
-                <div class="score">13</div>
+                <div class="score-col">
+                    <div class="score">13</div>
+                    
+                </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/362632/phd-in-multi-aperture-ultrasound-imaging-for-abdominal-aortic-aneurysm/" target="_blank" rel="noopener">PhD in Multi-Aperture Ultrasound Imaging for Abdominal Aortic Aneurysm</a></h3>
                     <div class="meta">Eindhoven University of Technology (TU/e)</div>
@@ -359,7 +405,10 @@ body {
         </div>
         <div class="card" data-id="363267">
             <div class="card-top">
-                <div class="score">13</div>
+                <div class="score-col">
+                    <div class="score">13</div>
+                    
+                </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/363267/phd-in-computational-imaging-for-high-throughput-applications-10-fte/" target="_blank" rel="noopener">PhD in Computational Imaging for High-Throughput Applications (1.0 fte)</a></h3>
                     <div class="meta">Leiden University</div>
@@ -374,7 +423,10 @@ body {
         </div>
         <div class="card" data-id="362999">
             <div class="card-top">
-                <div class="score">12</div>
+                <div class="score-col">
+                    <div class="score">12</div>
+                    
+                </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/362999/phd-position-cognitive-guidance-in-xr-to-improve-independent-mobility-for-people-with-disabilities/" target="_blank" rel="noopener">PhD Position Cognitive Guidance in XR to Improve Independent Mobility for People with Disabilities</a></h3>
                     <div class="meta">Delft University of Technology (TU Delft)</div>
@@ -389,7 +441,10 @@ body {
         </div>
         <div class="card" data-id="362432">
             <div class="card-top">
-                <div class="score">9</div>
+                <div class="score-col">
+                    <div class="score">9</div>
+                    
+                </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/362432/phd-position-strategising-for-the-green-transition-in-amsterdam/" target="_blank" rel="noopener">PhD Position Strategising for the Green Transition in Amsterdam</a></h3>
                     <div class="meta">University of Amsterdam (UvA)</div>
@@ -404,7 +459,10 @@ body {
         </div>
         <div class="card" data-id="362880">
             <div class="card-top">
-                <div class="score">9</div>
+                <div class="score-col">
+                    <div class="score">9</div>
+                    
+                </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/362880/phd-position-on-critical-approaches-to-designing-for-belonging/" target="_blank" rel="noopener">PhD position on Critical approaches to Designing for Belonging</a></h3>
                     <div class="meta">University of Twente (UT)</div>
@@ -419,7 +477,10 @@ body {
         </div>
         <div class="card" data-id="363178">
             <div class="card-top">
-                <div class="score">9</div>
+                <div class="score-col">
+                    <div class="score">9</div>
+                    
+                </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/363178/msca-dn-phd-position-brain-large-axial-field-of-view-petct/" target="_blank" rel="noopener">MSCA-DN PhD position: brain large axial field of view PET/CT</a></h3>
                     <div class="meta">Amsterdam UMC</div>
@@ -434,7 +495,10 @@ body {
         </div>
         <div class="card" data-id="362956">
             <div class="card-top">
-                <div class="score">7</div>
+                <div class="score-col">
+                    <div class="score">7</div>
+                    
+                </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/362956/phd-in-optimization-of-sustainable-agri-food-supply-chains-under-climate-risk/" target="_blank" rel="noopener">PhD in Optimization of Sustainable Agri-Food Supply Chains under Climate Risk</a></h3>
                     <div class="meta">Wageningen University & Research</div>
@@ -449,7 +513,10 @@ body {
         </div>
         <div class="card" data-id="361419">
             <div class="card-top">
-                <div class="score">5</div>
+                <div class="score-col">
+                    <div class="score">5</div>
+                    
+                </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/361419/phd-position-in-moral-philosophy-conceptual-engineering-and-ethics-of-emerging-technologies/" target="_blank" rel="noopener">PhD position in Moral Philosophy, Conceptual Engineering, and Ethics of Emerging Technologies</a></h3>
                     <div class="meta">University of Groningen</div>
@@ -464,7 +531,10 @@ body {
         </div>
         <div class="card" data-id="362385">
             <div class="card-top">
-                <div class="score">5</div>
+                <div class="score-col">
+                    <div class="score">5</div>
+                    
+                </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/362385/phd-candidate-donor-protect/" target="_blank" rel="noopener">PhD Candidate: DONOR-PROTECT</a></h3>
                     <div class="meta">Sanquin Blood Supply Foundation (Sanquin)</div>
@@ -479,7 +549,10 @@ body {
         </div>
         <div class="card" data-id="363283">
             <div class="card-top">
-                <div class="score">5</div>
+                <div class="score-col">
+                    <div class="score">5</div>
+                    
+                </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/363283/phd-in-global-talent-mobility-and-europes-strategic-autonomy/" target="_blank" rel="noopener">PhD in Global Talent Mobility and Europe’s Strategic Autonomy</a></h3>
                     <div class="meta">Utrecht University</div>
