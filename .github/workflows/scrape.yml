@@ -28,13 +28,13 @@ jobs:
           CRAWL_DELAY: "5"
 
       - name: Run LLM scorer
-        if: ${{ secrets.GEMINI_API_KEY != '' }}
+        continue-on-error: true
         run: python llm_scorer.py
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
       - name: Rebuild site with LLM scores
-        if: ${{ secrets.GEMINI_API_KEY != '' }}
+        continue-on-error: true
         run: python scraper.py --rebuild
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}

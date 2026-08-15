@@ -119,7 +119,8 @@ def main():
     args = parser.parse_args()
 
     if not API_KEY:
-        raise SystemExit("GEMINI_API_KEY environment variable not set.")
+        print("GEMINI_API_KEY not set — skipping LLM scoring.")
+        return
 
     if not VACANCIES_FILE.exists():
         raise SystemExit(f"No vacancies file at {VACANCIES_FILE}")
