@@ -138,6 +138,17 @@ def scrape_vacancy(url: str) -> dict | None:
             days_remaining = t
             break
 
+    # Research fields — extract from "Research fields" label
+    research_fields = ""
+    for p in soup.find_all("p"):
+        if p.get_text(strip=True) == "Research fields":
+            nxt = p.find_next_sibling()
+            if nxt:
+                research_fields = nxt.get_text(strip=True)
+            else:
+                research_fields = p.parent.get_text(strip=True).replace("Research fields", "").strip()
+            break
+
     return {
         "id": extract_id(url),
         "url": url,
@@ -147,6 +158,7 @@ def scrape_vacancy(url: str) -> dict | None:
         "location": metadata.get("location", metadata.get("city", "")),
         "deadline": deadline,
         "days_remaining": days_remaining,
+        "research_fields": research_fields,
         "description": description[:8000],
         "metadata": metadata,
         "scraped_at": datetime.now().isoformat(),
@@ -214,6 +226,16 @@ def score_vacancy(vacancy: dict) -> dict:
     has_journalism = bool(matches["journalism_media"])
     if not has_journalism and score > 0:
         score = score // 2
+
+    # Engineering penalty: if research field is "Engineering", these are
+    # typically hardcore science/civil/mechanical PhDs that happen to mention
+    # Python or data science. Kill the score UNLESS our core keywords appear
+    # in the title (meaning the position is genuinely about our field).
+    fields = vacancy.get("research_fields", "").lower()
+    if "engineering" in fields:
+        has_title_match = bool(term_in_title - {p for p in REGEX_SKILLS})  # ignore regex skill matches
+        if not has_title_match:
+            score = 0
 
     # Recommendation bucket
     if score >= 50:

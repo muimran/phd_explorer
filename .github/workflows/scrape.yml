@@ -24,6 +24,8 @@ jobs:
 
       - name: Run scraper
         run: python scraper.py
+        env:
+          CRAWL_DELAY: "3"
 
       - name: Commit results
         run: |
