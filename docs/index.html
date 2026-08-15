@@ -73,12 +73,9 @@ body {
     font-size: 0.8rem; font-weight: 600; color: var(--accent);
     text-align: center;
 }
-.llm-scores {
-    display: flex; gap: 0.25rem; justify-content: center;
-}
-.llm-badge {
+.kw-score {
     font-size: 0.6rem; color: var(--muted); white-space: nowrap;
-    cursor: default;
+    text-align: center;
 }
 .card-body { flex: 1; min-width: 0; }
 .card h3 { font-size: 0.95rem; font-weight: 500; line-height: 1.4; margin-bottom: 0.2rem; }
@@ -152,7 +149,7 @@ body {
 
 <div class="header">
     <h1>PhD Radar</h1>
-    <div class="updated">Last scraped 15 August 2026, 18:19</div>
+    <div class="updated">Last scraped 15 August 2026, 20:41</div>
 </div>
 
 <div class="stats">
@@ -161,40 +158,21 @@ body {
         <div class="stat-label">Total</div>
     </div>
     <div class="stat">
-        <div class="stat-num accent">0</div>
+        <div class="stat-num accent">4</div>
         <div class="stat-label">Strong</div>
     </div>
     <div class="stat">
-        <div class="stat-num">22</div>
+        <div class="stat-num">6</div>
         <div class="stat-label">Investigate</div>
     </div>
 </div>
 
-<div class="section-header"><h2>Worth investigating</h2><span class="section-count">22</span></div>
+<div class="section-header"><h2>Strong matches</h2><span class="section-count">4</span></div>
 
-        <div class="card" data-id="362433">
-            <div class="card-top">
-                <div class="score-col">
-                    <div class="score">29</div>
-                    <div class="llm-scores"><span class="llm-badge" title="The vacancy is related to social sciences and involves analysis of social media and civil society, but it requires qualitative interpretive research methods and a background in political science or sociology, which is not the candidate's primary expertise.">L 40</span></div>
-                </div>
-                <div class="card-body">
-                    <h3><a href="https://www.academictransfer.com/en/jobs/362433/phd-position-negotiating-democracy-in-amsterdam/" target="_blank" rel="noopener">PhD Position Negotiating Democracy in Amsterdam</a></h3>
-                    <div class="meta">University of Amsterdam (UvA)</div>
-                    <div class="tags">Tech & Data · Adjacent</div>
-                    <div class="terms">democracy, democratic, governance, social media analysis</div>
-                </div>
-                <div class="card-right">
-                    <div class="countdown" data-deadline="1 Sep ’26" title="1 Sep ’26"></div>
-                    <button class="dismiss-btn" onclick="dismiss('362433')" title="Not relevant">✕</button>
-                </div>
-            </div>
-        </div>
         <div class="card" data-id="362930">
             <div class="card-top">
                 <div class="score-col">
-                    <div class="score">29</div>
-                    <div class="llm-scores"><span class="llm-badge" title="The vacancy is an excellent fit because it involves computational social science, data science, and the analysis of online narratives, all of which align with the candidate's skills and interests in data journalism, computational journalism, and digital methods.">L 80</span></div>
+                    <div class="score" title="The vacancy is an excellent fit because it involves computational social science, data science, and the analysis of online narratives, all of which align with the candidate's skills and interests in data journalism, computational journalism, and digital methods.">80</div><div class="kw-score" title="Keyword score">kw 29</div>
                 </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/362930/phd-a-multimodal-analysis-of-emotion-narrative-and-migration-politics-online/" target="_blank" rel="noopener">PhD: A Multimodal Analysis of Emotion, Narrative, and Migration Politics Online</a></h3>
@@ -208,47 +186,10 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="362431">
-            <div class="card-top">
-                <div class="score-col">
-                    <div class="score">25</div>
-                    <div class="llm-scores"><span class="llm-badge" title="The vacancy is a good fit for the candidate's interest in human rights and social justice, but it lacks a strong computational or data-driven component, which is a core part of the candidate's skills and interests.">L 40</span></div>
-                </div>
-                <div class="card-body">
-                    <h3><a href="https://www.academictransfer.com/en/jobs/362431/phd-position-the-rule-of-law-from-below/" target="_blank" rel="noopener">PhD Position The Rule of Law from Below</a></h3>
-                    <div class="meta">University of Amsterdam (UvA)</div>
-                    <div class="tags">Adjacent</div>
-                    <div class="terms">human rights, rule of law, social justice</div>
-                </div>
-                <div class="card-right">
-                    <div class="countdown" data-deadline="1 Sep ’26" title="1 Sep ’26"></div>
-                    <button class="dismiss-btn" onclick="dismiss('362431')" title="Not relevant">✕</button>
-                </div>
-            </div>
-        </div>
-        <div class="card" data-id="362726">
-            <div class="card-top">
-                <div class="score-col">
-                    <div class="score">24</div>
-                    <div class="llm-scores"><span class="llm-badge" title="The vacancy is a good fit because it involves applying data science techniques to a security/society topic, specifically extremist groups, which aligns with the candidate's interests, but it requires a background in criminology, psychology, or data science, which is not a perfect match for the candidate's profile.">L 70</span></div>
-                </div>
-                <div class="card-body">
-                    <h3><a href="https://www.academictransfer.com/en/jobs/362726/phd-student-4-years-on-nihilistic-violent-extremist-groups/" target="_blank" rel="noopener">PhD student (4 years) on Nihilistic Violent Extremist Groups</a></h3>
-                    <div class="meta">Vrije Universiteit Amsterdam (VU)</div>
-                    <div class="tags">Tech & Data · Adjacent</div>
-                    <div class="terms">criminology, data science, extremism, radicalization, terrorism</div>
-                </div>
-                <div class="card-right">
-                    <div class="countdown" data-deadline="24 Aug ’26" title="24 Aug ’26"></div>
-                    <button class="dismiss-btn" onclick="dismiss('362726')" title="Not relevant">✕</button>
-                </div>
-            </div>
-        </div>
         <div class="card" data-id="362819">
             <div class="card-top">
                 <div class="score-col">
-                    <div class="score">23</div>
-                    <div class="llm-scores"><span class="llm-badge" title="The vacancy is an excellent fit because it involves applying NLP and computational models to language data, which aligns with the candidate's skills and interests in data journalism, computational social science, and digital methods.">L 80</span></div>
+                    <div class="score" title="The vacancy is an excellent fit because it involves applying NLP and computational models to language data, which aligns with the candidate's skills and interests in data journalism, computational social science, and digital methods.">80</div><div class="kw-score" title="Keyword score">kw 23</div>
                 </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/362819/phd-computational-semantic-representations-a-multilingual-language-change-study/" target="_blank" rel="noopener">PhD Computational Semantic Representations: a Multilingual Language-Change Study</a></h3>
@@ -262,29 +203,79 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="362200">
+        <div class="card" data-id="362726">
             <div class="card-top">
                 <div class="score-col">
-                    <div class="score">21</div>
-                    <div class="llm-scores"><span class="llm-badge" title="While the topic of media governance is relevant, the position requires traditional historical research methods and archival work rather than the computational and data-driven approach the candidate specializes in.">G 30</span> <span class="llm-badge" title="The vacancy is only superficially related to the candidate's interests through the mention of media, but it is primarily a history-focused position that does not align with the candidate's computational and data-driven background.">L 20</span></div>
+                    <div class="score" title="The vacancy is a good fit because it involves applying data science techniques to a security/society topic, specifically extremist groups, which aligns with the candidate's interests, but it requires a background in criminology, psychology, or data science, which is not a perfect match for the candidate's profile.">70</div><div class="kw-score" title="Keyword score">kw 24</div>
                 </div>
                 <div class="card-body">
-                    <h3><a href="https://www.academictransfer.com/en/jobs/362200/phd-media-and-democracy-in-the-1970s/" target="_blank" rel="noopener">PhD Media and Democracy in the 1970s</a></h3>
-                    <div class="meta">Utrecht University</div>
-                    <div class="tags">Adjacent</div>
-                    <div class="terms">\bR\b, democracy, governance</div>
+                    <h3><a href="https://www.academictransfer.com/en/jobs/362726/phd-student-4-years-on-nihilistic-violent-extremist-groups/" target="_blank" rel="noopener">PhD student (4 years) on Nihilistic Violent Extremist Groups</a></h3>
+                    <div class="meta">Vrije Universiteit Amsterdam (VU)</div>
+                    <div class="tags">Tech & Data · Adjacent</div>
+                    <div class="terms">criminology, data science, extremism, radicalization, terrorism</div>
                 </div>
                 <div class="card-right">
-                    <div class="countdown" data-deadline="6 Sep ’26" title="6 Sep ’26"></div>
-                    <button class="dismiss-btn" onclick="dismiss('362200')" title="Not relevant">✕</button>
+                    <div class="countdown" data-deadline="24 Aug ’26" title="24 Aug ’26"></div>
+                    <button class="dismiss-btn" onclick="dismiss('362726')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="362430">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score" title="The vacancy is a good fit because it involves social sciences and political participation, which is related to the candidate's interests in computational social science and public interest technology, although it may require more qualitative methods than the candidate is accustomed to.">60</div><div class="kw-score" title="Keyword score">kw 20</div>
+                </div>
+                <div class="card-body">
+                    <h3><a href="https://www.academictransfer.com/en/jobs/362430/phd-position-local-democracy-and-underrepresented-communities-in-amsterdam/" target="_blank" rel="noopener">PhD Position Local Democracy and Underrepresented Communities in Amsterdam</a></h3>
+                    <div class="meta">University of Amsterdam (UvA)</div>
+                    <div class="tags">Adjacent</div>
+                    <div class="terms">democracy, democratic</div>
+                </div>
+                <div class="card-right">
+                    <div class="countdown" data-deadline="1 Sep ’26" title="1 Sep ’26"></div>
+                    <button class="dismiss-btn" onclick="dismiss('362430')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div><div class="section-header"><h2>Worth investigating</h2><span class="section-count">6</span></div>
+
+        <div class="card" data-id="362433">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score" title="The vacancy is related to social sciences and involves analysis of social media and civil society, but it requires qualitative interpretive research methods and a background in political science or sociology, which is not the candidate's primary expertise.">40</div><div class="kw-score" title="Keyword score">kw 29</div>
+                </div>
+                <div class="card-body">
+                    <h3><a href="https://www.academictransfer.com/en/jobs/362433/phd-position-negotiating-democracy-in-amsterdam/" target="_blank" rel="noopener">PhD Position Negotiating Democracy in Amsterdam</a></h3>
+                    <div class="meta">University of Amsterdam (UvA)</div>
+                    <div class="tags">Tech & Data · Adjacent</div>
+                    <div class="terms">democracy, democratic, governance, social media analysis</div>
+                </div>
+                <div class="card-right">
+                    <div class="countdown" data-deadline="1 Sep ’26" title="1 Sep ’26"></div>
+                    <button class="dismiss-btn" onclick="dismiss('362433')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="362431">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score" title="The vacancy is a good fit for the candidate's interest in human rights and social justice, but it lacks a strong computational or data-driven component, which is a core part of the candidate's skills and interests.">40</div><div class="kw-score" title="Keyword score">kw 25</div>
+                </div>
+                <div class="card-body">
+                    <h3><a href="https://www.academictransfer.com/en/jobs/362431/phd-position-the-rule-of-law-from-below/" target="_blank" rel="noopener">PhD Position The Rule of Law from Below</a></h3>
+                    <div class="meta">University of Amsterdam (UvA)</div>
+                    <div class="tags">Adjacent</div>
+                    <div class="terms">human rights, rule of law, social justice</div>
+                </div>
+                <div class="card-right">
+                    <div class="countdown" data-deadline="1 Sep ’26" title="1 Sep ’26"></div>
+                    <button class="dismiss-btn" onclick="dismiss('362431')" title="Not relevant">✕</button>
                 </div>
             </div>
         </div>
         <div class="card" data-id="363228">
             <div class="card-top">
                 <div class="score-col">
-                    <div class="score">21</div>
-                    <div class="llm-scores"><span class="llm-badge" title="The vacancy has a tangential connection to the candidate's interests in AI and NLP, but its primary focus on computer vision and assistive technology for speech impairments is outside their core research areas.">L 40</span></div>
+                    <div class="score" title="The vacancy has a tangential connection to the candidate's interests in AI and NLP, but its primary focus on computer vision and assistive technology for speech impairments is outside their core research areas.">40</div><div class="kw-score" title="Keyword score">kw 21</div>
                 </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/363228/phd-position-on-restoring-communicative-agency-human-centered-ai-smart-glasses-for-people-with-speech-impairments/" target="_blank" rel="noopener">PhD position on ‘Restoring Communicative Agency: Human-centered AI smart glasses for people with speech impairments’</a></h3>
@@ -298,29 +289,10 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="362430">
-            <div class="card-top">
-                <div class="score-col">
-                    <div class="score">20</div>
-                    <div class="llm-scores"><span class="llm-badge" title="The vacancy is a good fit because it involves social sciences and political participation, which is related to the candidate's interests in computational social science and public interest technology, although it may require more qualitative methods than the candidate is accustomed to.">L 60</span></div>
-                </div>
-                <div class="card-body">
-                    <h3><a href="https://www.academictransfer.com/en/jobs/362430/phd-position-local-democracy-and-underrepresented-communities-in-amsterdam/" target="_blank" rel="noopener">PhD Position Local Democracy and Underrepresented Communities in Amsterdam</a></h3>
-                    <div class="meta">University of Amsterdam (UvA)</div>
-                    <div class="tags">Adjacent</div>
-                    <div class="terms">democracy, democratic</div>
-                </div>
-                <div class="card-right">
-                    <div class="countdown" data-deadline="1 Sep ’26" title="1 Sep ’26"></div>
-                    <button class="dismiss-btn" onclick="dismiss('362430')" title="Not relevant">✕</button>
-                </div>
-            </div>
-        </div>
         <div class="card" data-id="362666">
             <div class="card-top">
                 <div class="score-col">
-                    <div class="score">20</div>
-                    <div class="llm-scores"><span class="llm-badge" title="The vacancy is related to security and society topics, which aligns with the candidate's interests, but it is primarily focused on criminology, which is not a core area of expertise for the candidate.">L 40</span></div>
+                    <div class="score" title="The vacancy is related to security and society topics, which aligns with the candidate's interests, but it is primarily focused on criminology, which is not a core area of expertise for the candidate.">40</div><div class="kw-score" title="Keyword score">kw 20</div>
                 </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/362666/phd-fellow-governance-of-cybercrime/" target="_blank" rel="noopener">PhD Fellow Governance of Cybercrime</a></h3>
@@ -334,11 +306,62 @@ body {
                 </div>
             </div>
         </div>
+        <div class="card" data-id="363283">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score" title="The vacancy has a tangential connection to the candidate's interests through the use of data analysis and large-scale datasets, but it is primarily focused on geography and innovation systems, which is outside the candidate's core research areas.">40</div><div class="kw-score" title="Keyword score">kw 5</div>
+                </div>
+                <div class="card-body">
+                    <h3><a href="https://www.academictransfer.com/en/jobs/363283/phd-in-global-talent-mobility-and-europes-strategic-autonomy/" target="_blank" rel="noopener">PhD in Global Talent Mobility and Europe’s Strategic Autonomy</a></h3>
+                    <div class="meta">Utrecht University</div>
+                    <div class="tags">Tech & Data</div>
+                    <div class="terms">scraping, web scraping</div>
+                </div>
+                <div class="card-right">
+                    <div class="countdown" data-deadline="14 Sep ’26" title="14 Sep ’26"></div>
+                    <button class="dismiss-btn" onclick="dismiss('363283')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="361419">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score" title="The vacancy is a poor fit because it requires a strong background in philosophy, which the candidate lacks, although it touches on AI governance and ethics, which are of interest to the candidate.">30</div><div class="kw-score" title="Keyword score">kw 5</div>
+                </div>
+                <div class="card-body">
+                    <h3><a href="https://www.academictransfer.com/en/jobs/361419/phd-position-in-moral-philosophy-conceptual-engineering-and-ethics-of-emerging-technologies/" target="_blank" rel="noopener">PhD position in Moral Philosophy, Conceptual Engineering, and Ethics of Emerging Technologies</a></h3>
+                    <div class="meta">University of Groningen</div>
+                    <div class="tags">Adjacent</div>
+                    <div class="terms">democratic</div>
+                </div>
+                <div class="card-right">
+                    <div class="countdown" data-deadline="12 Sep ’26" title="12 Sep ’26"></div>
+                    <button class="dismiss-btn" onclick="dismiss('361419')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div><div class="section-header"><h2>Weak matches</h2><span class="section-count">12</span></div>
+
+        <div class="card" data-id="362200">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score" title="The vacancy is only superficially related to the candidate's interests through the mention of media, but it is primarily a history-focused position that does not align with the candidate's computational and data-driven background.">20</div><div class="kw-score" title="Keyword score">kw 21</div>
+                </div>
+                <div class="card-body">
+                    <h3><a href="https://www.academictransfer.com/en/jobs/362200/phd-media-and-democracy-in-the-1970s/" target="_blank" rel="noopener">PhD Media and Democracy in the 1970s</a></h3>
+                    <div class="meta">Utrecht University</div>
+                    <div class="tags">Adjacent</div>
+                    <div class="terms">\bR\b, democracy, governance</div>
+                </div>
+                <div class="card-right">
+                    <div class="countdown" data-deadline="6 Sep ’26" title="6 Sep ’26"></div>
+                    <button class="dismiss-btn" onclick="dismiss('362200')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
         <div class="card" data-id="362817">
             <div class="card-top">
                 <div class="score-col">
-                    <div class="score">17</div>
-                    <div class="llm-scores"><span class="llm-badge" title="The vacancy is focused on machine learning and formal methods in computer science, which has only superficial keyword overlap with the candidate's interests and skills in data journalism, computational social science, and public interest technology.">L 20</span></div>
+                    <div class="score" title="The vacancy is focused on machine learning and formal methods in computer science, which has only superficial keyword overlap with the candidate's interests and skills in data journalism, computational social science, and public interest technology.">20</div><div class="kw-score" title="Keyword score">kw 17</div>
                 </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/362817/phd-in-resilient-machine-learning-and-formal-methods/" target="_blank" rel="noopener">PhD in Resilient Machine Learning and Formal Methods</a></h3>
@@ -355,8 +378,7 @@ body {
         <div class="card" data-id="362349">
             <div class="card-top">
                 <div class="score-col">
-                    <div class="score">15</div>
-                    <div class="llm-scores"><span class="llm-badge" title="The role requires fluency in a Nordic language and focuses on traditional historical archival research (1930-1970), lacking the computational or contemporary data-driven focus of the candidate's profile.">G 20</span> <span class="llm-badge" title="The vacancy is in the field of History, which is not a core research area for the candidate, but has some superficial keyword overlap with their interests in media and politics.">L 20</span></div>
+                    <div class="score" title="The vacancy is in the field of History, which is not a core research area for the candidate, but has some superficial keyword overlap with their interests in media and politics.">20</div><div class="kw-score" title="Keyword score">kw 15</div>
                 </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/362349/phd-position-on-protest-and-political-speech-in-the-nordics-1930-1970/" target="_blank" rel="noopener">PhD position on protest and political speech in the Nordics, 1930-1970</a></h3>
@@ -373,8 +395,7 @@ body {
         <div class="card" data-id="362253">
             <div class="card-top">
                 <div class="score-col">
-                    <div class="score">13</div>
-                    <div class="llm-scores"><span class="llm-badge" title="This is a highly technical AI engineering role focused on robotics and biomedical dynamics, which aligns with the candidate's 'not interested' list and lacks the social or journalistic application they seek.">G 15</span> <span class="llm-badge" title="The vacancy is primarily focused on engineering and computer science, with no clear connection to the candidate's interests in data journalism, computational social science, or public interest technology.">L 20</span></div>
+                    <div class="score" title="The vacancy is primarily focused on engineering and computer science, with no clear connection to the candidate's interests in data journalism, computational social science, or public interest technology.">20</div><div class="kw-score" title="Keyword score">kw 13</div>
                 </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/362253/phd-candidate-in-mechanism-informed-world-models-and-agents/" target="_blank" rel="noopener">PhD Candidate in Mechanism-Informed World Models and Agents</a></h3>
@@ -388,47 +409,10 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="362632">
-            <div class="card-top">
-                <div class="score-col">
-                    <div class="score">13</div>
-                    <div class="llm-scores"><span class="llm-badge" title="The vacancy is in the field of biomedical engineering and medical sciences, which is not relevant to the candidate's background or interests in data journalism, computational social science, and public interest technology.">L 0</span></div>
-                </div>
-                <div class="card-body">
-                    <h3><a href="https://www.academictransfer.com/en/jobs/362632/phd-in-multi-aperture-ultrasound-imaging-for-abdominal-aortic-aneurysm/" target="_blank" rel="noopener">PhD in Multi-Aperture Ultrasound Imaging for Abdominal Aortic Aneurysm</a></h3>
-                    <div class="meta">Eindhoven University of Technology (TU/e)</div>
-                    <div class="tags">Tech & Data</div>
-                    <div class="terms">Python, computer vision, deep learning, machine learning</div>
-                </div>
-                <div class="card-right">
-                    <div class="countdown" data-deadline="14 Sep ’26" title="14 Sep ’26"></div>
-                    <button class="dismiss-btn" onclick="dismiss('362632')" title="Not relevant">✕</button>
-                </div>
-            </div>
-        </div>
-        <div class="card" data-id="363267">
-            <div class="card-top">
-                <div class="score-col">
-                    <div class="score">13</div>
-                    <div class="llm-scores"><span class="llm-badge" title="The vacancy is focused on computational imaging and computer vision, which is a pure engineering and computer science field that does not align with the candidate's interests or skills in data journalism, computational social science, and public interest technology.">L 10</span></div>
-                </div>
-                <div class="card-body">
-                    <h3><a href="https://www.academictransfer.com/en/jobs/363267/phd-in-computational-imaging-for-high-throughput-applications-10-fte/" target="_blank" rel="noopener">PhD in Computational Imaging for High-Throughput Applications (1.0 fte)</a></h3>
-                    <div class="meta">Leiden University</div>
-                    <div class="tags">Tech & Data</div>
-                    <div class="terms">Python, artificial intelligence, computer vision, machine learning</div>
-                </div>
-                <div class="card-right">
-                    <div class="countdown" data-deadline="5 Sep ’26" title="5 Sep ’26"></div>
-                    <button class="dismiss-btn" onclick="dismiss('363267')" title="Not relevant">✕</button>
-                </div>
-            </div>
-        </div>
         <div class="card" data-id="362999">
             <div class="card-top">
                 <div class="score-col">
-                    <div class="score">12</div>
-                    <div class="llm-scores"><span class="llm-badge" title="The vacancy is primarily focused on engineering and computer science with an emphasis on cognitive guidance, human-computer interaction, and accessibility, which has only superficial keyword overlap with the candidate's interests and skills.">L 20</span></div>
+                    <div class="score" title="The vacancy is primarily focused on engineering and computer science with an emphasis on cognitive guidance, human-computer interaction, and accessibility, which has only superficial keyword overlap with the candidate's interests and skills.">20</div><div class="kw-score" title="Keyword score">kw 12</div>
                 </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/362999/phd-position-cognitive-guidance-in-xr-to-improve-independent-mobility-for-people-with-disabilities/" target="_blank" rel="noopener">PhD Position Cognitive Guidance in XR to Improve Independent Mobility for People with Disabilities</a></h3>
@@ -445,8 +429,7 @@ body {
         <div class="card" data-id="362432">
             <div class="card-top">
                 <div class="score-col">
-                    <div class="score">9</div>
-                    <div class="llm-scores"><span class="llm-badge" title="The position focuses on qualitative and interpretive research methods in urban planning, which is a poor methodological match for a candidate specialized in computational methods and data journalism.">G 25</span> <span class="llm-badge" title="The vacancy is only superficially related to the candidate's interests through its focus on urban environments and governance, but lacks a strong computational or data-driven component.">L 20</span></div>
+                    <div class="score" title="The vacancy is only superficially related to the candidate's interests through its focus on urban environments and governance, but lacks a strong computational or data-driven component.">20</div><div class="kw-score" title="Keyword score">kw 9</div>
                 </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/362432/phd-position-strategising-for-the-green-transition-in-amsterdam/" target="_blank" rel="noopener">PhD Position Strategising for the Green Transition in Amsterdam</a></h3>
@@ -463,8 +446,7 @@ body {
         <div class="card" data-id="362880">
             <div class="card-top">
                 <div class="score-col">
-                    <div class="score">9</div>
-                    <div class="llm-scores"><span class="llm-badge" title="The vacancy is focused on design interventions in educational settings, which has only superficial keyword overlap with the candidate's interests in data journalism, computational social science, and public interest technology.">L 20</span></div>
+                    <div class="score" title="The vacancy is focused on design interventions in educational settings, which has only superficial keyword overlap with the candidate's interests in data journalism, computational social science, and public interest technology.">20</div><div class="kw-score" title="Keyword score">kw 9</div>
                 </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/362880/phd-position-on-critical-approaches-to-designing-for-belonging/" target="_blank" rel="noopener">PhD position on Critical approaches to Designing for Belonging</a></h3>
@@ -478,29 +460,10 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="363178">
-            <div class="card-top">
-                <div class="score-col">
-                    <div class="score">9</div>
-                    <div class="llm-scores"><span class="llm-badge" title="The vacancy is in the field of medical sciences and engineering, which is not relevant to the candidate's interests and skills in data journalism, computational social science, and public interest technology.">L 0</span></div>
-                </div>
-                <div class="card-body">
-                    <h3><a href="https://www.academictransfer.com/en/jobs/363178/msca-dn-phd-position-brain-large-axial-field-of-view-petct/" target="_blank" rel="noopener">MSCA-DN PhD position: brain large axial field of view PET/CT</a></h3>
-                    <div class="meta">Amsterdam UMC</div>
-                    <div class="tags">Tech & Data</div>
-                    <div class="terms">GIS, artificial intelligence, computational methods</div>
-                </div>
-                <div class="card-right">
-                    <div class="countdown" data-deadline="27 Aug ’26" title="27 Aug ’26"></div>
-                    <button class="dismiss-btn" onclick="dismiss('363178')" title="Not relevant">✕</button>
-                </div>
-            </div>
-        </div>
         <div class="card" data-id="362956">
             <div class="card-top">
                 <div class="score-col">
-                    <div class="score">7</div>
-                    <div class="llm-scores"><span class="llm-badge" title="The vacancy is primarily focused on agricultural sciences and engineering, with only superficial keyword overlap with the candidate's skills and interests in data journalism, computational social science, and public interest technology.">L 20</span></div>
+                    <div class="score" title="The vacancy is primarily focused on agricultural sciences and engineering, with only superficial keyword overlap with the candidate's skills and interests in data journalism, computational social science, and public interest technology.">20</div><div class="kw-score" title="Keyword score">kw 7</div>
                 </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/362956/phd-in-optimization-of-sustainable-agri-food-supply-chains-under-climate-risk/" target="_blank" rel="noopener">PhD in Optimization of Sustainable Agri-Food Supply Chains under Climate Risk</a></h3>
@@ -514,29 +477,10 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="361419">
-            <div class="card-top">
-                <div class="score-col">
-                    <div class="score">5</div>
-                    <div class="llm-scores"><span class="llm-badge" title="While the research topics in AI ethics and governance align with the candidate's interests, the position specifically requires a Master's degree in Philosophy, which the candidate lacks.">G 30</span> <span class="llm-badge" title="The vacancy is a poor fit because it requires a strong background in philosophy, which the candidate lacks, although it touches on AI governance and ethics, which are of interest to the candidate.">L 30</span></div>
-                </div>
-                <div class="card-body">
-                    <h3><a href="https://www.academictransfer.com/en/jobs/361419/phd-position-in-moral-philosophy-conceptual-engineering-and-ethics-of-emerging-technologies/" target="_blank" rel="noopener">PhD position in Moral Philosophy, Conceptual Engineering, and Ethics of Emerging Technologies</a></h3>
-                    <div class="meta">University of Groningen</div>
-                    <div class="tags">Adjacent</div>
-                    <div class="terms">democratic</div>
-                </div>
-                <div class="card-right">
-                    <div class="countdown" data-deadline="12 Sep ’26" title="12 Sep ’26"></div>
-                    <button class="dismiss-btn" onclick="dismiss('361419')" title="Not relevant">✕</button>
-                </div>
-            </div>
-        </div>
         <div class="card" data-id="362385">
             <div class="card-top">
                 <div class="score-col">
-                    <div class="score">5</div>
-                    <div class="llm-scores"><span class="llm-badge" title="While the project involves data-driven decision making and societal implications, it is situated in a medical research context and emphasizes qualitative/comparative methods rather than the candidate's computational and media-focused skillset.">G 32</span> <span class="llm-badge" title="The vacancy is primarily focused on ethics in health sciences and sociology, with little direct connection to the candidate's core interests in data journalism, computational social science, and AI governance.">L 20</span></div>
+                    <div class="score" title="The vacancy is primarily focused on ethics in health sciences and sociology, with little direct connection to the candidate's core interests in data journalism, computational social science, and AI governance.">20</div><div class="kw-score" title="Keyword score">kw 5</div>
                 </div>
                 <div class="card-body">
                     <h3><a href="https://www.academictransfer.com/en/jobs/362385/phd-candidate-donor-protect/" target="_blank" rel="noopener">PhD Candidate: DONOR-PROTECT</a></h3>
@@ -550,21 +494,54 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="363283">
+        <div class="card" data-id="363267">
             <div class="card-top">
                 <div class="score-col">
-                    <div class="score">5</div>
-                    <div class="llm-scores"><span class="llm-badge" title="The vacancy has a tangential connection to the candidate's interests through the use of data analysis and large-scale datasets, but it is primarily focused on geography and innovation systems, which is outside the candidate's core research areas.">L 40</span></div>
+                    <div class="score" title="The vacancy is focused on computational imaging and computer vision, which is a pure engineering and computer science field that does not align with the candidate's interests or skills in data journalism, computational social science, and public interest technology.">10</div><div class="kw-score" title="Keyword score">kw 13</div>
                 </div>
                 <div class="card-body">
-                    <h3><a href="https://www.academictransfer.com/en/jobs/363283/phd-in-global-talent-mobility-and-europes-strategic-autonomy/" target="_blank" rel="noopener">PhD in Global Talent Mobility and Europe’s Strategic Autonomy</a></h3>
-                    <div class="meta">Utrecht University</div>
+                    <h3><a href="https://www.academictransfer.com/en/jobs/363267/phd-in-computational-imaging-for-high-throughput-applications-10-fte/" target="_blank" rel="noopener">PhD in Computational Imaging for High-Throughput Applications (1.0 fte)</a></h3>
+                    <div class="meta">Leiden University</div>
                     <div class="tags">Tech & Data</div>
-                    <div class="terms">scraping, web scraping</div>
+                    <div class="terms">Python, artificial intelligence, computer vision, machine learning</div>
+                </div>
+                <div class="card-right">
+                    <div class="countdown" data-deadline="5 Sep ’26" title="5 Sep ’26"></div>
+                    <button class="dismiss-btn" onclick="dismiss('363267')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="362632">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score" title="The vacancy is in the field of biomedical engineering and medical sciences, which is not relevant to the candidate's background or interests in data journalism, computational social science, and public interest technology.">0</div><div class="kw-score" title="Keyword score">kw 13</div>
+                </div>
+                <div class="card-body">
+                    <h3><a href="https://www.academictransfer.com/en/jobs/362632/phd-in-multi-aperture-ultrasound-imaging-for-abdominal-aortic-aneurysm/" target="_blank" rel="noopener">PhD in Multi-Aperture Ultrasound Imaging for Abdominal Aortic Aneurysm</a></h3>
+                    <div class="meta">Eindhoven University of Technology (TU/e)</div>
+                    <div class="tags">Tech & Data</div>
+                    <div class="terms">Python, computer vision, deep learning, machine learning</div>
                 </div>
                 <div class="card-right">
                     <div class="countdown" data-deadline="14 Sep ’26" title="14 Sep ’26"></div>
-                    <button class="dismiss-btn" onclick="dismiss('363283')" title="Not relevant">✕</button>
+                    <button class="dismiss-btn" onclick="dismiss('362632')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="363178">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score" title="The vacancy is in the field of medical sciences and engineering, which is not relevant to the candidate's interests and skills in data journalism, computational social science, and public interest technology.">0</div><div class="kw-score" title="Keyword score">kw 9</div>
+                </div>
+                <div class="card-body">
+                    <h3><a href="https://www.academictransfer.com/en/jobs/363178/msca-dn-phd-position-brain-large-axial-field-of-view-petct/" target="_blank" rel="noopener">MSCA-DN PhD position: brain large axial field of view PET/CT</a></h3>
+                    <div class="meta">Amsterdam UMC</div>
+                    <div class="tags">Tech & Data</div>
+                    <div class="terms">GIS, artificial intelligence, computational methods</div>
+                </div>
+                <div class="card-right">
+                    <div class="countdown" data-deadline="27 Aug ’26" title="27 Aug ’26"></div>
+                    <button class="dismiss-btn" onclick="dismiss('363178')" title="Not relevant">✕</button>
                 </div>
             </div>
         </div>
@@ -580,7 +557,7 @@ body {
 </div>
 
 <div class="footer">
-    Source: <a href="https://www.academictransfer.com">AcademicTransfer</a> · Updates every 3 days
+    Source: <a href="https://www.academictransfer.com">AcademicTransfer</a> · Updates every 2 days · AI scored by Llama 3.3
 </div>
 
 </div>
