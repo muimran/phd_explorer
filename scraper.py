@@ -247,49 +247,38 @@ def generate_site(scored: list[dict]):
 
     def vacancy_card(v):
         score = v["score"]
-        terms = ", ".join(v["matched_terms"][:10])
+        terms = ", ".join(v["matched_terms"][:8])
         families = v.get("match_families", {})
 
-        if score >= 50:
-            badge_class = "badge-strong"
-            badge_label = "Strong match"
-        else:
-            badge_class = "badge-investigate"
-            badge_label = "Investigate"
-
-        family_badges = ""
+        fam_parts = []
         if families.get("journalism_media"):
-            family_badges += '<span class="fam fam-j">Journalism</span>'
+            fam_parts.append("Journalism")
         if families.get("tech_data"):
-            family_badges += '<span class="fam fam-t">Tech & Data</span>'
+            fam_parts.append("Tech & Data")
         if families.get("journalism_adjacent"):
-            family_badges += '<span class="fam fam-a">Adjacent</span>'
+            fam_parts.append("Adjacent")
+        fam_str = " · ".join(fam_parts)
 
         deadline_html = ""
         if v.get("deadline"):
-            deadline_html = f'<div class="meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>{v["deadline"]}</div>'
+            deadline_html = f' · {v["deadline"]}'
 
         employer_html = ""
         if v.get("employer"):
-            employer_html = f'<div class="meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/></svg>{v["employer"]}</div>'
+            employer_html = f'{v["employer"]}'
 
         return f"""
         <div class="card" data-id="{v['id']}">
             <div class="card-top">
-                <div class="badges">
-                    <span class="badge {badge_class}">{badge_label} · {score}</span>
-                    {family_badges}
+                <div class="score">{score}</div>
+                <div class="card-body">
+                    <h3><a href="{v['url']}" target="_blank" rel="noopener">{v['title']}</a></h3>
+                    <div class="meta">{employer_html}{deadline_html}</div>
+                    <div class="tags">{fam_str}</div>
+                    <div class="terms">{terms}</div>
                 </div>
-                <button class="dismiss-btn" onclick="dismiss('{v['id']}')" title="Not relevant">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-                </button>
+                <button class="dismiss-btn" onclick="dismiss('{v['id']}')" title="Not relevant">✕</button>
             </div>
-            <h3><a href="{v['url']}" target="_blank" rel="noopener">{v['title']}</a></h3>
-            <div class="card-meta">
-                {employer_html}
-                {deadline_html}
-            </div>
-            <div class="terms">{terms}</div>
         </div>"""
 
     cards_html = ""
@@ -315,194 +304,123 @@ def generate_site(scored: list[dict]):
 <title>PhD Radar</title>
 <style>
 :root {{
-    --bg: #f8f8fc;
-    --fg: #1a1a2e;
-    --card-bg: #ffffff;
-    --card-border: #e8e8f0;
-    --card-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
-    --card-hover: 0 4px 12px rgba(0,0,0,0.08);
-    --accent: #673ab7;
-    --accent-light: #ede7f6;
-    --accent-text: #4a148c;
-    --link: #673ab7;
-    --muted: #6b7280;
-    --muted-light: #9ca3af;
-    --green-bg: #e8f5e9; --green-fg: #2e7d32;
-    --blue-bg: #e3f2fd; --blue-fg: #1565c0;
-    --orange-bg: #fff3e0; --orange-fg: #e65100;
-    --red: #e53935;
-    --red-light: #ffebee;
-    --amber: #f57c00;
-    --amber-light: #fff8e1;
-    --radius: 12px;
-    --radius-sm: 8px;
+    --bg: #fff;
+    --fg: #1a1a1a;
+    --border: #e5e5e5;
+    --muted: #737373;
+    --accent: #7c3aed;
+    --radius: 10px;
 }}
 @media (prefers-color-scheme: dark) {{
     :root {{
-        --bg: #0f0f1a;
-        --fg: #e0e0e8;
-        --card-bg: #1a1a2e;
-        --card-border: #2a2a40;
-        --card-shadow: 0 1px 3px rgba(0,0,0,0.3);
-        --card-hover: 0 4px 12px rgba(0,0,0,0.4);
-        --accent: #b39ddb;
-        --accent-light: #1a1030;
-        --accent-text: #ce93d8;
-        --link: #b39ddb;
-        --muted: #9ca3af;
-        --muted-light: #6b7280;
-        --green-bg: #1b3a1b; --green-fg: #a5d6a7;
-        --blue-bg: #0d2847; --blue-fg: #90caf9;
-        --orange-bg: #3e1a00; --orange-fg: #ffcc80;
-        --red: #ef5350;
-        --red-light: #2a1215;
-        --amber: #ffb74d;
-        --amber-light: #2a2000;
+        --bg: #111;
+        --fg: #e5e5e5;
+        --border: #2a2a2a;
+        --muted: #888;
+        --accent: #a78bfa;
     }}
 }}
 * {{ margin: 0; padding: 0; box-sizing: border-box; }}
 body {{
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     background: var(--bg); color: var(--fg);
-    line-height: 1.6; -webkit-font-smoothing: antialiased;
+    line-height: 1.5; -webkit-font-smoothing: antialiased;
 }}
-.container {{ max-width: 720px; margin: 0 auto; padding: 2rem 1.25rem 6rem; }}
+.container {{ max-width: 680px; margin: 0 auto; padding: 2.5rem 1.5rem 6rem; }}
 
 /* Header */
-.header {{ margin-bottom: 2rem; }}
-.header h1 {{
-    font-size: 1.75rem; font-weight: 700; letter-spacing: -0.02em;
-    margin-bottom: 0.25rem;
-}}
-.header h1 span {{ color: var(--accent); }}
-.updated {{
-    font-size: 0.85rem; color: var(--muted);
-    display: flex; align-items: center; gap: 0.4rem;
-}}
-.updated svg {{ opacity: 0.5; }}
+.header {{ margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }}
+.header h1 {{ font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem; }}
+.updated {{ font-size: 0.8rem; color: var(--muted); }}
 
-/* Stats row */
+/* Stats */
 .stats {{
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;
-    margin-bottom: 2rem;
+    display: flex; gap: 2rem; margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem; border-bottom: 1px solid var(--border);
 }}
-.stat-card {{
-    background: var(--card-bg); border: 1px solid var(--card-border);
-    border-radius: var(--radius); padding: 1.25rem 1rem;
-    text-align: center; box-shadow: var(--card-shadow);
-}}
-.stat-num {{ font-size: 2rem; font-weight: 700; line-height: 1; margin-bottom: 0.25rem; }}
-.stat-num.strong {{ color: var(--accent); }}
-.stat-num.investigate {{ color: var(--amber); }}
-.stat-label {{ font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; }}
+.stat {{ }}
+.stat-num {{ font-size: 1.75rem; font-weight: 600; line-height: 1; }}
+.stat-num.accent {{ color: var(--accent); }}
+.stat-label {{ font-size: 0.75rem; color: var(--muted); margin-top: 0.15rem; }}
 
-/* Section headers */
+/* Sections */
 .section-header {{
-    display: flex; align-items: center; gap: 0.75rem;
-    margin: 2rem 0 1rem; padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--card-border);
+    display: flex; align-items: center; gap: 0.5rem;
+    margin: 2rem 0 0.75rem;
 }}
-.section-header h2 {{ font-size: 1.1rem; font-weight: 600; }}
+.section-header h2 {{ font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }}
 .section-count {{
-    background: var(--accent-light); color: var(--accent-text);
-    font-size: 0.75rem; font-weight: 600; padding: 2px 10px;
-    border-radius: 100px;
+    font-size: 0.7rem; font-weight: 600; color: var(--accent);
+    background: none; padding: 0;
 }}
 
 /* Cards */
 .card {{
-    background: var(--card-bg); border: 1px solid var(--card-border);
-    border-radius: var(--radius); padding: 1.25rem;
-    margin-bottom: 0.75rem; box-shadow: var(--card-shadow);
-    transition: box-shadow 0.2s, opacity 0.3s, transform 0.3s;
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 0;
+    transition: opacity 0.3s;
 }}
-.card:hover {{ box-shadow: var(--card-hover); }}
-.card.dismissed {{
-    opacity: 0; transform: scale(0.95); max-height: 0;
-    overflow: hidden; padding: 0; margin: 0; border: none;
+.card:last-child {{ border-bottom: none; }}
+.card.dismissed {{ opacity: 0; height: 0; overflow: hidden; padding: 0; border: none; }}
+.card-top {{ display: flex; align-items: flex-start; gap: 1rem; }}
+.score {{
+    font-size: 0.8rem; font-weight: 600; color: var(--accent);
+    min-width: 28px; text-align: center;
+    padding-top: 0.15rem;
 }}
-.card-top {{ display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }}
-.badges {{ display: flex; gap: 0.4rem; flex-wrap: wrap; }}
-.badge {{
-    font-size: 0.7rem; font-weight: 600; padding: 3px 10px;
-    border-radius: 100px; text-transform: uppercase; letter-spacing: 0.03em;
-}}
-.badge-strong {{ background: var(--accent-light); color: var(--accent-text); }}
-.badge-investigate {{ background: var(--amber-light); color: var(--amber); }}
-.card h3 {{ font-size: 1rem; font-weight: 600; line-height: 1.4; margin-bottom: 0.5rem; }}
-.card a {{ color: var(--link); text-decoration: none; }}
-.card a:hover {{ text-decoration: underline; }}
-.card-meta {{ display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.5rem; }}
-.meta-item {{
-    display: flex; align-items: center; gap: 0.3rem;
-    font-size: 0.8rem; color: var(--muted);
-}}
-.terms {{
-    font-size: 0.78rem; color: var(--muted-light);
-    padding-top: 0.5rem; border-top: 1px solid var(--card-border);
-}}
+.card-body {{ flex: 1; min-width: 0; }}
+.card h3 {{ font-size: 0.95rem; font-weight: 500; line-height: 1.4; margin-bottom: 0.2rem; }}
+.card a {{ color: var(--fg); text-decoration: none; }}
+.card a:hover {{ color: var(--accent); }}
+.meta {{ font-size: 0.8rem; color: var(--muted); margin-bottom: 0.2rem; }}
+.tags {{ font-size: 0.75rem; color: var(--accent); margin-bottom: 0.15rem; }}
+.terms {{ font-size: 0.75rem; color: var(--muted); opacity: 0.6; }}
 .dismiss-btn {{
-    background: none; border: none; color: var(--muted-light);
-    cursor: pointer; padding: 4px; border-radius: 6px;
-    transition: all 0.15s; display: flex; align-items: center;
+    background: none; border: none; color: var(--border);
+    cursor: pointer; padding: 0.25rem; font-size: 0.85rem;
+    line-height: 1; transition: color 0.15s;
 }}
-.dismiss-btn:hover {{ background: var(--red-light); color: var(--red); }}
+.dismiss-btn:hover {{ color: var(--fg); }}
 
-/* Family badges */
-.fam {{
-    font-size: 0.65rem; font-weight: 500; padding: 2px 8px;
-    border-radius: 100px; text-transform: uppercase; letter-spacing: 0.03em;
-}}
-.fam-j {{ background: var(--green-bg); color: var(--green-fg); }}
-.fam-t {{ background: var(--blue-bg); color: var(--blue-fg); }}
-.fam-a {{ background: var(--orange-bg); color: var(--orange-fg); }}
-
-/* Empty state */
-.empty {{
-    text-align: center; padding: 3rem 1rem; color: var(--muted);
-    background: var(--card-bg); border-radius: var(--radius);
-    border: 1px dashed var(--card-border);
-}}
+/* Empty */
+.empty {{ text-align: center; padding: 3rem 1rem; color: var(--muted); }}
 
 /* Sync bar */
 #sync-bar {{
     display: none; position: fixed; bottom: 0; left: 0; right: 0;
-    background: var(--card-bg); border-top: 1px solid var(--card-border);
-    box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
-    padding: 0.75rem 1rem; text-align: center; z-index: 100;
+    background: var(--bg); border-top: 1px solid var(--border);
+    padding: 0.75rem 1.5rem; z-index: 100;
 }}
 #sync-bar .inner {{
-    max-width: 720px; margin: 0 auto;
-    display: flex; align-items: center; justify-content: center; gap: 0.75rem;
-    font-size: 0.85rem; color: var(--muted);
+    max-width: 680px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 0.8rem; color: var(--muted);
 }}
+.sync-actions {{ display: flex; gap: 0.5rem; }}
 .sync-btn {{
     background: var(--accent); color: #fff; border: none;
-    border-radius: var(--radius-sm); padding: 0.5rem 1.25rem;
-    cursor: pointer; font-size: 0.85rem; font-weight: 500;
-    transition: opacity 0.15s;
+    border-radius: 6px; padding: 0.4rem 1rem;
+    cursor: pointer; font-size: 0.8rem; font-weight: 500;
 }}
 .sync-btn:hover {{ opacity: 0.85; }}
 .sync-btn.secondary {{
-    background: transparent; color: var(--muted); border: 1px solid var(--card-border);
+    background: transparent; color: var(--muted); border: 1px solid var(--border);
 }}
-.sync-btn.secondary:hover {{ background: var(--card-border); }}
 .count {{ font-weight: 600; color: var(--fg); }}
 
 /* Footer */
 .footer {{
-    margin-top: 3rem; padding-top: 1.5rem;
-    border-top: 1px solid var(--card-border);
-    font-size: 0.78rem; color: var(--muted-light); text-align: center;
+    margin-top: 2.5rem; padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.75rem; color: var(--muted);
 }}
-.footer a {{ color: var(--muted-light); text-decoration: none; }}
+.footer a {{ color: var(--muted); text-decoration: none; }}
 .footer a:hover {{ color: var(--accent); }}
 
 @media (max-width: 480px) {{
-    .stats {{ grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }}
-    .stat-card {{ padding: 0.75rem 0.5rem; }}
-    .stat-num {{ font-size: 1.5rem; }}
-    .container {{ padding: 1.25rem 1rem 6rem; }}
+    .container {{ padding: 1.5rem 1rem 6rem; }}
+    .stats {{ gap: 1.5rem; }}
+    .stat-num {{ font-size: 1.4rem; }}
 }}
 </style>
 </head>
@@ -510,24 +428,21 @@ body {{
 <div class="container">
 
 <div class="header">
-    <h1>PhD <span>Radar</span></h1>
-    <div class="updated">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-        Last updated: {updated_str}
-    </div>
+    <h1>PhD Radar</h1>
+    <div class="updated">Last scraped {updated_str}</div>
 </div>
 
 <div class="stats">
-    <div class="stat-card">
+    <div class="stat">
         <div class="stat-num">{len(scored)}</div>
         <div class="stat-label">Total</div>
     </div>
-    <div class="stat-card">
-        <div class="stat-num strong">{len(apply_list)}</div>
+    <div class="stat">
+        <div class="stat-num accent">{len(apply_list)}</div>
         <div class="stat-label">Strong</div>
     </div>
-    <div class="stat-card">
-        <div class="stat-num investigate">{len(investigate_list)}</div>
+    <div class="stat">
+        <div class="stat-num">{len(investigate_list)}</div>
         <div class="stat-label">Investigate</div>
     </div>
 </div>
@@ -537,8 +452,10 @@ body {{
 <div id="sync-bar">
     <div class="inner">
         <span><span class="count" id="dismiss-count">0</span> dismissed</span>
-        <button class="sync-btn" onclick="syncDismissals()">Save to GitHub</button>
-        <button class="sync-btn secondary" onclick="undoAll()">Undo</button>
+        <div class="sync-actions">
+            <button class="sync-btn secondary" onclick="undoAll()">Undo</button>
+            <button class="sync-btn" onclick="syncDismissals()">Save</button>
+        </div>
     </div>
 </div>
 
