@@ -90,7 +90,7 @@ WEIGHTS = {
 }
 
 # Minimum score to appear in the report. Set LOW to bias toward false positives.
-MIN_SCORE = 10
+MIN_SCORE = 5
 
 # ── Hard exclusions ──────────────────────────────────────────────────────────
 # Vacancies matching these are dropped entirely. Be conservative — only add
