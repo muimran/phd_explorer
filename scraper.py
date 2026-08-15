@@ -278,7 +278,7 @@ def generate_site(scored: list[dict]):
 
         deadline_html = ""
         if v.get("deadline"):
-            deadline_html = f' · <span class="deadline-date" data-deadline="{v["deadline"]}">{v["deadline"]}</span>'
+            deadline_html = f'<div class="countdown" data-deadline="{v["deadline"]}" title="{v["deadline"]}"></div>'
 
         employer_html = ""
         if v.get("employer"):
@@ -290,11 +290,14 @@ def generate_site(scored: list[dict]):
                 <div class="score">{score}</div>
                 <div class="card-body">
                     <h3><a href="{v['url']}" target="_blank" rel="noopener">{v['title']}</a></h3>
-                    <div class="meta">{employer_html}{deadline_html}</div>
+                    <div class="meta">{employer_html}</div>
                     <div class="tags">{fam_str}</div>
                     <div class="terms">{terms}</div>
                 </div>
-                <button class="dismiss-btn" onclick="dismiss('{v['id']}')" title="Not relevant">✕</button>
+                <div class="card-right">
+                    {deadline_html}
+                    <button class="dismiss-btn" onclick="dismiss('{v['id']}')" title="Not relevant">✕</button>
+                </div>
             </div>
         </div>"""
 
@@ -392,9 +395,20 @@ body {{
 .meta {{ font-size: 0.8rem; color: var(--muted); margin-bottom: 0.2rem; }}
 .tags {{ font-size: 0.75rem; color: var(--accent); margin-bottom: 0.15rem; }}
 .terms {{ font-size: 0.75rem; color: var(--muted); opacity: 0.6; }}
+.card-right {{
+    display: flex; flex-direction: column; align-items: flex-end;
+    gap: 0.5rem; flex-shrink: 0; padding-top: 0.1rem;
+}}
+.countdown {{
+    font-size: 0.75rem; color: var(--muted); white-space: nowrap;
+    cursor: default;
+}}
+.countdown.urgent {{ color: var(--accent); font-weight: 600; }}
+.countdown.expired {{ color: var(--border); }}
 .dismiss-btn {{
-    background: none; border: none; color: var(--border);
-    cursor: pointer; padding: 0.25rem; font-size: 0.85rem;
+    background: none; border: none;
+    color: var(--border); cursor: pointer;
+    padding: 0.3rem; font-size: 1.1rem;
     line-height: 1; transition: color 0.15s;
 }}
 .dismiss-btn:hover {{ color: var(--fg); }}
@@ -484,10 +498,9 @@ body {{
 
 <script>
 // Calculate days remaining for each deadline
-document.querySelectorAll('.deadline-date').forEach(el => {{
-    const raw = el.dataset.deadline;  // e.g. "22 Aug '26" or "22 Aug 2026"
+document.querySelectorAll('.countdown').forEach(el => {{
+    const raw = el.dataset.deadline;
     if (!raw) return;
-    // Parse: "22 Aug '26" → "22 Aug 2026"
     const normalized = raw.replace(/'(\d{{2}})/, '20$1');
     const deadline = new Date(normalized);
     if (isNaN(deadline)) return;
@@ -497,17 +510,16 @@ document.querySelectorAll('.deadline-date').forEach(el => {{
     const diff = Math.ceil((deadline - now) / (1000 * 60 * 60 * 24));
     if (diff < 0) {{
         el.textContent = 'Expired';
-        el.style.color = '#999';
+        el.classList.add('expired');
     }} else if (diff === 0) {{
-        el.textContent = 'Today!';
-        el.style.color = 'var(--accent)';
-        el.style.fontWeight = '600';
-    }} else if (diff <= 7) {{
-        el.textContent = diff + (diff === 1 ? ' day left' : ' days left');
-        el.style.color = 'var(--accent)';
-        el.style.fontWeight = '600';
+        el.textContent = 'Today';
+        el.classList.add('urgent');
+    }} else if (diff === 1) {{
+        el.textContent = '1 day';
+        el.classList.add('urgent');
     }} else {{
-        el.textContent = diff + ' days left · ' + raw;
+        el.textContent = diff + ' days';
+        if (diff <= 7) el.classList.add('urgent');
     }}
 }});
 
