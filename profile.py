@@ -28,7 +28,9 @@ TECH_DATA = [
     "artificial intelligence", "machine learning", "deep learning",
     "NLP", "natural language processing", "large language models", "LLM",
     "computer vision", "multimodal",
-    "social media analysis", "web scraping", "data scraping",
+    "social media analysis", "social media data", "social media",
+    "social media monitoring",
+    "web scraping", "data scraping",
     "information retrieval", "network analysis", "data mining",
     "data visualization", "data visualisation", "visual analytics",
     "human-computer interaction", "HCI",
@@ -68,7 +70,7 @@ JOURNALISM_ADJACENT = [
     "data justice", "open government data",
     # Security, law & society
     "rule of law", "extremism", "radicalization", "radicalisation",
-    "violent extremism", "terrorism", "counterterrorism",
+    "violent extremism", "extremist violence", "terrorism", "counterterrorism",
     "human rights", "civil liberties", "social justice",
     "public safety", "security studies", "criminology",
 ]
