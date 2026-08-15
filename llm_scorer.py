@@ -19,10 +19,10 @@ import time
 from pathlib import Path
 
 try:
-    import google.generativeai as genai
+    from google import genai
 except ImportError:
     raise SystemExit(
-        "google-generativeai not installed. Run: pip install google-generativeai"
+        "google-genai not installed. Run: pip install google-genai"
     )
 
 from profile import PROFILE_SUMMARY
@@ -33,7 +33,7 @@ VACANCIES_FILE = DATA_DIR / "vacancies.jsonl"
 MIN_KEYWORD_SCORE = 5  # only send vacancies that passed keyword filter
 
 API_KEY = os.environ.get("GEMINI_API_KEY", "")
-MODEL = "gemini-2.0-flash"  # free tier
+MODEL = "gemini-2.5-flash"  # free tier
 RATE_LIMIT_DELAY = 4  # seconds between calls (free tier: 15 RPM)
 
 SYSTEM_PROMPT = f"""You are an academic career advisor. You evaluate PhD vacancy descriptions
@@ -71,7 +71,7 @@ Return ONLY a JSON object with these fields:
 No other text. No markdown fencing. Just the JSON object."""
 
 
-def score_with_llm(vacancy: dict, model) -> dict:
+def score_with_llm(vacancy: dict, client) -> dict:
     """Send a vacancy to Gemini and get an LLM score."""
     prompt = f"""VACANCY TITLE: {vacancy['title']}
 
@@ -85,19 +85,27 @@ DESCRIPTION (first 3000 chars):
 Score this vacancy for the candidate described in your instructions."""
 
     try:
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(
+            model=MODEL,
+            contents=prompt,
+            config={
+                "system_instruction": SYSTEM_PROMPT,
+                "temperature": 0.1,
+            },
+        )
         text = response.text.strip()
         # Extract JSON from response (handle markdown fences if present)
         if "```" in text:
-            text = re.search(r"```(?:json)?\s*(.*?)\s*```", text, re.DOTALL)
-            text = text.group(1) if text else ""
+            m = re.search(r"```(?:json)?\s*(.*?)\s*```", text, re.DOTALL)
+            text = m.group(1) if m else text
         result = json.loads(text)
         return {
             "llm_score": int(result.get("score", 0)),
             "llm_reason": result.get("reason", ""),
         }
     except (json.JSONDecodeError, ValueError, AttributeError) as e:
-        print(f"    ⚠ Parse error: {e} — raw: {text[:200] if 'text' in dir() else 'no response'}")
+        raw = text[:200] if "text" in dir() else "no response"
+        print(f"    ⚠ Parse error: {e} — raw: {raw}")
         return {"llm_score": -1, "llm_reason": f"Parse error: {e}"}
     except Exception as e:
         print(f"    ✗ API error: {e}")
@@ -141,9 +149,8 @@ def main():
         print("Nothing to score.")
         return
 
-    # Init Gemini
-    genai.configure(api_key=API_KEY)
-    model = genai.GenerativeModel(MODEL, system_instruction=SYSTEM_PROMPT)
+    # Init Gemini client
+    client = genai.Client(api_key=API_KEY)
 
     # Score each vacancy
     scored_ids = {}
@@ -151,7 +158,7 @@ def main():
         slug = v["title"][:60]
         print(f"  [{i+1}/{len(to_score)}] {slug}...")
 
-        result = score_with_llm(v, model)
+        result = score_with_llm(v, client)
         scored_ids[v["id"]] = result
 
         if result["llm_score"] >= 0:
