@@ -33,7 +33,7 @@ VACANCIES_FILE = DATA_DIR / "vacancies.jsonl"
 MIN_KEYWORD_SCORE = 5  # only send vacancies that passed keyword filter
 
 API_KEY = os.environ.get("GEMINI_API_KEY", "")
-MODEL = "gemini-2.5-flash"  # free tier
+MODEL = "gemini-3-flash-preview"  # free tier
 RATE_LIMIT_DELAY = 4  # seconds between calls (free tier: 15 RPM)
 
 SYSTEM_PROMPT = f"""You are an academic career advisor. You evaluate PhD vacancy descriptions
