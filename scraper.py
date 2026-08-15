@@ -285,21 +285,18 @@ def generate_site(scored: list[dict]):
 
     # Filter out dismissed vacancies
     scored = [s for s in scored if s["id"] not in dismissed]
-    scored = sorted(scored, key=lambda x: x["score"], reverse=True)
+    # Sort by Groq LLM score (primary), fall back to keyword score
+    scored = sorted(scored, key=lambda x: (x.get("groq_score") or 0, x["score"]), reverse=True)
 
-    apply_list = [s for s in scored if s["recommendation"] == "APPLY"]
-    investigate_list = [s for s in scored if s["recommendation"] == "INVESTIGATE"]
+    # Split into sections based on Groq score
+    strong_list = [s for s in scored if (s.get("groq_score") or 0) >= 60]
+    investigate_list = [s for s in scored if 30 <= (s.get("groq_score") or 0) < 60]
+    weak_list = [s for s in scored if (s.get("groq_score") or 0) < 30 and s["recommendation"] != "IGNORE"]
 
     def vacancy_card(v):
-        score = v["score"]
-        gemini_score = v.get("gemini_score")
-        gemini_reason = v.get("gemini_reason", "")
+        kw_score = v["score"]
         groq_score = v.get("groq_score")
         groq_reason = v.get("groq_reason", "")
-        # Migration: old llm_score → gemini_score
-        if gemini_score is None and v.get("llm_score") is not None:
-            gemini_score = v.get("llm_score")
-            gemini_reason = v.get("llm_reason", "")
         terms = ", ".join(v["matched_terms"][:8])
         families = v.get("match_families", {})
 
@@ -320,20 +317,19 @@ def generate_site(scored: list[dict]):
         if v.get("employer"):
             employer_html = f'{v["employer"]}'
 
-        # LLM score badges
-        llm_parts = []
-        if gemini_score is not None and gemini_score >= 0:
-            llm_parts.append(f'<span class="llm-badge" title="{gemini_reason}">G {gemini_score}</span>')
+        # Primary score: Groq LLM score, with keyword score as subtitle
         if groq_score is not None and groq_score >= 0:
-            llm_parts.append(f'<span class="llm-badge" title="{groq_reason}">L {groq_score}</span>')
-        llm_html = " ".join(llm_parts)
+            score_html = f'<div class="score" title="{groq_reason}">{groq_score}</div>'
+            score_html += f'<div class="kw-score" title="Keyword score">kw {kw_score}</div>'
+        else:
+            score_html = f'<div class="score">{kw_score}</div>'
+            score_html += f'<div class="kw-score">kw</div>'
 
         return f"""
         <div class="card" data-id="{v['id']}">
             <div class="card-top">
                 <div class="score-col">
-                    <div class="score">{score}</div>
-                    <div class="llm-scores">{llm_html}</div>
+                    {score_html}
                 </div>
                 <div class="card-body">
                     <h3><a href="{v['url']}" target="_blank" rel="noopener">{v['title']}</a></h3>
@@ -349,17 +345,21 @@ def generate_site(scored: list[dict]):
         </div>"""
 
     cards_html = ""
-    if apply_list:
-        cards_html += f'<div class="section-header"><h2>Strong matches</h2><span class="section-count">{len(apply_list)}</span></div>\n'
-        for v in apply_list:
+    if strong_list:
+        cards_html += f'<div class="section-header"><h2>Strong matches</h2><span class="section-count">{len(strong_list)}</span></div>\n'
+        for v in strong_list:
             cards_html += vacancy_card(v)
     if investigate_list:
         cards_html += f'<div class="section-header"><h2>Worth investigating</h2><span class="section-count">{len(investigate_list)}</span></div>\n'
         for v in investigate_list:
             cards_html += vacancy_card(v)
+    if weak_list:
+        cards_html += f'<div class="section-header"><h2>Weak matches</h2><span class="section-count">{len(weak_list)}</span></div>\n'
+        for v in weak_list:
+            cards_html += vacancy_card(v)
 
-    if not apply_list and not investigate_list:
-        cards_html = '<div class="empty">No matching vacancies right now. Check back in 3 days.</div>'
+    if not strong_list and not investigate_list and not weak_list:
+        cards_html = '<div class="empty">No matching vacancies right now. Check back soon.</div>'
 
     dismissed_json = json.dumps(sorted(dismissed))
 
@@ -438,12 +438,9 @@ body {{
     font-size: 0.8rem; font-weight: 600; color: var(--accent);
     text-align: center;
 }}
-.llm-scores {{
-    display: flex; gap: 0.25rem; justify-content: center;
-}}
-.llm-badge {{
+.kw-score {{
     font-size: 0.6rem; color: var(--muted); white-space: nowrap;
-    cursor: default;
+    text-align: center;
 }}
 .card-body {{ flex: 1; min-width: 0; }}
 .card h3 {{ font-size: 0.95rem; font-weight: 500; line-height: 1.4; margin-bottom: 0.2rem; }}
@@ -526,7 +523,7 @@ body {{
         <div class="stat-label">Total</div>
     </div>
     <div class="stat">
-        <div class="stat-num accent">{len(apply_list)}</div>
+        <div class="stat-num accent">{len(strong_list)}</div>
         <div class="stat-label">Strong</div>
     </div>
     <div class="stat">
@@ -548,7 +545,7 @@ body {{
 </div>
 
 <div class="footer">
-    Source: <a href="https://www.academictransfer.com">AcademicTransfer</a> · Updates every 3 days
+    Source: <a href="https://www.academictransfer.com">AcademicTransfer</a> · Updates every 2 days · AI scored by Llama 3.3
 </div>
 
 </div>

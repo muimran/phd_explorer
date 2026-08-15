@@ -2,8 +2,8 @@ name: PhD Radar
 
 on:
   schedule:
-    # Every 3 days at 07:00 UTC (09:00 CEST)
-    - cron: '0 7 */3 * *'
+    # Every 2 days at 07:00 UTC (09:00 CEST)
+    - cron: '0 7 */2 * *'
   workflow_dispatch:  # manual trigger
 
 permissions:
@@ -31,11 +31,9 @@ jobs:
         continue-on-error: true
         run: python llm_scorer.py
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
 
       - name: Rebuild site with LLM scores
-        continue-on-error: true
         run: python scraper.py --rebuild
 
       - name: Commit results
