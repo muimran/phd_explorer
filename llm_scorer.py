@@ -95,7 +95,14 @@ def parse_llm_response(text: str) -> dict:
     if "```" in text:
         m = re.search(r"```(?:json)?\s*(.*?)\s*```", text, re.DOTALL)
         text = m.group(1) if m else text
-    result = json.loads(text)
+    try:
+        result = json.loads(text)
+    except json.JSONDecodeError:
+        # Some models wrap the JSON in a short explanation despite the prompt.
+        match = re.search(r"\{.*\}", text, re.DOTALL)
+        if not match:
+            raise
+        result = json.loads(match.group(0))
     return {
         "score": int(result.get("score", 0)),
         "reason": result.get("reason", ""),
