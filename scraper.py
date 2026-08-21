@@ -318,7 +318,12 @@ def generate_site(scored: list[dict]):
     # Split into sections using the same score shown to the reader.
     strong_list = [s for s in scored if primary_score(s) >= 60]
     investigate_list = [s for s in scored if 30 <= primary_score(s) < 60]
-    weak_list = [s for s in scored if primary_score(s) < 30 and s["recommendation"] != "IGNORE"]
+    weak_list = [s for s in scored if 0 < primary_score(s) < 30 and s["recommendation"] != "IGNORE"]
+    zero_list = sorted(
+        [s for s in scored if primary_score(s) == 0],
+        key=lambda x: x.get("scraped_at", ""),
+        reverse=True,
+    )
 
     def vacancy_card(v):
         kw_score = v["score"]
@@ -326,6 +331,11 @@ def generate_site(scored: list[dict]):
         groq_reason = v.get("groq_reason", "")
         terms = ", ".join(v["matched_terms"][:8])
         families = v.get("match_families", {})
+        scraped_at = v.get("scraped_at", "")
+        try:
+            added_label = datetime.fromisoformat(scraped_at).strftime("%d %b %Y")
+        except (TypeError, ValueError):
+            added_label = "Unknown"
 
         fam_parts = []
         if families.get("journalism_media"):
@@ -360,7 +370,7 @@ def generate_site(scored: list[dict]):
                 </div>
                 <div class="card-body">
                     <h3><a href="{v['url']}" target="_blank" rel="noopener">{v['title']}</a></h3>
-                    <div class="meta">{employer_html}</div>
+                    <div class="meta">{employer_html} · Added {added_label}</div>
                     <div class="tags">{fam_str}</div>
                     <div class="terms">{terms}</div>
                 </div>
@@ -384,8 +394,12 @@ def generate_site(scored: list[dict]):
         cards_html += f'<div class="section-header"><h2>Weak matches</h2><span class="section-count">{len(weak_list)}</span></div>\n'
         for v in weak_list:
             cards_html += vacancy_card(v)
+    if zero_list:
+        cards_html += f'<div class="section-header"><h2>Zero-score matches</h2><span class="section-count">{len(zero_list)}</span></div>\n'
+        for v in zero_list:
+            cards_html += vacancy_card(v)
 
-    if not strong_list and not investigate_list and not weak_list:
+    if not strong_list and not investigate_list and not weak_list and not zero_list:
         cards_html = '<div class="empty">No matching vacancies right now. Check back soon.</div>'
 
     archive_html = ""
@@ -573,6 +587,10 @@ body {{
     <div class="stat">
         <div class="stat-num">{len(investigate_list)}</div>
         <div class="stat-label">Investigate</div>
+    </div>
+    <div class="stat">
+        <div class="stat-num">{len(zero_list)}</div>
+        <div class="stat-label">Zero score</div>
     </div>
 </div>
 
