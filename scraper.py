@@ -308,13 +308,17 @@ def generate_site(scored: list[dict]):
             active.append(vacancy)
     scored = active
     expired = sorted(expired, key=lambda x: deadline_date(x.get("deadline", "")) or date.min, reverse=True)
-    # Sort by Groq LLM score (primary), fall back to keyword score
-    scored = sorted(scored, key=lambda x: (x.get("groq_score") or 0, x["score"]), reverse=True)
+    # Use the Groq score when available; otherwise use the keyword score consistently.
+    def primary_score(v):
+        groq_score = v.get("groq_score")
+        return groq_score if groq_score is not None and groq_score >= 0 else v["score"]
 
-    # Split into sections based on Groq score
-    strong_list = [s for s in scored if (s.get("groq_score") or 0) >= 60]
-    investigate_list = [s for s in scored if 30 <= (s.get("groq_score") or 0) < 60]
-    weak_list = [s for s in scored if (s.get("groq_score") or 0) < 30 and s["recommendation"] != "IGNORE"]
+    scored = sorted(scored, key=lambda x: (primary_score(x), x["score"]), reverse=True)
+
+    # Split into sections using the same score shown to the reader.
+    strong_list = [s for s in scored if primary_score(s) >= 60]
+    investigate_list = [s for s in scored if 30 <= primary_score(s) < 60]
+    weak_list = [s for s in scored if primary_score(s) < 30 and s["recommendation"] != "IGNORE"]
 
     def vacancy_card(v):
         kw_score = v["score"]
