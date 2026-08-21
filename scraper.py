@@ -325,7 +325,7 @@ def generate_site(scored: list[dict]):
         reverse=True,
     )
 
-    def vacancy_card(v):
+    def vacancy_card(v, show_added=False):
         kw_score = v["score"]
         groq_score = v.get("groq_score")
         groq_reason = v.get("groq_reason", "")
@@ -362,6 +362,10 @@ def generate_site(scored: list[dict]):
             score_html = f'<div class="score">{kw_score}</div>'
             score_html += f'<div class="kw-score">kw</div>'
 
+        meta_text = employer_html
+        if show_added:
+            meta_text += f" · Added {added_label}"
+
         return f"""
         <div class="card" data-id="{v['id']}">
             <div class="card-top">
@@ -370,7 +374,7 @@ def generate_site(scored: list[dict]):
                 </div>
                 <div class="card-body">
                     <h3><a href="{v['url']}" target="_blank" rel="noopener">{v['title']}</a></h3>
-                    <div class="meta">{employer_html} · Added {added_label}</div>
+                    <div class="meta">{meta_text}</div>
                     <div class="tags">{fam_str}</div>
                     <div class="terms">{terms}</div>
                 </div>
@@ -395,9 +399,13 @@ def generate_site(scored: list[dict]):
         for v in weak_list:
             cards_html += vacancy_card(v)
     if zero_list:
-        cards_html += f'<div class="section-header"><h2>Zero-score matches</h2><span class="section-count">{len(zero_list)}</span></div>\n'
-        for v in zero_list:
-            cards_html += vacancy_card(v)
+        zero_cards = "".join(vacancy_card(v, show_added=True) for v in zero_list)
+        cards_html += f"""
+        <details class="archive zero-archive">
+            <summary>Zero-score matches <span class="section-count">{len(zero_list)}</span></summary>
+            <p class="archive-note">These low-confidence matches are kept for review and sorted by the date they were added.</p>
+            {zero_cards}
+        </details>"""
 
     if not strong_list and not investigate_list and not weak_list and not zero_list:
         cards_html = '<div class="empty">No matching vacancies right now. Check back soon.</div>'
