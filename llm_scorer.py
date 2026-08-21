@@ -26,7 +26,7 @@ VACANCIES_FILE = DATA_DIR / "vacancies.jsonl"
 MIN_KEYWORD_SCORE = 5  # only send vacancies that passed keyword filter
 
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
-GROQ_MODEL = "llama-3.3-70b-versatile"
+GROQ_MODEL = "openai/gpt-oss-120b"
 GROQ_DELAY = 3  # seconds between calls (free tier: 30 RPM)
 
 SYSTEM_PROMPT = f"""You are an academic career advisor. You evaluate PhD vacancy descriptions
