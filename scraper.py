@@ -274,6 +274,19 @@ def load_dismissed() -> set[str]:
     return set()
 
 
+def deadline_date(value: str) -> date | None:
+    """Parse AcademicTransfer's human-readable deadline into a date."""
+    if not value:
+        return None
+    normalized = value.replace("’", "'").replace("‘", "'").strip()
+    for fmt in ("%d %b '%y", "%d %B '%y", "%Y-%m-%d", "%d/%m/%Y"):
+        try:
+            return datetime.strptime(normalized, fmt).date()
+        except ValueError:
+            continue
+    return None
+
+
 def generate_site(scored: list[dict]):
     """Generate a static HTML site in /docs."""
     SITE_DIR.mkdir(exist_ok=True)
@@ -283,8 +296,18 @@ def generate_site(scored: list[dict]):
     updated_str = now.strftime("%d %B %Y, %H:%M")
     dismissed = load_dismissed()
 
-    # Filter out dismissed vacancies
+    # Filter out dismissed vacancies and move past-deadline records to the archive.
     scored = [s for s in scored if s["id"] not in dismissed]
+    active = []
+    expired = []
+    for vacancy in scored:
+        deadline = deadline_date(vacancy.get("deadline", ""))
+        if deadline and deadline < date.today():
+            expired.append(vacancy)
+        else:
+            active.append(vacancy)
+    scored = active
+    expired = sorted(expired, key=lambda x: deadline_date(x.get("deadline", "")) or date.min, reverse=True)
     # Sort by Groq LLM score (primary), fall back to keyword score
     scored = sorted(scored, key=lambda x: (x.get("groq_score") or 0, x["score"]), reverse=True)
 
@@ -360,6 +383,16 @@ def generate_site(scored: list[dict]):
 
     if not strong_list and not investigate_list and not weak_list:
         cards_html = '<div class="empty">No matching vacancies right now. Check back soon.</div>'
+
+    archive_html = ""
+    if expired:
+        archive_cards = "".join(vacancy_card(v) for v in expired)
+        archive_html = f"""
+        <details class="archive">
+            <summary>Expired opportunities <span class="section-count">{len(expired)}</span></summary>
+            <p class="archive-note">These records are kept for reference but are no longer in the active opportunity list.</p>
+            {archive_cards}
+        </details>"""
 
     dismissed_json = json.dumps(sorted(dismissed))
 
@@ -469,6 +502,13 @@ body {{
 
 /* Empty */
 .empty {{ text-align: center; padding: 3rem 1rem; color: var(--muted); }}
+.archive {{ margin-top: 2rem; border-top: 1px solid var(--border); }}
+.archive summary {{ cursor: pointer; list-style: none; padding: 1.25rem 0; font-size: 0.95rem; font-weight: 500; }}
+.archive summary::-webkit-details-marker {{ display: none; }}
+.archive summary::before {{ content: '>'; display: inline-block; margin-right: 0.5rem; color: var(--muted); }}
+.archive[open] summary::before {{ transform: rotate(90deg); }}
+.archive-note {{ margin: -0.4rem 0 1rem; color: var(--muted); font-size: 0.8rem; }}
+
 
 /* Sync bar */
 #sync-bar {{
@@ -533,6 +573,7 @@ body {{
 </div>
 
 {cards_html}
+{archive_html}
 
 <div id="sync-bar">
     <div class="inner">
