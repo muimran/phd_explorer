@@ -104,6 +104,13 @@ body {
 
 /* Empty */
 .empty { text-align: center; padding: 3rem 1rem; color: var(--muted); }
+.archive { margin-top: 2rem; border-top: 1px solid var(--border); }
+.archive summary { cursor: pointer; list-style: none; padding: 1.25rem 0; font-size: 0.95rem; font-weight: 500; }
+.archive summary::-webkit-details-marker { display: none; }
+.archive summary::before { content: '>'; display: inline-block; margin-right: 0.5rem; color: var(--muted); }
+.archive[open] summary::before { transform: rotate(90deg); }
+.archive-note { margin: -0.4rem 0 1rem; color: var(--muted); font-size: 0.8rem; }
+
 
 /* Sync bar */
 #sync-bar {
@@ -149,16 +156,16 @@ body {
 
 <div class="header">
     <h1>PhD Radar</h1>
-    <div class="updated">Last scraped 21 August 2026, 07:43</div>
+    <div class="updated">Last scraped 21 August 2026, 13:44</div>
 </div>
 
 <div class="stats">
     <div class="stat">
-        <div class="stat-num">27</div>
+        <div class="stat-num">22</div>
         <div class="stat-label">Total</div>
     </div>
     <div class="stat">
-        <div class="stat-num accent">6</div>
+        <div class="stat-num accent">5</div>
         <div class="stat-label">Strong</div>
     </div>
     <div class="stat">
@@ -167,25 +174,8 @@ body {
     </div>
 </div>
 
-<div class="section-header"><h2>Strong matches</h2><span class="section-count">6</span></div>
+<div class="section-header"><h2>Strong matches</h2><span class="section-count">5</span></div>
 
-        <div class="card" data-id="362930">
-            <div class="card-top">
-                <div class="score-col">
-                    <div class="score" title="The PhD vacancy is an excellent fit for the candidate, as it involves computational social science, data science, and the analysis of online narratives, which aligns with the candidate's interests and skills in data journalism, computational journalism, and digital methods.">90</div><div class="kw-score" title="Keyword score">kw 29</div>
-                </div>
-                <div class="card-body">
-                    <h3><a href="https://www.academictransfer.com/en/jobs/362930/phd-a-multimodal-analysis-of-emotion-narrative-and-migration-politics-online/" target="_blank" rel="noopener">PhD: A Multimodal Analysis of Emotion, Narrative, and Migration Politics Online</a></h3>
-                    <div class="meta">Utrecht University</div>
-                    <div class="tags">Tech & Data</div>
-                    <div class="terms">computational methods, computational social science, data science, data scraping, multimodal, scraping</div>
-                </div>
-                <div class="card-right">
-                    <div class="countdown" data-deadline="20 Aug ’26" title="20 Aug ’26"></div>
-                    <button class="dismiss-btn" onclick="dismiss('362930')" title="Not relevant">✕</button>
-                </div>
-            </div>
-        </div>
         <div class="card" data-id="362726">
             <div class="card-top">
                 <div class="score-col">
@@ -288,7 +278,7 @@ body {
                     <button class="dismiss-btn" onclick="dismiss('362200')" title="Not relevant">✕</button>
                 </div>
             </div>
-        </div><div class="section-header"><h2>Weak matches</h2><span class="section-count">20</span></div>
+        </div><div class="section-header"><h2>Weak matches</h2><span class="section-count">16</span></div>
 
         <div class="card" data-id="362431">
             <div class="card-top">
@@ -304,23 +294,6 @@ body {
                 <div class="card-right">
                     <div class="countdown" data-deadline="1 Sep ’26" title="1 Sep ’26"></div>
                     <button class="dismiss-btn" onclick="dismiss('362431')" title="Not relevant">✕</button>
-                </div>
-            </div>
-        </div>
-        <div class="card" data-id="362349">
-            <div class="card-top">
-                <div class="score-col">
-                    <div class="score" title="The vacancy is only superficially related to the candidate's interests, as it involves historical research on protest and political speech, but lacks a clear connection to data journalism, computational methods, or public-interest technology.">20</div><div class="kw-score" title="Keyword score">kw 15</div>
-                </div>
-                <div class="card-body">
-                    <h3><a href="https://www.academictransfer.com/en/jobs/362349/phd-position-on-protest-and-political-speech-in-the-nordics-1930-1970/" target="_blank" rel="noopener">PhD position on protest and political speech in the Nordics, 1930-1970</a></h3>
-                    <div class="meta">University of Amsterdam (UvA)</div>
-                    <div class="tags">Journalism</div>
-                    <div class="terms">media studies</div>
-                </div>
-                <div class="card-right">
-                    <div class="countdown" data-deadline="20 Aug ’26" title="20 Aug ’26"></div>
-                    <button class="dismiss-btn" onclick="dismiss('362349')" title="Not relevant">✕</button>
                 </div>
             </div>
         </div>
@@ -389,40 +362,6 @@ body {
                 <div class="card-right">
                     <div class="countdown" data-deadline="13 Sep ’26" title="13 Sep ’26"></div>
                     <button class="dismiss-btn" onclick="dismiss('363228')" title="Not relevant">✕</button>
-                </div>
-            </div>
-        </div>
-        <div class="card" data-id="362817">
-            <div class="card-top">
-                <div class="score-col">
-                    <div class="score" title="The vacancy is focused on machine learning and formal methods in computer science, which is outside the candidate's core research areas of interest in data journalism, computational social science, and public interest technology.">0</div><div class="kw-score" title="Keyword score">kw 17</div>
-                </div>
-                <div class="card-body">
-                    <h3><a href="https://www.academictransfer.com/en/jobs/362817/phd-in-resilient-machine-learning-and-formal-methods/" target="_blank" rel="noopener">PhD in Resilient Machine Learning and Formal Methods</a></h3>
-                    <div class="meta">Eindhoven University of Technology (TU/e)</div>
-                    <div class="tags">Tech & Data</div>
-                    <div class="terms">Python, artificial intelligence, machine learning</div>
-                </div>
-                <div class="card-right">
-                    <div class="countdown" data-deadline="20 Aug ’26" title="20 Aug ’26"></div>
-                    <button class="dismiss-btn" onclick="dismiss('362817')" title="Not relevant">✕</button>
-                </div>
-            </div>
-        </div>
-        <div class="card" data-id="362253">
-            <div class="card-top">
-                <div class="score-col">
-                    <div class="score" title="The vacancy is focused on mechanism-informed world models and agents in the context of engineering and computer science, which is unrelated to the candidate's interests in data journalism, computational social science, and public interest technology.">0</div><div class="kw-score" title="Keyword score">kw 13</div>
-                </div>
-                <div class="card-body">
-                    <h3><a href="https://www.academictransfer.com/en/jobs/362253/phd-candidate-in-mechanism-informed-world-models-and-agents/" target="_blank" rel="noopener">PhD Candidate in Mechanism-Informed World Models and Agents</a></h3>
-                    <div class="meta">University of Amsterdam (UvA)</div>
-                    <div class="tags">Tech & Data</div>
-                    <div class="terms">Python, artificial intelligence, deep learning, machine learning</div>
-                </div>
-                <div class="card-right">
-                    <div class="countdown" data-deadline="20 Aug ’26" title="20 Aug ’26"></div>
-                    <button class="dismiss-btn" onclick="dismiss('362253')" title="Not relevant">✕</button>
                 </div>
             </div>
         </div>
@@ -508,23 +447,6 @@ body {
                 <div class="card-right">
                     <div class="countdown" data-deadline="27 Aug ’26" title="27 Aug ’26"></div>
                     <button class="dismiss-btn" onclick="dismiss('363178')" title="Not relevant">✕</button>
-                </div>
-            </div>
-        </div>
-        <div class="card" data-id="362956">
-            <div class="card-top">
-                <div class="score-col">
-                    <div class="score" title="The vacancy is in agricultural sciences and engineering, which is outside the candidate's area of interest and expertise in data journalism, computational social science, and public interest technology.">0</div><div class="kw-score" title="Keyword score">kw 7</div>
-                </div>
-                <div class="card-body">
-                    <h3><a href="https://www.academictransfer.com/en/jobs/362956/phd-in-optimization-of-sustainable-agri-food-supply-chains-under-climate-risk/" target="_blank" rel="noopener">PhD in Optimization of Sustainable Agri-Food Supply Chains under Climate Risk</a></h3>
-                    <div class="meta">Wageningen University & Research</div>
-                    <div class="tags">Tech & Data</div>
-                    <div class="terms">Python, \bR\b, data science</div>
-                </div>
-                <div class="card-right">
-                    <div class="countdown" data-deadline="17 Aug ’26" title="17 Aug ’26"></div>
-                    <button class="dismiss-btn" onclick="dismiss('362956')" title="Not relevant">✕</button>
                 </div>
             </div>
         </div>
@@ -630,6 +552,97 @@ body {
                 </div>
             </div>
         </div>
+
+        <details class="archive">
+            <summary>Expired opportunities <span class="section-count">5</span></summary>
+            <p class="archive-note">These records are kept for reference but are no longer in the active opportunity list.</p>
+            
+        <div class="card" data-id="362253">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score" title="The vacancy is focused on mechanism-informed world models and agents in the context of engineering and computer science, which is unrelated to the candidate's interests in data journalism, computational social science, and public interest technology.">0</div><div class="kw-score" title="Keyword score">kw 13</div>
+                </div>
+                <div class="card-body">
+                    <h3><a href="https://www.academictransfer.com/en/jobs/362253/phd-candidate-in-mechanism-informed-world-models-and-agents/" target="_blank" rel="noopener">PhD Candidate in Mechanism-Informed World Models and Agents</a></h3>
+                    <div class="meta">University of Amsterdam (UvA)</div>
+                    <div class="tags">Tech & Data</div>
+                    <div class="terms">Python, artificial intelligence, deep learning, machine learning</div>
+                </div>
+                <div class="card-right">
+                    <div class="countdown" data-deadline="20 Aug ’26" title="20 Aug ’26"></div>
+                    <button class="dismiss-btn" onclick="dismiss('362253')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="362349">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score" title="The vacancy is only superficially related to the candidate's interests, as it involves historical research on protest and political speech, but lacks a clear connection to data journalism, computational methods, or public-interest technology.">20</div><div class="kw-score" title="Keyword score">kw 15</div>
+                </div>
+                <div class="card-body">
+                    <h3><a href="https://www.academictransfer.com/en/jobs/362349/phd-position-on-protest-and-political-speech-in-the-nordics-1930-1970/" target="_blank" rel="noopener">PhD position on protest and political speech in the Nordics, 1930-1970</a></h3>
+                    <div class="meta">University of Amsterdam (UvA)</div>
+                    <div class="tags">Journalism</div>
+                    <div class="terms">media studies</div>
+                </div>
+                <div class="card-right">
+                    <div class="countdown" data-deadline="20 Aug ’26" title="20 Aug ’26"></div>
+                    <button class="dismiss-btn" onclick="dismiss('362349')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="362817">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score" title="The vacancy is focused on machine learning and formal methods in computer science, which is outside the candidate's core research areas of interest in data journalism, computational social science, and public interest technology.">0</div><div class="kw-score" title="Keyword score">kw 17</div>
+                </div>
+                <div class="card-body">
+                    <h3><a href="https://www.academictransfer.com/en/jobs/362817/phd-in-resilient-machine-learning-and-formal-methods/" target="_blank" rel="noopener">PhD in Resilient Machine Learning and Formal Methods</a></h3>
+                    <div class="meta">Eindhoven University of Technology (TU/e)</div>
+                    <div class="tags">Tech & Data</div>
+                    <div class="terms">Python, artificial intelligence, machine learning</div>
+                </div>
+                <div class="card-right">
+                    <div class="countdown" data-deadline="20 Aug ’26" title="20 Aug ’26"></div>
+                    <button class="dismiss-btn" onclick="dismiss('362817')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="362930">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score" title="The PhD vacancy is an excellent fit for the candidate, as it involves computational social science, data science, and the analysis of online narratives, which aligns with the candidate's interests and skills in data journalism, computational journalism, and digital methods.">90</div><div class="kw-score" title="Keyword score">kw 29</div>
+                </div>
+                <div class="card-body">
+                    <h3><a href="https://www.academictransfer.com/en/jobs/362930/phd-a-multimodal-analysis-of-emotion-narrative-and-migration-politics-online/" target="_blank" rel="noopener">PhD: A Multimodal Analysis of Emotion, Narrative, and Migration Politics Online</a></h3>
+                    <div class="meta">Utrecht University</div>
+                    <div class="tags">Tech & Data</div>
+                    <div class="terms">computational methods, computational social science, data science, data scraping, multimodal, scraping</div>
+                </div>
+                <div class="card-right">
+                    <div class="countdown" data-deadline="20 Aug ’26" title="20 Aug ’26"></div>
+                    <button class="dismiss-btn" onclick="dismiss('362930')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="362956">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score" title="The vacancy is in agricultural sciences and engineering, which is outside the candidate's area of interest and expertise in data journalism, computational social science, and public interest technology.">0</div><div class="kw-score" title="Keyword score">kw 7</div>
+                </div>
+                <div class="card-body">
+                    <h3><a href="https://www.academictransfer.com/en/jobs/362956/phd-in-optimization-of-sustainable-agri-food-supply-chains-under-climate-risk/" target="_blank" rel="noopener">PhD in Optimization of Sustainable Agri-Food Supply Chains under Climate Risk</a></h3>
+                    <div class="meta">Wageningen University & Research</div>
+                    <div class="tags">Tech & Data</div>
+                    <div class="terms">Python, \bR\b, data science</div>
+                </div>
+                <div class="card-right">
+                    <div class="countdown" data-deadline="17 Aug ’26" title="17 Aug ’26"></div>
+                    <button class="dismiss-btn" onclick="dismiss('362956')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        </details>
 
 <div id="sync-bar">
     <div class="inner">
