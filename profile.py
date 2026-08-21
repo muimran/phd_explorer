@@ -22,6 +22,9 @@ JOURNALISM_MEDIA = [
     "media monitoring",
     "news recommendation", "news algorithms", "news analysis",
     "computational communication",
+    "social data science", "information spread", "information diffusion",
+    "online environments", "online platforms", "platform communication",
+    "inauthentic content", "coordinated inauthentic behavior", "bots",
 ]
 
 TECH_DATA = [
@@ -41,6 +44,8 @@ TECH_DATA = [
     "digital trace data", "text-as-data", "text as data",
     "recommender system", "recommendation system",
     "synthetic media", "deepfake",
+    "online marketplace", "online marketplaces", "quantitative social research",
+    "quantitative empirical research", "time series analysis",
 ]
 
 JOURNALISM_ADJACENT = [
@@ -54,6 +59,8 @@ JOURNALISM_ADJACENT = [
     "AI and society", "responsible AI", "AI ethics",
     "content moderation", "online harm", "hate speech",
     "propaganda", "information disorder", "information ecosystem",
+    "information manipulation", "online manipulation", "inauthentic behavior",
+    "coordinated behavior", "content authenticity", "platforms and society",
     "democratic", "democracy", "elections",
     "transparency", "accountability", "governance",
     "freedom of expression", "censorship",
