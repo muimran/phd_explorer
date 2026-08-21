@@ -38,6 +38,16 @@ python scraper.py --rebuild
 GitHub Actions runs the scraper daily at 07:00 UTC and commits results.
 Enable GitHub Pages from the `docs/` folder in your repo settings.
 
+## Current behaviour
+
+- Active vacancies are grouped into **Strong matches**, **Worth investigating**, and **Weak matches**.
+- Vacancies whose deadlines have passed are retained in `data/vacancies.jsonl` and moved into a collapsed **Expired opportunities** archive in the generated site.
+- The displayed score uses the Groq score when available. If Groq scoring is unavailable, it falls back to the weighted keyword score so vacancies are not incorrectly placed in the weak section.
+- The matching profile includes data journalism, computational social research, online information spread, bots, inauthentic content, misinformation, platform governance, quantitative research, Python, R, GIS, and related skills.
+- GitHub Actions updates the data on schedule and uploads the generated `docs/` folder to `/public_html/phd-explorer/` on Hostinger via FTPS.
+
+For a record of project changes, see [`CHANGELOG.md`](CHANGELOG.md).
+
 ## Customisation
 
 Edit `profile.py` to:
