@@ -168,9 +168,21 @@ def scrape_vacancy(url: str) -> dict | None:
 # ── Scoring ──────────────────────────────────────────────────────────────────
 
 def hard_exclude(vacancy: dict) -> bool:
-    """True if vacancy is obviously irrelevant."""
+    """Exclude clearly unrelated fields unless there is a core social/media signal."""
     text = (vacancy["title"] + " " + vacancy["description"]).lower()
-    return any(term in text for term in EXCLUDE_TERMS)
+    has_exclusion = any(term.lower() in text for term in EXCLUDE_TERMS)
+    if not has_exclusion:
+        return False
+
+    # Let Groq evaluate interdisciplinary work when the vacancy also has a
+    # genuine journalism, media, communication, or computational-social focus.
+    core_terms = JOURNALISM_MEDIA + [
+        "computational social science", "algorithmic accountability",
+        "platform governance", "misinformation", "disinformation",
+        "online political communication", "digital democracy",
+        "media effects", "information disorder", "public sphere",
+    ]
+    return not any(term.lower() in text for term in core_terms)
 
 
 def score_vacancy(vacancy: dict) -> dict:
