@@ -129,6 +129,8 @@ EXCLUDE_TERMS = [
     "genomics", "proteomics", "metabolomics",
     "livestock", "poultry", "crop", "soil science", "agrifood", "agri-food",
     "semiconductor", "photonics", "optics",
+    "federated learning", "decentralized learning", "distributed systems",
+    "deep learning framework", "GPU/HPC", "Byzantine participants",
     "fluid mechanics", "thermodynamics", "aerodynamics",
 ]
 
