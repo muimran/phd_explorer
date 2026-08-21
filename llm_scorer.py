@@ -119,7 +119,10 @@ def score_with_groq(vacancy: dict, client) -> dict:
                 {"role": "user", "content": build_prompt(vacancy)},
             ],
             temperature=0.1,
-            max_tokens=200,
+            reasoning_effort="low",
+            reasoning_format="hidden",
+            response_format={"type": "json_object"},
+            max_completion_tokens=500,
         )
         result = parse_llm_response(response.choices[0].message.content)
         return {"groq_score": result["score"], "groq_reason": result["reason"]}
