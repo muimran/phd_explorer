@@ -127,7 +127,7 @@ EXCLUDE_TERMS = [
     "pharmacology", "pharmaceutical", "clinical trial",
     "pathology", "radiology", "surgery", "surgical",
     "genomics", "proteomics", "metabolomics",
-    "livestock", "poultry", "crop", "soil science",
+    "livestock", "poultry", "crop", "soil science", "agrifood", "agri-food",
     "semiconductor", "photonics", "optics",
     "fluid mechanics", "thermodynamics", "aerodynamics",
 ]

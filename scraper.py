@@ -815,7 +815,10 @@ def main():
             print("No vacancies file found.")
             return
         all_v = [json.loads(line) for line in VACANCIES_FILE.read_text().strip().split("\n") if line.strip()]
-        relevant = [v for v in all_v if v.get("score", 0) >= MIN_SCORE]
+        relevant = [
+            v for v in all_v
+            if v.get("score", 0) >= MIN_SCORE or v.get("groq_score") == 0
+        ]
         generate_site(relevant)
         return
 
@@ -825,7 +828,10 @@ def main():
         # Include any previously scored relevant vacancies
         if VACANCIES_FILE.exists():
             all_v = [json.loads(line) for line in VACANCIES_FILE.read_text().strip().split("\n") if line.strip()]
-            relevant = [v for v in all_v if v.get("score", 0) >= MIN_SCORE]
+            relevant = [
+                v for v in all_v
+                if v.get("score", 0) >= MIN_SCORE or v.get("groq_score") == 0
+            ]
         generate_site(relevant)
 
 
