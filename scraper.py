@@ -650,9 +650,11 @@ document.querySelectorAll('.countdown').forEach(el => {{
     deadline.setHours(0,0,0,0);
     const diff = Math.ceil((deadline - now) / (1000 * 60 * 60 * 24));
     if (diff < 0) {{
-        // Hide expired cards entirely
+        // Hide expired cards from main sections (not the archive)
         const card = el.closest('.card');
-        if (card) card.classList.add('dismissed');
+        if (card && !card.closest('.archive')) card.classList.add('dismissed');
+        el.textContent = 'Expired';
+        el.classList.add('expired');
         return;
     }} else if (diff === 0) {{
         el.textContent = 'Today';
