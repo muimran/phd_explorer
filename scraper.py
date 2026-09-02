@@ -344,7 +344,8 @@ def generate_site(scored: list[dict]):
         kw_score = v["score"]
         groq_score = v.get("groq_score")
         groq_reason = v.get("groq_reason", "")
-        terms = ", ".join(v["matched_terms"][:8])
+        clean_terms = [re.sub(r'\\b', '', t) if t.startswith(r'\b') else t for t in v["matched_terms"][:8]]
+        terms = ", ".join(clean_terms)
         families = v.get("match_families", {})
         scraped_at = v.get("scraped_at", "")
         try:
