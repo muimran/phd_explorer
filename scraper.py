@@ -263,10 +263,13 @@ def score_vacancy(vacancy: dict) -> dict:
     else:
         rec = "IGNORE"
 
-    # Flatten matched terms for display
+    # Flatten matched terms for display (clean up regex patterns)
     all_matched = []
     for family_name, matched in matches.items():
-        all_matched.extend(matched)
+        for term in matched:
+            # Convert regex patterns to readable names
+            clean = re.sub(r'\\b', '', term) if term.startswith(r'\b') else term
+            all_matched.append(clean)
 
     return {
         **vacancy,
@@ -646,8 +649,10 @@ document.querySelectorAll('.countdown').forEach(el => {{
     deadline.setHours(0,0,0,0);
     const diff = Math.ceil((deadline - now) / (1000 * 60 * 60 * 24));
     if (diff < 0) {{
-        el.textContent = 'Expired';
-        el.classList.add('expired');
+        // Hide expired cards entirely
+        const card = el.closest('.card');
+        if (card) card.classList.add('dismissed');
+        return;
     }} else if (diff === 0) {{
         el.textContent = 'Today';
         el.classList.add('urgent');
