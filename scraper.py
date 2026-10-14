@@ -48,6 +48,12 @@ def save_seen(ids: set[str]):
 
 # ── Scoring ──────────────────────────────────────────────────────────────────
 
+def is_postdoc(vacancy: dict) -> bool:
+    """Detect postdoc positions — we're looking for PhD only."""
+    title = vacancy["title"].lower()
+    return any(t in title for t in ["postdoc", "post-doc", "postdoctoral", "post doc"])
+
+
 def hard_exclude(vacancy: dict) -> bool:
     """Exclude clearly unrelated fields unless there is a core social/media signal."""
     text = (vacancy["title"] + " " + vacancy["description"]).lower()
@@ -762,6 +768,10 @@ def scrape_all(max_new: int = 0) -> list[dict]:
 
         # Score each vacancy
         for v in vacancies:
+            if is_postdoc(v):
+                slug = v["title"][:60]
+                print(f"    → excluded (postdoc): {slug}")
+                continue
             if hard_exclude(v):
                 slug = v["title"][:60]
                 print(f"    → excluded (hard filter): {slug}")
@@ -803,7 +813,7 @@ def main():
                 v["country_name"] = "Netherlands"
         relevant = [
             v for v in all_v
-            if v.get("score", 0) >= MIN_SCORE or v.get("groq_score") == 0
+            if not is_postdoc(v) and (v.get("score", 0) >= MIN_SCORE or v.get("groq_score") == 0)
         ]
         generate_site(relevant)
         return
@@ -822,7 +832,7 @@ def main():
                     v["country_name"] = "Netherlands"
             relevant = [
                 v for v in all_v
-                if v.get("score", 0) >= MIN_SCORE or v.get("groq_score") == 0
+                if not is_postdoc(v) and (v.get("score", 0) >= MIN_SCORE or v.get("groq_score") == 0)
             ]
         generate_site(relevant)
 
