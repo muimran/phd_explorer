@@ -22,10 +22,12 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run keyword scraper
+      - name: Run keyword scraper (all sources)
         run: python scraper.py
         env:
           CRAWL_DELAY: "5"
+          EURAXESS_DELAY: "8"
+          EURAXESS_PAGES: "3"
 
       - name: Run LLM scorer
         continue-on-error: true

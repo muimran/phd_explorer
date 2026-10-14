@@ -77,9 +77,12 @@ No other text. No markdown fencing. Just the JSON object."""
 
 
 def build_prompt(vacancy: dict) -> str:
+    country = vacancy.get('country_name', vacancy.get('country', ''))
     return f"""VACANCY TITLE: {vacancy['title']}
 
 EMPLOYER: {vacancy.get('employer', 'Unknown')}
+
+COUNTRY: {country or 'Not specified'}
 
 RESEARCH FIELDS: {vacancy.get('research_fields', 'Not specified')}
 

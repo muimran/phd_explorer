@@ -1,70 +1,40 @@
 """
-PhD Explorer — scrapes AcademicTransfer for Dutch PhD vacancies.
+PhD Explorer — multi-source PhD vacancy radar.
+
+Scrapes PhD positions from multiple sources, scores them with keywords
+and LLM, and generates a static HTML site with filtering.
 
 Usage:
     python scraper.py                  # scrape + score + generate site
     python scraper.py --scrape-only    # just scrape, skip scoring
     python scraper.py --max 10         # limit to 10 new vacancies (for testing)
+    python scraper.py --rebuild        # rebuild site from existing data
 """
 
 import argparse
 import json
 import re
-import time
-import xml.etree.ElementTree as ET
 from datetime import datetime, date
 from pathlib import Path
-
-import requests
-from bs4 import BeautifulSoup
 
 from profile import (
     JOURNALISM_MEDIA, TECH_DATA, JOURNALISM_ADJACENT, YOUR_SKILLS,
     REGEX_SKILLS, WEIGHTS, MIN_SCORE, EXCLUDE_TERMS, PROFILE_SUMMARY,
 )
+from sources import academictransfer, euraxess
 
 # ── Paths ────────────────────────────────────────────────────────────────────
 DATA_DIR = Path(__file__).parent / "data"
 VACANCIES_FILE = DATA_DIR / "vacancies.jsonl"
 SEEN_FILE = DATA_DIR / "seen_ids.json"
 DISMISSED_FILE = DATA_DIR / "dismissed.json"
-SITE_DIR = Path(__file__).parent / "docs"  # GitHub Pages serves from /docs
+SITE_DIR = Path(__file__).parent / "docs"
 
-SITEMAP_URL = "https://www.academictransfer.com/sitemap-vacancies.xml"
-CRAWL_DELAY = int(__import__('os').environ.get('CRAWL_DELAY', '10'))  # seconds, per robots.txt
-
-HEADERS = {
-    "User-Agent": "PhD-Explorer/1.0 (academic opportunity research tool)",
-    "Accept": "text/html,application/xhtml+xml",
-    "Accept-Language": "en-US,en;q=0.9,nl;q=0.8",
-}
+# All enabled source modules
+SOURCES = [academictransfer, euraxess]
 
 
-# ── Scraping ─────────────────────────────────────────────────────────────────
-
-def fetch_sitemap() -> list[str]:
-    """Fetch the vacancies sitemap and return all URLs."""
-    print("Fetching sitemap...")
-    resp = requests.get(SITEMAP_URL, headers=HEADERS, timeout=30)
-    resp.raise_for_status()
-    root = ET.fromstring(resp.content)
-    ns = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
-    urls = [loc.text for loc in root.findall(".//s:loc", ns)]
-    print(f"  {len(urls)} total vacancy URLs in sitemap")
-    return urls
-
-
-def filter_phd_urls(urls: list[str]) -> list[str]:
-    """Keep only English-language PhD vacancy URLs."""
-    phd = [u for u in urls if "/en/jobs/" in u and "phd" in u.lower()]
-    print(f"  {len(phd)} are English-language PhD positions (by URL slug)")
-    return phd
-
-
-def extract_id(url: str) -> str:
-    m = re.search(r"/jobs/(\d+)/", url)
-    return m.group(1) if m else url
-
+# ── Seen IDs ────────────────────────────────────────────────────────────────
 
 def load_seen() -> set[str]:
     if SEEN_FILE.exists():
@@ -76,95 +46,6 @@ def save_seen(ids: set[str]):
     SEEN_FILE.write_text(json.dumps(sorted(ids)))
 
 
-def scrape_vacancy(url: str) -> dict | None:
-    """Scrape one vacancy page. Returns structured dict or None on failure."""
-    try:
-        resp = requests.get(url, headers=HEADERS, timeout=30)
-        resp.raise_for_status()
-    except requests.RequestException as e:
-        print(f"    ✗ {e}")
-        return None
-
-    soup = BeautifulSoup(resp.text, "lxml")
-
-    title = ""
-    h1 = soup.find("h1")
-    if h1:
-        title = h1.get_text(strip=True)
-
-    # Employer — find links to /employer/ pages, skip the nav menu ones
-    employer = ""
-    for emp_link in soup.find_all("a", href=re.compile(r"/employer/")):
-        text = emp_link.get_text(strip=True)
-        # Skip generic nav links and very long blurbs
-        if text and len(text) < 100 and "applied sciences" not in text.lower():
-            employer = text
-            break
-
-    # Extract full text from main content area, excluding boilerplate
-    main = soup.find("main") or soup.find("article") or soup
-    # Remove nav, footer, cookie banners — these contain "Privacy", "Terms", etc.
-    for junk in main.find_all(["nav", "footer"]):
-        junk.decompose()
-    for junk in main.find_all(class_=re.compile(r"cookie|consent|banner|Footer", re.I)):
-        junk.decompose()
-    parts = []
-    for el in main.find_all(["p", "li", "h2", "h3", "h4"]):
-        t = el.get_text(strip=True)
-        if t and len(t) > 5:
-            parts.append(t)
-    description = "\n".join(parts)
-
-    # Key-value metadata (dl/dt/dd pairs)
-    metadata = {}
-    for dt in soup.find_all("dt"):
-        dd = dt.find_next_sibling("dd")
-        if dd:
-            metadata[dt.get_text(strip=True).lower().rstrip(":")] = dd.get_text(strip=True)
-
-    # Deadline — extract from the "Deadline..." span on AcademicTransfer pages
-    deadline = metadata.get("deadline", metadata.get("closing date", ""))
-    for span in soup.find_all("span"):
-        t = span.get_text(strip=True)
-        if t.startswith("Deadline"):
-            deadline = t.replace("Deadline", "").strip()
-            break
-
-    # Days remaining — extract from "X days remaining" element
-    days_remaining = ""
-    for div in soup.find_all("div", class_="whitespace-nowrap"):
-        t = div.get_text(strip=True)
-        if "remaining" in t.lower():
-            days_remaining = t
-            break
-
-    # Research fields — extract from "Research fields" label
-    research_fields = ""
-    for p in soup.find_all("p"):
-        if p.get_text(strip=True) == "Research fields":
-            nxt = p.find_next_sibling()
-            if nxt:
-                research_fields = nxt.get_text(strip=True)
-            else:
-                research_fields = p.parent.get_text(strip=True).replace("Research fields", "").strip()
-            break
-
-    return {
-        "id": extract_id(url),
-        "url": url,
-        "title": title,
-        "employer": employer,
-        "department": metadata.get("department", metadata.get("faculty", "")),
-        "location": metadata.get("location", metadata.get("city", "")),
-        "deadline": deadline,
-        "days_remaining": days_remaining,
-        "research_fields": research_fields,
-        "description": description[:8000],
-        "metadata": metadata,
-        "scraped_at": datetime.now().isoformat(),
-    }
-
-
 # ── Scoring ──────────────────────────────────────────────────────────────────
 
 def hard_exclude(vacancy: dict) -> bool:
@@ -174,8 +55,6 @@ def hard_exclude(vacancy: dict) -> bool:
     if not has_exclusion:
         return False
 
-    # Let Groq evaluate interdisciplinary work when the vacancy also has a
-    # genuine journalism, media, communication, or computational-social focus.
     core_terms = JOURNALISM_MEDIA + [
         "computational social science", "algorithmic accountability",
         "platform governance", "misinformation", "disinformation",
@@ -191,11 +70,10 @@ def score_vacancy(vacancy: dict) -> dict:
     desc_text = vacancy["description"].lower()
     full_text = title_text + " " + desc_text
 
-    # Title multiplier: a keyword in the title is worth 3× a keyword in the body.
     TITLE_BONUS = 3
 
     matches = {"journalism_media": [], "tech_data": [], "journalism_adjacent": [], "your_skills": []}
-    term_in_title = set()   # track which terms appeared in the title
+    term_in_title = set()
 
     families = [
         ("journalism_media", JOURNALISM_MEDIA),
@@ -212,7 +90,6 @@ def score_vacancy(vacancy: dict) -> dict:
                 if low in title_text:
                     term_in_title.add(term)
 
-    # Regex-based skill matching (for short terms like R, NLP, etc.)
     full_raw = vacancy["title"] + " " + vacancy["description"]
     for pattern in REGEX_SKILLS:
         if re.search(pattern, full_raw):
@@ -220,8 +97,6 @@ def score_vacancy(vacancy: dict) -> dict:
             if re.search(pattern, vacancy["title"]):
                 term_in_title.add(pattern)
 
-    # Score: each unique match contributes its family weight.
-    # Terms found in the title get an extra TITLE_BONUS multiplier.
     score = 0
     for family_name, matched in matches.items():
         for term in set(matched):
@@ -232,30 +107,18 @@ def score_vacancy(vacancy: dict) -> dict:
                 score += base
     score = min(score, 100)
 
-    # Bonus: journalism terms are what make a vacancy truly relevant.
-    # A PhD with lots of tech/adjacent matches but ZERO journalism/media
-    # connection is probably not your field — halve its score.
     has_journalism = bool(matches["journalism_media"])
     if not has_journalism and score > 0:
         score = score // 2
 
-    # Engineering filter: if the ONLY research field is "Engineering", these
-    # are typically hardcore science/civil/mechanical PhDs that happen to
-    # mention Python or data science. Kill the score UNLESS our keywords
-    # appear in the title (meaning the position is genuinely about our field).
-    # If the field lists Engineering + something else (e.g. "Engineering;
-    # Social Sciences"), keep it — the other field signals relevance.
     fields = vacancy.get("research_fields", "").lower()
     if "engineering" in fields:
-        # Check if engineering is the ONLY field (strip out "engineering" and see what's left)
         other_fields = fields.replace("engineering", "").strip("; ,")
         if not other_fields:
-            # Pure engineering — only keep if title has our keywords
             has_title_match = bool(term_in_title - {p for p in REGEX_SKILLS})
             if not has_title_match:
                 score = 0
 
-    # Recommendation bucket
     if score >= 50:
         rec = "APPLY"
     elif score >= MIN_SCORE:
@@ -263,11 +126,9 @@ def score_vacancy(vacancy: dict) -> dict:
     else:
         rec = "IGNORE"
 
-    # Flatten matched terms for display (clean up regex patterns)
     all_matched = []
     for family_name, matched in matches.items():
         for term in matched:
-            # Convert regex patterns to readable names
             clean = re.sub(r'\\b', '', term) if term.startswith(r'\b') else term
             all_matched.append(clean)
 
@@ -280,20 +141,19 @@ def score_vacancy(vacancy: dict) -> dict:
     }
 
 
-# ── HTML report (GitHub Pages) ───────────────────────────────────────────────
+# ── HTML report ──────────────────────────────────────────────────────────────
 
 def load_dismissed() -> set[str]:
-    """Load dismissed vacancy IDs."""
     if DISMISSED_FILE.exists():
         return set(json.loads(DISMISSED_FILE.read_text()))
     return set()
 
 
 def deadline_date(value: str) -> date | None:
-    """Parse AcademicTransfer's human-readable deadline into a date."""
+    """Parse various deadline formats into a date."""
     if not value:
         return None
-    normalized = value.replace("’", "'").replace("‘", "'").strip()
+    normalized = value.replace("'", "'").replace("’", "'").strip()
     for fmt in ("%d %b '%y", "%d %B '%y", "%Y-%m-%d", "%d/%m/%Y"):
         try:
             return datetime.strptime(normalized, fmt).date()
@@ -302,16 +162,21 @@ def deadline_date(value: str) -> date | None:
     return None
 
 
+# Source display names and colours
+SOURCE_META = {
+    "academictransfer": {"label": "AcademicTransfer", "color": "#2563eb"},
+    "euraxess": {"label": "EURAXESS", "color": "#059669"},
+}
+
+
 def generate_site(scored: list[dict]):
     """Generate a static HTML site in /docs."""
     SITE_DIR.mkdir(exist_ok=True)
 
     now = datetime.now()
-    today = date.today().isoformat()
     updated_str = now.strftime("%d %B %Y, %H:%M")
     dismissed = load_dismissed()
 
-    # Filter out dismissed vacancies and move past-deadline records to the archive.
     scored = [s for s in scored if s["id"] not in dismissed]
     active = []
     expired = []
@@ -323,14 +188,13 @@ def generate_site(scored: list[dict]):
             active.append(vacancy)
     scored = active
     expired = sorted(expired, key=lambda x: deadline_date(x.get("deadline", "")) or date.min, reverse=True)
-    # Use the Groq score when available; otherwise use the keyword score consistently.
+
     def primary_score(v):
         groq_score = v.get("groq_score")
         return groq_score if groq_score is not None and groq_score >= 0 else v["score"]
 
     scored = sorted(scored, key=lambda x: (primary_score(x), x["score"]), reverse=True)
 
-    # Split into sections using the same score shown to the reader.
     strong_list = [s for s in scored if primary_score(s) >= 60]
     investigate_list = [s for s in scored if 30 <= primary_score(s) < 60]
     weak_list = [s for s in scored if 0 < primary_score(s) < 30 and s["recommendation"] != "IGNORE"]
@@ -340,14 +204,24 @@ def generate_site(scored: list[dict]):
         reverse=True,
     )
 
+    # Collect unique sources and countries for filter buttons
+    all_items = scored + expired
+    sources_used = sorted({v.get("source", "academictransfer") for v in all_items})
+    countries_used = sorted({v.get("country", "") for v in all_items if v.get("country")})
+
     def vacancy_card(v, show_added=False):
         kw_score = v["score"]
         groq_score = v.get("groq_score")
         groq_reason = v.get("groq_reason", "")
-        clean_terms = [re.sub(r'\\b', '', t) if t.startswith(r'\b') else t for t in v["matched_terms"][:8]]
+        clean_terms = [re.sub(r'\\b', '', t) if t.startswith(r'\b') else t for t in v.get("matched_terms", [])[:8]]
         terms = ", ".join(clean_terms)
         families = v.get("match_families", {})
         scraped_at = v.get("scraped_at", "")
+        source = v.get("source", "academictransfer")
+        country = v.get("country", "")
+        country_name = v.get("country_name", country)
+        source_info = SOURCE_META.get(source, {"label": source, "color": "#737373"})
+
         try:
             added_label = datetime.fromisoformat(scraped_at).strftime("%d %b %Y")
         except (TypeError, ValueError):
@@ -370,7 +244,6 @@ def generate_site(scored: list[dict]):
         if v.get("employer"):
             employer_html = f'{v["employer"]}'
 
-        # Primary score: Groq LLM score, with keyword score as subtitle
         if groq_score is not None and groq_score >= 0:
             score_html = f'<div class="score" title="{groq_reason}">{groq_score}</div>'
             score_html += f'<div class="kw-score" title="Keyword score">kw {kw_score}</div>'
@@ -382,13 +255,19 @@ def generate_site(scored: list[dict]):
         if show_added:
             meta_text += f" · Added {added_label}"
 
+        # Source and country badges
+        badge_html = f'<span class="source-badge" style="border-color:{source_info["color"]};color:{source_info["color"]}">{source_info["label"]}</span>'
+        if country:
+            badge_html += f' <span class="country-badge">{country}</span>'
+
         return f"""
-        <div class="card" data-id="{v['id']}">
+        <div class="card" data-id="{v['id']}" data-source="{source}" data-country="{country}">
             <div class="card-top">
                 <div class="score-col">
                     {score_html}
                 </div>
                 <div class="card-body">
+                    <div class="badges">{badge_html}</div>
                     <h3><a href="{v['url']}" target="_blank" rel="noopener">{v['title']}</a></h3>
                     <div class="meta">{meta_text}</div>
                     <div class="tags">{fam_str}</div>
@@ -436,7 +315,25 @@ def generate_site(scored: list[dict]):
             {archive_cards}
         </details>"""
 
+    # Build filter buttons
+    source_buttons = ""
+    for src in sources_used:
+        info = SOURCE_META.get(src, {"label": src, "color": "#737373"})
+        source_buttons += f'<button class="filter-btn active" data-filter="source" data-value="{src}" style="--btn-color:{info["color"]}">{info["label"]}</button>\n'
+
+    country_buttons = ""
+    for cc in countries_used:
+        country_buttons += f'<button class="filter-btn active" data-filter="country" data-value="{cc}">{cc}</button>\n'
+
     dismissed_json = json.dumps(sorted(dismissed))
+
+    # Source list for footer
+    source_labels = [SOURCE_META.get(s, {"label": s})["label"] for s in sources_used]
+    source_links = {
+        "academictransfer": '<a href="https://www.academictransfer.com">AcademicTransfer</a>',
+        "euraxess": '<a href="https://euraxess.ec.europa.eu">EURAXESS</a>',
+    }
+    footer_sources = " · ".join(source_links.get(s, s) for s in sources_used)
 
     html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -477,13 +374,36 @@ body {{
 
 /* Stats */
 .stats {{
-    display: flex; gap: 2rem; margin-bottom: 2.5rem;
+    display: flex; gap: 2rem; margin-bottom: 1.5rem;
     padding-bottom: 1.5rem; border-bottom: 1px solid var(--border);
 }}
 .stat {{ }}
 .stat-num {{ font-size: 1.75rem; font-weight: 600; line-height: 1; }}
 .stat-num.accent {{ color: var(--accent); }}
 .stat-label {{ font-size: 0.75rem; color: var(--muted); margin-top: 0.15rem; }}
+
+/* Filters */
+.filters {{
+    display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem; border-bottom: 1px solid var(--border);
+}}
+.filter-group {{ display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; }}
+.filter-group::before {{ font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-right: 0.25rem; }}
+.filter-group.source-filters::before {{ content: "Source"; }}
+.filter-group.country-filters::before {{ content: "Country"; }}
+.filter-sep {{ width: 1px; height: 1.5rem; background: var(--border); margin: 0 0.5rem; }}
+.filter-btn {{
+    font-size: 0.7rem; font-weight: 500;
+    padding: 0.25rem 0.6rem; border-radius: 999px;
+    border: 1px solid var(--border); background: var(--bg); color: var(--muted);
+    cursor: pointer; transition: all 0.15s;
+}}
+.filter-btn.active {{
+    border-color: var(--btn-color, var(--accent));
+    color: var(--btn-color, var(--accent));
+    background: color-mix(in srgb, var(--btn-color, var(--accent)) 8%, var(--bg));
+}}
+.filter-btn:hover {{ opacity: 0.8; }}
 
 /* Sections */
 .section-header {{
@@ -504,6 +424,7 @@ body {{
 }}
 .card:last-child {{ border-bottom: none; }}
 .card.dismissed {{ opacity: 0; height: 0; overflow: hidden; padding: 0; border: none; }}
+.card.filtered {{ display: none; }}
 .card-top {{ display: flex; align-items: flex-start; gap: 1rem; }}
 .score-col {{
     display: flex; flex-direction: column; align-items: center;
@@ -521,6 +442,17 @@ body {{
 .card h3 {{ font-size: 0.95rem; font-weight: 500; line-height: 1.4; margin-bottom: 0.2rem; }}
 .card a {{ color: var(--fg); text-decoration: none; }}
 .card a:hover {{ color: var(--accent); }}
+.badges {{ display: flex; gap: 0.35rem; margin-bottom: 0.3rem; flex-wrap: wrap; }}
+.source-badge {{
+    font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;
+    padding: 0.1rem 0.4rem; border-radius: 3px;
+    border: 1px solid; background: transparent;
+}}
+.country-badge {{
+    font-size: 0.6rem; font-weight: 600;
+    padding: 0.1rem 0.4rem; border-radius: 3px;
+    background: var(--border); color: var(--fg);
+}}
 .meta {{ font-size: 0.8rem; color: var(--muted); margin-bottom: 0.2rem; }}
 .tags {{ font-size: 0.75rem; color: var(--accent); margin-bottom: 0.15rem; }}
 .terms {{ font-size: 0.75rem; color: var(--muted); opacity: 0.6; }}
@@ -618,6 +550,16 @@ body {{
     </div>
 </div>
 
+<div class="filters">
+    <div class="filter-group source-filters">
+        {source_buttons}
+    </div>
+    <div class="filter-sep"></div>
+    <div class="filter-group country-filters">
+        {country_buttons}
+    </div>
+</div>
+
 {cards_html}
 {archive_html}
 
@@ -632,25 +574,53 @@ body {{
 </div>
 
 <div class="footer">
-    Source: <a href="https://www.academictransfer.com">AcademicTransfer</a> · Updates every 2 days · AI scored by Llama 3.3
+    Sources: {footer_sources} · Updates every 2 days · AI scored by Llama 3.3
 </div>
 
 </div>
 
 <script>
-// Calculate days remaining for each deadline
+// ── Filters ──
+document.querySelectorAll('.filter-btn').forEach(btn => {{
+    btn.addEventListener('click', () => {{
+        btn.classList.toggle('active');
+        applyFilters();
+    }});
+}});
+
+function applyFilters() {{
+    const activeSources = new Set();
+    const activeCountries = new Set();
+    document.querySelectorAll('.filter-btn[data-filter="source"].active').forEach(b => activeSources.add(b.dataset.value));
+    document.querySelectorAll('.filter-btn[data-filter="country"].active').forEach(b => activeCountries.add(b.dataset.value));
+
+    document.querySelectorAll('.card').forEach(card => {{
+        const src = card.dataset.source || 'academictransfer';
+        const country = card.dataset.country || '';
+        const sourceOk = activeSources.size === 0 || activeSources.has(src);
+        const countryOk = activeCountries.size === 0 || activeCountries.has(country);
+        card.classList.toggle('filtered', !(sourceOk && countryOk));
+    }});
+}}
+
+// ── Deadlines ──
 document.querySelectorAll('.countdown').forEach(el => {{
     const raw = el.dataset.deadline;
     if (!raw) return;
-    const normalized = raw.replace(/['‘’](\\d{{2}})/, '20$1');
-    const deadline = new Date(normalized);
+    // Handle ISO dates (YYYY-MM-DD) and AT-style ("28 Oct '26")
+    let deadline;
+    if (/^\\d{{4}}-\\d{{2}}-\\d{{2}}/.test(raw)) {{
+        deadline = new Date(raw);
+    }} else {{
+        const normalized = raw.replace(/['\\u2018\\u2019](\\d{{2}})/, '20$1');
+        deadline = new Date(normalized);
+    }}
     if (isNaN(deadline)) return;
     const now = new Date();
     now.setHours(0,0,0,0);
     deadline.setHours(0,0,0,0);
     const diff = Math.ceil((deadline - now) / (1000 * 60 * 60 * 24));
     if (diff < 0) {{
-        // Hide expired cards from main sections (not the archive)
         const card = el.closest('.card');
         if (card && !card.closest('.archive')) card.classList.add('dismissed');
         el.textContent = 'Expired';
@@ -668,6 +638,7 @@ document.querySelectorAll('.countdown').forEach(el => {{
     }}
 }});
 
+// ── Dismissals ──
 const serverDismissed = new Set({dismissed_json});
 let sessionDismissed = new Set();
 
@@ -776,55 +747,43 @@ async function syncDismissals() {{
 # ── Main ─────────────────────────────────────────────────────────────────────
 
 def scrape_all(max_new: int = 0) -> list[dict]:
-    """Scrape all new PhD vacancies from AcademicTransfer."""
+    """Scrape all new PhD vacancies from all sources."""
     DATA_DIR.mkdir(exist_ok=True)
 
-    urls = fetch_sitemap()
-    phd_urls = filter_phd_urls(urls)
-
     seen = load_seen()
-    new_urls = [u for u in phd_urls if extract_id(u) not in seen]
-    print(f"  {len(new_urls)} are new (not previously seen)")
+    all_vacancies = []
 
-    if max_new > 0:
-        new_urls = new_urls[:max_new]
-        print(f"  Limiting to {max_new} for this run")
-
-    vacancies = []
-    for i, url in enumerate(new_urls):
-        slug = url.rstrip("/").split("/")[-1][:60]
-        print(f"  [{i+1}/{len(new_urls)}] {slug}...")
-        vacancy = scrape_vacancy(url)
-        if vacancy is None:
+    for source_module in SOURCES:
+        try:
+            vacancies = source_module.scrape(seen, max_new=max_new)
+        except Exception as e:
+            print(f"  ✗ Source {source_module.__name__} failed: {e}")
             continue
 
-        if hard_exclude(vacancy):
-            print(f"    → excluded (hard filter)")
-            seen.add(vacancy["id"])
-            continue
+        # Score each vacancy
+        for v in vacancies:
+            if hard_exclude(v):
+                slug = v["title"][:60]
+                print(f"    → excluded (hard filter): {slug}")
+                continue
 
-        scored = score_vacancy(vacancy)
-        vacancies.append(scored)
-        seen.add(vacancy["id"])
-
-        if i < len(new_urls) - 1:
-            time.sleep(CRAWL_DELAY)
+            scored = score_vacancy(v)
+            all_vacancies.append(scored)
 
     # Append to JSONL
     with open(VACANCIES_FILE, "a") as f:
-        for v in vacancies:
+        for v in all_vacancies:
             f.write(json.dumps(v) + "\n")
 
     save_seen(seen)
 
-    # Filter to relevant only
-    relevant = [v for v in vacancies if v["score"] >= MIN_SCORE]
-    print(f"\n✓ Scraped {len(vacancies)} new vacancies → {len(relevant)} relevant (score ≥ {MIN_SCORE})")
+    relevant = [v for v in all_vacancies if v["score"] >= MIN_SCORE]
+    print(f"\n✓ Scraped {len(all_vacancies)} new vacancies → {len(relevant)} relevant (score ≥ {MIN_SCORE})")
     return relevant
 
 
 def main():
-    parser = argparse.ArgumentParser(description="PhD Explorer — Dutch PhD vacancy radar")
+    parser = argparse.ArgumentParser(description="PhD Explorer — multi-source PhD vacancy radar")
     parser.add_argument("--scrape-only", action="store_true", help="Scrape without generating site")
     parser.add_argument("--max", type=int, default=0, help="Max new vacancies to scrape (0 = all)")
     parser.add_argument("--rebuild", action="store_true", help="Rebuild site from existing data")
@@ -835,6 +794,13 @@ def main():
             print("No vacancies file found.")
             return
         all_v = [json.loads(line) for line in VACANCIES_FILE.read_text().strip().split("\n") if line.strip()]
+        # Backfill source/country for legacy vacancies
+        for v in all_v:
+            if "source" not in v:
+                v["source"] = "academictransfer"
+            if "country" not in v:
+                v["country"] = "NL"
+                v["country_name"] = "Netherlands"
         relevant = [
             v for v in all_v
             if v.get("score", 0) >= MIN_SCORE or v.get("groq_score") == 0
@@ -845,9 +811,15 @@ def main():
     relevant = scrape_all(max_new=args.max)
 
     if not args.scrape_only:
-        # Include any previously scored relevant vacancies
         if VACANCIES_FILE.exists():
             all_v = [json.loads(line) for line in VACANCIES_FILE.read_text().strip().split("\n") if line.strip()]
+            # Backfill source/country for legacy vacancies
+            for v in all_v:
+                if "source" not in v:
+                    v["source"] = "academictransfer"
+                if "country" not in v:
+                    v["country"] = "NL"
+                    v["country_name"] = "Netherlands"
             relevant = [
                 v for v in all_v
                 if v.get("score", 0) >= MIN_SCORE or v.get("groq_score") == 0

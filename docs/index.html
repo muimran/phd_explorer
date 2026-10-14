@@ -37,13 +37,36 @@ body {
 
 /* Stats */
 .stats {
-    display: flex; gap: 2rem; margin-bottom: 2.5rem;
+    display: flex; gap: 2rem; margin-bottom: 1.5rem;
     padding-bottom: 1.5rem; border-bottom: 1px solid var(--border);
 }
 .stat { }
 .stat-num { font-size: 1.75rem; font-weight: 600; line-height: 1; }
 .stat-num.accent { color: var(--accent); }
 .stat-label { font-size: 0.75rem; color: var(--muted); margin-top: 0.15rem; }
+
+/* Filters */
+.filters {
+    display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem; border-bottom: 1px solid var(--border);
+}
+.filter-group { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; }
+.filter-group::before { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-right: 0.25rem; }
+.filter-group.source-filters::before { content: "Source"; }
+.filter-group.country-filters::before { content: "Country"; }
+.filter-sep { width: 1px; height: 1.5rem; background: var(--border); margin: 0 0.5rem; }
+.filter-btn {
+    font-size: 0.7rem; font-weight: 500;
+    padding: 0.25rem 0.6rem; border-radius: 999px;
+    border: 1px solid var(--border); background: var(--bg); color: var(--muted);
+    cursor: pointer; transition: all 0.15s;
+}
+.filter-btn.active {
+    border-color: var(--btn-color, var(--accent));
+    color: var(--btn-color, var(--accent));
+    background: color-mix(in srgb, var(--btn-color, var(--accent)) 8%, var(--bg));
+}
+.filter-btn:hover { opacity: 0.8; }
 
 /* Sections */
 .section-header {
@@ -64,6 +87,7 @@ body {
 }
 .card:last-child { border-bottom: none; }
 .card.dismissed { opacity: 0; height: 0; overflow: hidden; padding: 0; border: none; }
+.card.filtered { display: none; }
 .card-top { display: flex; align-items: flex-start; gap: 1rem; }
 .score-col {
     display: flex; flex-direction: column; align-items: center;
@@ -81,6 +105,17 @@ body {
 .card h3 { font-size: 0.95rem; font-weight: 500; line-height: 1.4; margin-bottom: 0.2rem; }
 .card a { color: var(--fg); text-decoration: none; }
 .card a:hover { color: var(--accent); }
+.badges { display: flex; gap: 0.35rem; margin-bottom: 0.3rem; flex-wrap: wrap; }
+.source-badge {
+    font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;
+    padding: 0.1rem 0.4rem; border-radius: 3px;
+    border: 1px solid; background: transparent;
+}
+.country-badge {
+    font-size: 0.6rem; font-weight: 600;
+    padding: 0.1rem 0.4rem; border-radius: 3px;
+    background: var(--border); color: var(--fg);
+}
 .meta { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.2rem; }
 .tags { font-size: 0.75rem; color: var(--accent); margin-bottom: 0.15rem; }
 .terms { font-size: 0.75rem; color: var(--muted); opacity: 0.6; }
@@ -156,12 +191,12 @@ body {
 
 <div class="header">
     <h1>PhD Radar</h1>
-    <div class="updated">Last scraped 13 October 2026, 14:49</div>
+    <div class="updated">Last scraped 15 October 2026, 00:32</div>
 </div>
 
 <div class="stats">
     <div class="stat">
-        <div class="stat-num">28</div>
+        <div class="stat-num">26</div>
         <div class="stat-label">Total</div>
     </div>
     <div class="stat">
@@ -178,14 +213,27 @@ body {
     </div>
 </div>
 
+<div class="filters">
+    <div class="filter-group source-filters">
+        <button class="filter-btn active" data-filter="source" data-value="academictransfer" style="--btn-color:#2563eb">AcademicTransfer</button>
+
+    </div>
+    <div class="filter-sep"></div>
+    <div class="filter-group country-filters">
+        <button class="filter-btn active" data-filter="country" data-value="NL">NL</button>
+
+    </div>
+</div>
+
 <div class="section-header"><h2>Strong matches</h2><span class="section-count">4</span></div>
 
-        <div class="card" data-id="364331">
+        <div class="card" data-id="364331" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Good fit: focuses on AI governance, media, and digital tech with social science angle aligning with candidate interests">75</div><div class="kw-score" title="Keyword score">kw 50</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/364331/phd-candidate-in-access-actors-and-accountability-the-role-of-researchers-in-ai-governance/" target="_blank" rel="noopener">PhD Candidate in Access, Actors and Accountability: The Role of Researchers in AI Governance</a></h3>
                     <div class="meta">University of Amsterdam (UvA)</div>
                     <div class="tags">Adjacent</div>
@@ -197,12 +245,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="364079">
+        <div class="card" data-id="364079" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Good fit: aligns with misinformation, AI, digital communication research and uses quantitative methods matching candidate's skills">75</div><div class="kw-score" title="Keyword score">kw 14</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/364079/phd-candidate-agents-of-doubt-a-novel-framework-on-adolescents/" target="_blank" rel="noopener">PhD Candidate: "Agents of Doubt: A Novel Framework on Adolescents"</a></h3>
                     <div class="meta">University of Amsterdam (UvA)</div>
                     <div class="tags">Tech & Data · Adjacent</div>
@@ -214,12 +263,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="364211">
+        <div class="card" data-id="364211" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Good fit: aligns with AI governance and socio‑technical research, but lacks direct media/journalism focus">65</div><div class="kw-score" title="Keyword score">kw 21</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/364211/phd-in-trustworthy-llm-enabled-ecosystems-from-requirements-to-architecture/" target="_blank" rel="noopener">PhD in Trustworthy LLM-Enabled Ecosystems: From Requirements to Architecture</a></h3>
                     <div class="meta">Eindhoven University of Technology (TU/e)</div>
                     <div class="tags">Tech & Data · Adjacent</div>
@@ -231,12 +281,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="364549">
+        <div class="card" data-id="364549" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Good fit: aligns with computational social science and network analysis, relevant skills in Python, but focus is broader than media-specific topics">65</div><div class="kw-score" title="Keyword score">kw 15</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/364549/phd-candidate-in-population-scale-network-science-10-fte-4-years/" target="_blank" rel="noopener">PhD Candidate in Population-Scale Network Science (1.0 FTE, 4 years)</a></h3>
                     <div class="meta">Leiden University</div>
                     <div class="tags">Tech & Data</div>
@@ -249,12 +300,13 @@ body {
             </div>
         </div><div class="section-header"><h2>Worth investigating</h2><span class="section-count">6</span></div>
 
-        <div class="card" data-id="364429">
+        <div class="card" data-id="364429" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Related to misinformation and media effects, but focus on health hacks is peripheral to the candidate's core media/politics interests">55</div><div class="kw-score" title="Keyword score">kw 19</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/364429/phd-position-in-communication-science-explaining-susceptibility-to-health-hacks/" target="_blank" rel="noopener">PhD position in Communication Science: Explaining Susceptibility to Health Hacks</a></h3>
                     <div class="meta">Vrije Universiteit Amsterdam (VU)</div>
                     <div class="tags">Tech & Data · Adjacent</div>
@@ -266,12 +318,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="364624">
+        <div class="card" data-id="364624" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Relevant to media manipulation and misinformation but focuses on computer‑vision deepfake detection, which is only tangential to the candidate’s NLP‑centric skill set">55</div><div class="kw-score" title="Keyword score">kw 16</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/364624/phd-position-on-explainable-deepfake-detection-using-foundation-models/" target="_blank" rel="noopener">PhD position on explainable DeepFake detection using Foundation models</a></h3>
                     <div class="meta">University of Twente (UT)</div>
                     <div class="tags">Tech & Data</div>
@@ -283,12 +336,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="364581">
+        <div class="card" data-id="364581" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Related quantitative social science focus on security and politics aligns partially with candidate's interests, but lacks media/NLP emphasis">55</div><div class="kw-score" title="Keyword score">kw 15</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/364581/phd-position-in-political-science-militarization-and-democratic-erosion-in-latin-america/" target="_blank" rel="noopener">PhD Position in Political Science: Militarization and Democratic Erosion in Latin America</a></h3>
                     <div class="meta">University of Amsterdam (UvA)</div>
                     <div class="tags">Adjacent</div>
@@ -300,12 +354,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="364570">
+        <div class="card" data-id="364570" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Related to political economy and quantitative analysis, but lacks direct focus on media, journalism, or AI governance, making it only a tangential fit.">45</div><div class="kw-score" title="Keyword score">kw 7</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/364570/phd-position-why-are-the-super-rich-so-tax-averse/" target="_blank" rel="noopener">PhD Position 'Why Are the Super-Rich So Tax-Averse?'</a></h3>
                     <div class="meta">University of Amsterdam (UvA)</div>
                     <div class="tags">Tech & Data</div>
@@ -317,12 +372,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="364100">
+        <div class="card" data-id="364100" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Only tangential link via media history, but lacks computational/social science focus">30</div><div class="kw-score" title="Keyword score">kw 21</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/364100/phd-in-the-history-of-democracy-in-the-1970s/" target="_blank" rel="noopener">PhD in the History of Democracy in the 1970s</a></h3>
                     <div class="meta">Utrecht University</div>
                     <div class="tags">Adjacent</div>
@@ -334,12 +390,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="363929">
+        <div class="card" data-id="363929" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Only tangential computational skill overlap; research focus on education/neuroscience not aligned with candidate's media/social science interests">30</div><div class="kw-score" title="Keyword score">kw 7</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/363929/phd-position-curiosity-in-the-classroom/" target="_blank" rel="noopener">PhD Position: Curiosity in the Classroom</a></h3>
                     <div class="meta">Radboud University</div>
                     <div class="tags">Tech & Data</div>
@@ -350,31 +407,15 @@ body {
                     <button class="dismiss-btn" onclick="dismiss('363929')" title="Not relevant">✕</button>
                 </div>
             </div>
-        </div><div class="section-header"><h2>Weak matches</h2><span class="section-count">8</span></div>
+        </div><div class="section-header"><h2>Weak matches</h2><span class="section-count">6</span></div>
 
-        <div class="card" data-id="363888">
-            <div class="card-top">
-                <div class="score-col">
-                    <div class="score" title="Focus on land-use optimization and environmental science with little relevance to media, journalism, or computational social science">15</div><div class="kw-score" title="Keyword score">kw 7</div>
-                </div>
-                <div class="card-body">
-                    <h3><a href="https://www.academictransfer.com/en/jobs/363888/phd-spatial-optimization-of-land-use-in-brazil/" target="_blank" rel="noopener">PhD: Spatial Optimization of Land Use in Brazil</a></h3>
-                    <div class="meta">Utrecht University</div>
-                    <div class="tags">Tech & Data</div>
-                    <div class="terms">Python, R, data science</div>
-                </div>
-                <div class="card-right">
-                    <div class="countdown" data-deadline="13 Oct ’26" title="13 Oct ’26"></div>
-                    <button class="dismiss-btn" onclick="dismiss('363888')" title="Not relevant">✕</button>
-                </div>
-            </div>
-        </div>
-        <div class="card" data-id="363984">
+        <div class="card" data-id="363984" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The position is a generic statistics PhD with mathematical focus, lacking relevance to media, journalism, or computational social science interests.">15</div><div class="kw-score" title="Keyword score">kw 7</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/363984/phd-in-statistics/" target="_blank" rel="noopener">PhD in Statistics</a></h3>
                     <div class="meta">Eindhoven University of Technology (TU/e)</div>
                     <div class="tags">Tech & Data</div>
@@ -386,12 +427,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="364658">
+        <div class="card" data-id="364658" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Only superficial overlap (Python, GIS); core focus on agricultural economics and biodiversity is unrelated to candidate's media/society interests">15</div><div class="kw-score" title="Keyword score">kw 7</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/364658/phd-economics-of-native-species-production-and-rural-development-in-the-cerrado/" target="_blank" rel="noopener">PhD: Economics of native species production and rural development in the Cerrado</a></h3>
                     <div class="meta">Wageningen University & Research</div>
                     <div class="tags"></div>
@@ -403,12 +445,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="363844">
+        <div class="card" data-id="363844" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The role focuses on linguistic fieldwork and language documentation, which does not align with the candidate's data journalism and computational media expertise.">10</div><div class="kw-score" title="Keyword score">kw 45</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/363844/two-phd-candidates-descriptivedocumentary-linguistics-in-indonesia/" target="_blank" rel="noopener">Two PhD candidates, Descriptive/Documentary Linguistics in Indonesia</a></h3>
                     <div class="meta">Leiden University</div>
                     <div class="tags">Journalism</div>
@@ -420,12 +463,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="364287">
+        <div class="card" data-id="364287" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Focus on AI engineering and industry applications, not media/social data journalism or public-interest tech">10</div><div class="kw-score" title="Keyword score">kw 19</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/364287/phd-position-sustainable-generative-ai-for-digital-sovereignty/" target="_blank" rel="noopener">PhD Position: Sustainable Generative AI for Digital Sovereignty</a></h3>
                     <div class="meta">Delft University of Technology (TU Delft)</div>
                     <div class="tags">Tech & Data · Adjacent</div>
@@ -437,12 +481,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="364630">
+        <div class="card" data-id="364630" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The role centers on transport logistics optimization and game theory, unrelated to media, journalism, or computational social science interests.">5</div><div class="kw-score" title="Keyword score">kw 6</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/364630/phd-position-optimizing-multi-actor-transport-and-logistics-systems/" target="_blank" rel="noopener">PhD Position Optimizing Multi-actor Transport and Logistics Systems</a></h3>
                     <div class="meta">Delft University of Technology (TU Delft)</div>
                     <div class="tags"></div>
@@ -454,29 +499,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="363620">
-            <div class="card-top">
-                <div class="score-col">
-                    <div class="score" title="Focus on control theory and transportation digital twins, no alignment with media, journalism, or computational social science interests">5</div><div class="kw-score" title="Keyword score">kw 5</div>
-                </div>
-                <div class="card-body">
-                    <h3><a href="https://www.academictransfer.com/en/jobs/363620/phd-position-control-theory-for-self-designing-digital-twins-of-transportation-systems/" target="_blank" rel="noopener">PhD Position Control Theory for Self-Designing Digital Twins of Transportation Systems</a></h3>
-                    <div class="meta">Delft University of Technology (TU Delft)</div>
-                    <div class="tags">Tech & Data</div>
-                    <div class="terms">Python, machine learning</div>
-                </div>
-                <div class="card-right">
-                    <div class="countdown" data-deadline="14 Oct ’26" title="14 Oct ’26"></div>
-                    <button class="dismiss-btn" onclick="dismiss('363620')" title="Not relevant">✕</button>
-                </div>
-            </div>
-        </div>
-        <div class="card" data-id="364137">
+        <div class="card" data-id="364137" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Focus on qualitative anthropology and fieldwork with no computational or media/data journalism component">5</div><div class="kw-score" title="Keyword score">kw 5</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/364137/phd-position-decolonising-reparations/" target="_blank" rel="noopener">PhD Position: Decolonising Reparations</a></h3>
                     <div class="meta">Radboud University</div>
                     <div class="tags">Adjacent</div>
@@ -492,12 +521,13 @@ body {
             <summary>Zero-score matches <span class="section-count">10</span></summary>
             <p class="archive-note">These low-confidence matches are kept for review and sorted by the date they were added.</p>
             
-        <div class="card" data-id="364617">
+        <div class="card" data-id="364617" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Focus on atmospheric physics and GPU radiation modeling, no relevance to media, journalism, or computational social science">0</div><div class="kw-score" title="Keyword score">kw 13</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/364617/phd-3d-radiation-in-clouds-and-wildfire-plumes-using-gpus-and-machine-learning/" target="_blank" rel="noopener">PhD: 3D radiation in clouds and wildfire plumes using GPUs and machine learning</a></h3>
                     <div class="meta">Wageningen University & Research · Added 09 Oct 2026</div>
                     <div class="tags">Tech & Data</div>
@@ -509,12 +539,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="364560">
+        <div class="card" data-id="364560" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Requires legal qualifications and focuses on space law, which do not match the candidate's computational journalism and data-focused background">0</div><div class="kw-score" title="Keyword score">kw 32</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/364560/phd-position-in-space-law-and-artificial-intelligence/" target="_blank" rel="noopener">PhD Position in Space Law and Artificial Intelligence</a></h3>
                     <div class="meta">Vrije Universiteit Amsterdam (VU) · Added 09 Oct 2026</div>
                     <div class="tags">Tech & Data · Adjacent</div>
@@ -526,12 +557,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="364428">
+        <div class="card" data-id="364428" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The role focuses on chemical touch sensors and robotics engineering, unrelated to media, journalism, or computational social science">0</div><div class="kw-score" title="Keyword score">kw 23</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/364428/phd-tactochem-robotic-systems-chemistry/" target="_blank" rel="noopener">PhD TactoChem – Robotic Systems Chemistry</a></h3>
                     <div class="meta">University of Groningen · Added 09 Oct 2026</div>
                     <div class="tags">Journalism · Tech & Data</div>
@@ -543,12 +575,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="364461">
+        <div class="card" data-id="364461" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The role focuses on materials science and laboratory automation, unrelated to the candidate's media/society computational journalism interests">0</div><div class="kw-score" title="Keyword score">kw 15</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/364461/phd-position-agentic-ai-driven-experiments-for-materials-discovery/" target="_blank" rel="noopener">PhD Position: Agentic AI-Driven Experiments for Materials Discovery</a></h3>
                     <div class="meta">DIFFER · Added 05 Oct 2026</div>
                     <div class="tags">Tech & Data</div>
@@ -560,12 +593,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="364394">
+        <div class="card" data-id="364394" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Focus on bio-digital systems and living organisms, unrelated to media/data journalism or computational social science">0</div><div class="kw-score" title="Keyword score">kw 8</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/364394/phd-position-in-decoding-environmental-history-from-microorganisms-for-living-sensors-and-memory/" target="_blank" rel="noopener">PhD Position in Decoding Environmental History from Microorganisms for Living Sensors and Memory</a></h3>
                     <div class="meta">Delft University of Technology (TU Delft) · Added 01 Oct 2026</div>
                     <div class="tags">Tech & Data</div>
@@ -577,12 +611,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="364349">
+        <div class="card" data-id="364349" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Focus on medical device regulation and clinical evidence, unrelated to media, journalism, or computational social science">0</div><div class="kw-score" title="Keyword score">kw 5</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/364349/phd-position-decision-making-under-uncertainty-for-emerging-orphan-and-breakthrough-medical-devices/" target="_blank" rel="noopener">PhD Position Decision-making Under Uncertainty for Emerging Orphan and Breakthrough Medical Devices</a></h3>
                     <div class="meta">Delft University of Technology (TU Delft) · Added 01 Oct 2026</div>
                     <div class="tags">Adjacent</div>
@@ -594,12 +629,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="364342">
+        <div class="card" data-id="364342" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Focus on energy data privacy and engineering, no alignment with media, journalism, or public-interest tech interests">0</div><div class="kw-score" title="Keyword score">kw 28</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/364342/phd-position-on-adaptive-privacy-and-differential-privacy-for-energy-data/" target="_blank" rel="noopener">PhD position on ‘Adaptive Privacy and Differential Privacy for Energy Data’</a></h3>
                     <div class="meta">The Open Universiteit (OU) · Added 01 Oct 2026</div>
                     <div class="tags">Tech & Data · Adjacent</div>
@@ -611,12 +647,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="364340">
+        <div class="card" data-id="364340" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The role focuses on neurobiology and EEG, unrelated to the candidate's media, journalism, or computational social science interests">0</div><div class="kw-score" title="Keyword score">kw 7</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/364340/phd-position-eeg-and-neurobiological-markers/" target="_blank" rel="noopener">PhD position EEG and Neurobiological Markers</a></h3>
                     <div class="meta">University of Groningen · Added 01 Oct 2026</div>
                     <div class="tags">Tech & Data</div>
@@ -628,12 +665,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="364169">
+        <div class="card" data-id="364169" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Focus on biological single-cell ML, no alignment with media/society computational journalism interests">0</div><div class="kw-score" title="Keyword score">kw 31</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/364169/phd-candidate-in-explainable-machine-learning-for-studying-biology-at-single-cell-resolution/" target="_blank" rel="noopener">PhD Candidate in Explainable Machine Learning for Studying Biology at Single-Cell Resolution</a></h3>
                     <div class="meta">University of Amsterdam (UvA) · Added 25 Sep 2026</div>
                     <div class="tags">Tech & Data</div>
@@ -645,12 +683,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="363944">
+        <div class="card" data-id="363944" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Requires a law degree and focuses on private/maritime law, which does not match the candidate's computational journalism and data-focused background">0</div><div class="kw-score" title="Keyword score">kw 5</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/363944/lecturerphd-researcher-private-law-liability-position-of-european-ports/" target="_blank" rel="noopener">Lecturer/(PhD) researcher private-law liability position of European ports</a></h3>
                     <div class="meta">Erasmus University Rotterdam (EUR) · Added 15 Sep 2026</div>
                     <div class="tags">Adjacent</div>
@@ -665,15 +704,52 @@ body {
         </details>
 
         <details class="archive">
-            <summary>Expired opportunities <span class="section-count">42</span></summary>
+            <summary>Expired opportunities <span class="section-count">44</span></summary>
             <p class="archive-note">These records are kept for reference but are no longer in the active opportunity list.</p>
             
-        <div class="card" data-id="364431">
+        <div class="card" data-id="363620" data-source="academictransfer" data-country="NL">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score" title="Focus on control theory and transportation digital twins, no alignment with media, journalism, or computational social science interests">5</div><div class="kw-score" title="Keyword score">kw 5</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
+                    <h3><a href="https://www.academictransfer.com/en/jobs/363620/phd-position-control-theory-for-self-designing-digital-twins-of-transportation-systems/" target="_blank" rel="noopener">PhD Position Control Theory for Self-Designing Digital Twins of Transportation Systems</a></h3>
+                    <div class="meta">Delft University of Technology (TU Delft)</div>
+                    <div class="tags">Tech & Data</div>
+                    <div class="terms">Python, machine learning</div>
+                </div>
+                <div class="card-right">
+                    <div class="countdown" data-deadline="14 Oct ’26" title="14 Oct ’26"></div>
+                    <button class="dismiss-btn" onclick="dismiss('363620')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="363888" data-source="academictransfer" data-country="NL">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score" title="Focus on land-use optimization and environmental science with little relevance to media, journalism, or computational social science">15</div><div class="kw-score" title="Keyword score">kw 7</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
+                    <h3><a href="https://www.academictransfer.com/en/jobs/363888/phd-spatial-optimization-of-land-use-in-brazil/" target="_blank" rel="noopener">PhD: Spatial Optimization of Land Use in Brazil</a></h3>
+                    <div class="meta">Utrecht University</div>
+                    <div class="tags">Tech & Data</div>
+                    <div class="terms">Python, R, data science</div>
+                </div>
+                <div class="card-right">
+                    <div class="countdown" data-deadline="13 Oct ’26" title="13 Oct ’26"></div>
+                    <button class="dismiss-btn" onclick="dismiss('363888')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="364431" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The role focuses on chemical touch sensors, robotics, and systems chemistry, which do not align with the candidate's media/data journalism and computational social science interests">0</div><div class="kw-score" title="Keyword score">kw 23</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/364431/phd-tactochem-signal-amplification-and-processing/" target="_blank" rel="noopener">PhD TactoChem – Signal Amplification and Processing</a></h3>
                     <div class="meta">University of Groningen</div>
                     <div class="tags">Journalism · Tech & Data</div>
@@ -685,12 +761,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="363891">
+        <div class="card" data-id="363891" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The role centers on legal regulation of the hydrogen economy, lacking relevance to the candidate's media, data journalism, or computational social science interests">5</div><div class="kw-score" title="Keyword score">kw 15</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/363891/phd-in-adapative-regulatory-frameworks-for-the-hydrogen-economy/" target="_blank" rel="noopener">PhD in Adapative Regulatory Frameworks for the Hydrogen Economy</a></h3>
                     <div class="meta">University of Groningen</div>
                     <div class="tags">Adjacent</div>
@@ -702,12 +779,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="364160">
+        <div class="card" data-id="364160" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The role focuses on medical biomarkers and ageing biology, which lies outside the candidate's media/society computational interests.">0</div><div class="kw-score" title="Keyword score">kw 16</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/364160/phd-candidate-in-rehabilitation-medicine-biological-age-and-biomarkers/" target="_blank" rel="noopener">PhD Candidate in Rehabilitation Medicine – Biological Age and Biomarkers</a></h3>
                     <div class="meta">Amsterdam UMC</div>
                     <div class="tags">Tech & Data</div>
@@ -719,12 +797,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="363624">
+        <div class="card" data-id="363624" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The position focuses on zebrafish preclinical imaging and disease modeling, unrelated to media, journalism, or computational social science.">0</div><div class="kw-score" title="Keyword score">kw 8</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/363624/msca-dn-phd-in-preclinical-outcomes-in-zebrafish-models-of-leukodystrophies/" target="_blank" rel="noopener">MSCA-DN PhD in preclinical outcomes in zebrafish models of leukodystrophies</a></h3>
                     <div class="meta">Amsterdam UMC</div>
                     <div class="tags">Tech & Data</div>
@@ -736,12 +815,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="363694">
+        <div class="card" data-id="363694" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The role focuses on medical/biological biomarkers and neuroscience, which are outside the candidate's media/society computational interests.">0</div><div class="kw-score" title="Keyword score">kw 7</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/363694/msca-dn-phd-position-in-liquid-biomarkers-for-leukodystrophies-tubingen-ge/" target="_blank" rel="noopener">MSCA-DN PhD position in liquid biomarkers for leukodystrophies (Tübingen, GE)</a></h3>
                     <div class="meta">Amsterdam UMC</div>
                     <div class="tags">Tech & Data</div>
@@ -753,12 +833,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="363800">
+        <div class="card" data-id="363800" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The role focuses on environmental governance and biodiversity, lacking relevance to the candidate's journalism, media, or AI governance interests.">15</div><div class="kw-score" title="Keyword score">kw 16</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/363800/phd-position-landscape-governance/" target="_blank" rel="noopener">PhD position Landscape Governance</a></h3>
                     <div class="meta">Wageningen University & Research</div>
                     <div class="tags">Adjacent</div>
@@ -770,12 +851,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="363933">
+        <div class="card" data-id="363933" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Good fit: uses media data and quantitative analysis on gender and leadership, matching candidate's computational journalism and social science interests, though not core media-focused research">65</div><div class="kw-score" title="Keyword score">kw 8</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/363933/phd-position-in-the-field-of-organizational-behavior/" target="_blank" rel="noopener">PhD position in the field of Organizational Behavior</a></h3>
                     <div class="meta">University of Groningen</div>
                     <div class="tags">Adjacent</div>
@@ -787,12 +869,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="363411">
+        <div class="card" data-id="363411" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Requires legal expertise and competition law focus, which does not match the candidate's media/data journalism background">10</div><div class="kw-score" title="Keyword score">kw 8</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/363411/phd-position-competition-law-enforcement-in-mixed-markets/" target="_blank" rel="noopener">PhD position: Competition Law Enforcement in Mixed Markets</a></h3>
                     <div class="meta">Utrecht University</div>
                     <div class="tags">Tech & Data</div>
@@ -804,12 +887,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="363344">
+        <div class="card" data-id="363344" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The role centers on visual attention neuroscience and psychophysics, lacking relevance to media, journalism, or computational social science interests.">15</div><div class="kw-score" title="Keyword score">kw 12</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/363344/phd-position-4-years-on-the-role-of-foveal-processing-in-spatial-attention/" target="_blank" rel="noopener">PhD position (4 years) on the Role of Foveal Processing in Spatial Attention</a></h3>
                     <div class="meta">Vrije Universiteit Amsterdam (VU)</div>
                     <div class="tags">Tech & Data</div>
@@ -821,12 +905,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="363712">
+        <div class="card" data-id="363712" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Good fit: aligns with AI, politics, and computational social science using NLP, matching candidate's interests and skills">78</div><div class="kw-score" title="Keyword score">kw 9</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/363712/phd-position-on-the-effects-of-incorporation-of-emotion-sensitive-ai-on-politics-and-policymaking/" target="_blank" rel="noopener">PhD Position on the Effects of Incorporation of Emotion-Sensitive A.I. on Politics and Policymaking</a></h3>
                     <div class="meta">University of Amsterdam (UvA)</div>
                     <div class="tags">Tech & Data</div>
@@ -838,12 +923,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="363579">
+        <div class="card" data-id="363579" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Focus on scientific machine learning for physics, unrelated to media, journalism, or public-interest tech">5</div><div class="kw-score" title="Keyword score">kw 21</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/363579/phd-position-scientific-machine-learning-for-scientific-foundation-models/" target="_blank" rel="noopener">PhD Position Scientific Machine Learning for Scientific Foundation Models</a></h3>
                     <div class="meta">Delft University of Technology (TU Delft)</div>
                     <div class="tags">Tech & Data</div>
@@ -855,12 +941,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="363520">
+        <div class="card" data-id="363520" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The position focuses on mathematical and engineering aspects of wave-based imaging, unrelated to media, journalism, or computational social science.">0</div><div class="kw-score" title="Keyword score">kw 9</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/363520/phd-student-on-the-subject-of-inverse-problems-for-wave-based-imaging/" target="_blank" rel="noopener">PhD student on the subject of Inverse Problems for Wave-Based Imaging</a></h3>
                     <div class="meta">Centrum Wiskunde en Informatica (CWI)</div>
                     <div class="tags">Tech & Data</div>
@@ -872,12 +959,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="363401">
+        <div class="card" data-id="363401" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Hard-excluded by the candidate profile.">0</div><div class="kw-score" title="Keyword score">kw 0</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/363401/phd-position-decentralized-and-trustworthy-ai-pipelines-eu-project-waltz/" target="_blank" rel="noopener">PhD Position Decentralized and Trustworthy AI Pipelines (EU project WALTZ)</a></h3>
                     <div class="meta">Delft University of Technology (TU Delft)</div>
                     <div class="tags">Tech & Data · Adjacent</div>
@@ -889,12 +977,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="363629">
+        <div class="card" data-id="363629" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The role focuses on auditory neuroscience and neuroimaging, which does not align with the candidate's media‑oriented computational journalism interests.">5</div><div class="kw-score" title="Keyword score">kw 19</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/363629/phd-candidate-in-neuroai-for-auditory-neuroscience/" target="_blank" rel="noopener">PhD Candidate in NeuroAI for Auditory Neuroscience</a></h3>
                     <div class="meta">Maastricht University (UM)</div>
                     <div class="tags">Tech & Data</div>
@@ -906,12 +995,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="363634">
+        <div class="card" data-id="363634" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Possible fit: uses computational/digital methods and NLP on textual data, but focus is historical gender labor rather than media or journalism">45</div><div class="kw-score" title="Keyword score">kw 16</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/363634/phd-candidate-on-the-transimperial-history-of-womens-work-1600-1900/" target="_blank" rel="noopener">PhD Candidate on the Transimperial History of Women’s Work (1600-1900)</a></h3>
                     <div class="meta">Erasmus University Rotterdam (EUR)</div>
                     <div class="tags">Tech & Data</div>
@@ -923,12 +1013,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="363340">
+        <div class="card" data-id="363340" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Hard-excluded by the candidate profile.">0</div><div class="kw-score" title="Keyword score">kw 0</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/363340/phd-in-spatial-system-mapping-and-decision-support-design-for-nature-inclusive-agrifood-transitions/" target="_blank" rel="noopener">PhD in Spatial System Mapping and Decision-Support Design for Nature-Inclusive Agrifood Transitions</a></h3>
                     <div class="meta">Eindhoven University of Technology (TU/e)</div>
                     <div class="tags"></div>
@@ -940,12 +1031,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="362999">
+        <div class="card" data-id="362999" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The vacancy is focused on engineering, computer science, and human-computer interaction in the context of disabilities and mobility, which is outside the candidate's core interests in data journalism, computational social science, and public-interest technology.">0</div><div class="kw-score" title="Keyword score">kw 12</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/362999/phd-position-cognitive-guidance-in-xr-to-improve-independent-mobility-for-people-with-disabilities/" target="_blank" rel="noopener">PhD Position Cognitive Guidance in XR to Improve Independent Mobility for People with Disabilities</a></h3>
                     <div class="meta">Delft University of Technology (TU Delft)</div>
                     <div class="tags">Tech & Data</div>
@@ -957,12 +1049,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="363666">
+        <div class="card" data-id="363666" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Focus on medical imaging AI and clinical applications, outside candidate's media/society computational interests">0</div><div class="kw-score" title="Keyword score">kw 44</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/363666/phd-candidate-in-explainable-ai-and-foundation-models-for-ct-imaging/" target="_blank" rel="noopener">PhD Candidate in Explainable AI and Foundation Models for CT Imaging</a></h3>
                     <div class="meta">Maastricht University (UM)</div>
                     <div class="tags">Tech & Data · Adjacent</div>
@@ -974,12 +1067,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="362632">
+        <div class="card" data-id="362632" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The vacancy is in the field of medical imaging and biomedical engineering, which is not relevant to the candidate's focus on media, society, and computational journalism.">0</div><div class="kw-score" title="Keyword score">kw 13</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/362632/phd-in-multi-aperture-ultrasound-imaging-for-abdominal-aortic-aneurysm/" target="_blank" rel="noopener">PhD in Multi-Aperture Ultrasound Imaging for Abdominal Aortic Aneurysm</a></h3>
                     <div class="meta">Eindhoven University of Technology (TU/e)</div>
                     <div class="tags">Tech & Data</div>
@@ -991,12 +1085,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="363068">
+        <div class="card" data-id="363068" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Hard-excluded by the candidate profile.">0</div><div class="kw-score" title="Keyword score">kw 0</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/363068/phd-position-engineering-trustworthy-energy-data-spaces/" target="_blank" rel="noopener">PhD Position: Engineering Trustworthy Energy Data Spaces</a></h3>
                     <div class="meta">Wageningen University & Research</div>
                     <div class="tags">Tech & Data · Adjacent</div>
@@ -1008,12 +1103,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="363283">
+        <div class="card" data-id="363283" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The vacancy is only superficially related to the candidate's interests, with some overlap in data analysis and web scraping, but is primarily focused on geography and innovation systems, which is not a core area of interest for the candidate.">20</div><div class="kw-score" title="Keyword score">kw 5</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/363283/phd-in-global-talent-mobility-and-europes-strategic-autonomy/" target="_blank" rel="noopener">PhD in Global Talent Mobility and Europe’s Strategic Autonomy</a></h3>
                     <div class="meta">Utrecht University</div>
                     <div class="tags">Tech & Data</div>
@@ -1025,12 +1121,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="363341">
+        <div class="card" data-id="363341" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Strong alignment with candidate's interests in misinformation, online information spread, and required Python/R skills, though broader social data focus makes it a good but not core fit">75</div><div class="kw-score" title="Keyword score">kw 100</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/363341/phd-position-in-social-data-science/" target="_blank" rel="noopener">PhD Position in Social Data Science</a></h3>
                     <div class="meta">Vrije Universiteit Amsterdam (VU)</div>
                     <div class="tags">Journalism · Tech & Data</div>
@@ -1042,12 +1139,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="363228">
+        <div class="card" data-id="363228" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Hard-excluded by the candidate profile.">0</div><div class="kw-score" title="Keyword score">kw 0</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/363228/phd-position-on-restoring-communicative-agency-human-centered-ai-smart-glasses-for-people-with-speech-impairments/" target="_blank" rel="noopener">PhD position on ‘Restoring Communicative Agency: Human-centered AI smart glasses for people with speech impairments’</a></h3>
                     <div class="meta">The Open Universiteit (OU)</div>
                     <div class="tags">Tech & Data</div>
@@ -1059,12 +1157,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="361419">
+        <div class="card" data-id="361419" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The vacancy is in moral philosophy and conceptual engineering, which is only superficially related to the candidate's interests in data journalism, computational social science, and AI governance.">20</div><div class="kw-score" title="Keyword score">kw 5</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/361419/phd-position-in-moral-philosophy-conceptual-engineering-and-ethics-of-emerging-technologies/" target="_blank" rel="noopener">PhD position in Moral Philosophy, Conceptual Engineering, and Ethics of Emerging Technologies</a></h3>
                     <div class="meta">University of Groningen</div>
                     <div class="tags">Adjacent</div>
@@ -1076,12 +1175,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="362200">
+        <div class="card" data-id="362200" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The vacancy is related to media and democracy, which aligns with the candidate's interests, but it focuses on historical research methods and archival sources, which is tangential to the candidate's computational and data-driven background.">40</div><div class="kw-score" title="Keyword score">kw 21</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/362200/phd-media-and-democracy-in-the-1970s/" target="_blank" rel="noopener">PhD Media and Democracy in the 1970s</a></h3>
                     <div class="meta">Utrecht University</div>
                     <div class="tags">Adjacent</div>
@@ -1093,12 +1193,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="363267">
+        <div class="card" data-id="363267" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The vacancy is focused on computational imaging for high-throughput applications, which is a field unrelated to the candidate's interests in data journalism, computational social science, and public interest technology.">0</div><div class="kw-score" title="Keyword score">kw 13</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/363267/phd-in-computational-imaging-for-high-throughput-applications-10-fte/" target="_blank" rel="noopener">PhD in Computational Imaging for High-Throughput Applications (1.0 fte)</a></h3>
                     <div class="meta">Leiden University</div>
                     <div class="tags">Tech & Data</div>
@@ -1110,12 +1211,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="362430">
+        <div class="card" data-id="362430" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The PhD position's focus on local democracy, underrepresented communities, and participatory research methods aligns with the candidate's interests in computational social science and public interest technology, but lacks a strong computational or data-driven component.">70</div><div class="kw-score" title="Keyword score">kw 20</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/362430/phd-position-local-democracy-and-underrepresented-communities-in-amsterdam/" target="_blank" rel="noopener">PhD Position Local Democracy and Underrepresented Communities in Amsterdam</a></h3>
                     <div class="meta">University of Amsterdam (UvA)</div>
                     <div class="tags">Adjacent</div>
@@ -1127,12 +1229,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="362431">
+        <div class="card" data-id="362431" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The vacancy is related to sociology and human rights, but it lacks a strong computational or data-driven component, and the focus is on qualitative socio-legal research rather than the candidate's areas of interest.">20</div><div class="kw-score" title="Keyword score">kw 25</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/362431/phd-position-the-rule-of-law-from-below/" target="_blank" rel="noopener">PhD Position The Rule of Law from Below</a></h3>
                     <div class="meta">University of Amsterdam (UvA)</div>
                     <div class="tags">Adjacent</div>
@@ -1144,12 +1247,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="362432">
+        <div class="card" data-id="362432" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The vacancy is only superficially related to the candidate's interests, with a focus on environmental science, urban planning, and governance, which is outside their core areas of expertise in data journalism, computational social science, and public-interest technology.">20</div><div class="kw-score" title="Keyword score">kw 9</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/362432/phd-position-strategising-for-the-green-transition-in-amsterdam/" target="_blank" rel="noopener">PhD Position Strategising for the Green Transition in Amsterdam</a></h3>
                     <div class="meta">University of Amsterdam (UvA)</div>
                     <div class="tags">Adjacent</div>
@@ -1161,12 +1265,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="362433">
+        <div class="card" data-id="362433" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The vacancy is a good fit because it involves qualitative research methods, social media analysis, and a focus on democracy and civil society, which are related to the candidate's interests in computational social science and public interest technology.">70</div><div class="kw-score" title="Keyword score">kw 33</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/362433/phd-position-negotiating-democracy-in-amsterdam/" target="_blank" rel="noopener">PhD Position Negotiating Democracy in Amsterdam</a></h3>
                     <div class="meta">University of Amsterdam (UvA)</div>
                     <div class="tags">Tech & Data · Adjacent</div>
@@ -1178,12 +1283,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="362666">
+        <div class="card" data-id="362666" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The PhD position in Governance of Cybercrime is a good fit for the candidate due to its relevance to security and society topics, although it may require some adaptation to the criminology field.">60</div><div class="kw-score" title="Keyword score">kw 20</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/362666/phd-fellow-governance-of-cybercrime/" target="_blank" rel="noopener">PhD Fellow Governance of Cybercrime</a></h3>
                     <div class="meta">Leiden University</div>
                     <div class="tags">Adjacent</div>
@@ -1195,12 +1301,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="362385">
+        <div class="card" data-id="362385" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The vacancy is focused on medical research and health sciences, which is outside the candidate's area of interest and expertise in data journalism, computational social science, and public interest technology.">0</div><div class="kw-score" title="Keyword score">kw 5</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/362385/phd-candidate-donor-protect/" target="_blank" rel="noopener">PhD Candidate: DONOR-PROTECT</a></h3>
                     <div class="meta">Sanquin Blood Supply Foundation (Sanquin)</div>
                     <div class="tags">Tech & Data</div>
@@ -1212,12 +1319,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="363178">
+        <div class="card" data-id="363178" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The vacancy is in medical imaging, which is outside the candidate's focus on media/society and does not align with their skills or interests.">0</div><div class="kw-score" title="Keyword score">kw 9</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/363178/msca-dn-phd-position-brain-large-axial-field-of-view-petct/" target="_blank" rel="noopener">MSCA-DN PhD position: brain large axial field of view PET/CT</a></h3>
                     <div class="meta">Amsterdam UMC</div>
                     <div class="tags">Tech & Data</div>
@@ -1229,12 +1337,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="362726">
+        <div class="card" data-id="362726" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The PhD position's focus on nihilistic violent extremist groups, combining criminology and data science, aligns with the candidate's interests in security/society topics and computational methods for social science research.">80</div><div class="kw-score" title="Keyword score">kw 32</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/362726/phd-student-4-years-on-nihilistic-violent-extremist-groups/" target="_blank" rel="noopener">PhD student (4 years) on Nihilistic Violent Extremist Groups</a></h3>
                     <div class="meta">Vrije Universiteit Amsterdam (VU)</div>
                     <div class="tags">Tech & Data · Adjacent</div>
@@ -1246,12 +1355,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="362819">
+        <div class="card" data-id="362819" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The PhD position is an excellent fit for the candidate, as it involves applying computational models and NLP techniques to study language change, which aligns with the candidate's interests in data journalism, computational social science, and digital methods.">80</div><div class="kw-score" title="Keyword score">kw 23</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/362819/phd-computational-semantic-representations-a-multilingual-language-change-study/" target="_blank" rel="noopener">PhD Computational Semantic Representations: a Multilingual Language-Change Study</a></h3>
                     <div class="meta">Utrecht University</div>
                     <div class="tags">Tech & Data</div>
@@ -1263,12 +1373,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="362880">
+        <div class="card" data-id="362880" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The vacancy is focused on design interventions for school environments, which is unrelated to the candidate's interests in data journalism, computational social science, and public interest technology.">0</div><div class="kw-score" title="Keyword score">kw 9</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/362880/phd-position-on-critical-approaches-to-designing-for-belonging/" target="_blank" rel="noopener">PhD position on Critical approaches to Designing for Belonging</a></h3>
                     <div class="meta">University of Twente (UT)</div>
                     <div class="tags">Tech & Data</div>
@@ -1280,12 +1391,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="362253">
+        <div class="card" data-id="362253" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The vacancy is focused on mechanism-informed world models and agents in the context of engineering and computer science, which is unrelated to the candidate's interests in data journalism, computational social science, and public interest technology.">0</div><div class="kw-score" title="Keyword score">kw 13</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/362253/phd-candidate-in-mechanism-informed-world-models-and-agents/" target="_blank" rel="noopener">PhD Candidate in Mechanism-Informed World Models and Agents</a></h3>
                     <div class="meta">University of Amsterdam (UvA)</div>
                     <div class="tags">Tech & Data</div>
@@ -1297,12 +1409,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="362349">
+        <div class="card" data-id="362349" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The vacancy is only superficially related to the candidate's interests, as it involves historical research on protest and political speech, but lacks a clear connection to data journalism, computational methods, or public-interest technology.">20</div><div class="kw-score" title="Keyword score">kw 15</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/362349/phd-position-on-protest-and-political-speech-in-the-nordics-1930-1970/" target="_blank" rel="noopener">PhD position on protest and political speech in the Nordics, 1930-1970</a></h3>
                     <div class="meta">University of Amsterdam (UvA)</div>
                     <div class="tags">Journalism</div>
@@ -1314,12 +1427,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="362817">
+        <div class="card" data-id="362817" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The vacancy is focused on machine learning and formal methods in computer science, which is outside the candidate's core research areas of interest in data journalism, computational social science, and public interest technology.">0</div><div class="kw-score" title="Keyword score">kw 17</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/362817/phd-in-resilient-machine-learning-and-formal-methods/" target="_blank" rel="noopener">PhD in Resilient Machine Learning and Formal Methods</a></h3>
                     <div class="meta">Eindhoven University of Technology (TU/e)</div>
                     <div class="tags">Tech & Data</div>
@@ -1331,12 +1445,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="362930">
+        <div class="card" data-id="362930" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="The PhD vacancy is an excellent fit for the candidate, as it involves computational social science, data science, and the analysis of online narratives, which aligns with the candidate's interests and skills in data journalism, computational journalism, and digital methods.">90</div><div class="kw-score" title="Keyword score">kw 74</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/362930/phd-a-multimodal-analysis-of-emotion-narrative-and-migration-politics-online/" target="_blank" rel="noopener">PhD: A Multimodal Analysis of Emotion, Narrative, and Migration Politics Online</a></h3>
                     <div class="meta">Utrecht University</div>
                     <div class="tags">Journalism · Tech & Data</div>
@@ -1348,12 +1463,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="362601">
+        <div class="card" data-id="362601" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Hard-excluded by the candidate profile.">0</div><div class="kw-score" title="Keyword score">kw 0</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/362601/phd-behavioural-economic-modelling-for-pest-risk-management/" target="_blank" rel="noopener">PhD: Behavioural & Economic Modelling for Pest Risk Management</a></h3>
                     <div class="meta">Wageningen University & Research</div>
                     <div class="tags"></div>
@@ -1365,12 +1481,13 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="362956">
+        <div class="card" data-id="362956" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
                     <div class="score" title="Hard-excluded by the candidate profile.">0</div><div class="kw-score" title="Keyword score">kw 0</div>
                 </div>
                 <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#2563eb;color:#2563eb">AcademicTransfer</span> <span class="country-badge">NL</span></div>
                     <h3><a href="https://www.academictransfer.com/en/jobs/362956/phd-in-optimization-of-sustainable-agri-food-supply-chains-under-climate-risk/" target="_blank" rel="noopener">PhD in Optimization of Sustainable Agri-Food Supply Chains under Climate Risk</a></h3>
                     <div class="meta">Wageningen University & Research</div>
                     <div class="tags">Tech & Data</div>
@@ -1395,25 +1512,53 @@ body {
 </div>
 
 <div class="footer">
-    Source: <a href="https://www.academictransfer.com">AcademicTransfer</a> · Updates every 2 days · AI scored by Llama 3.3
+    Sources: <a href="https://www.academictransfer.com">AcademicTransfer</a> · Updates every 2 days · AI scored by Llama 3.3
 </div>
 
 </div>
 
 <script>
-// Calculate days remaining for each deadline
+// ── Filters ──
+document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        btn.classList.toggle('active');
+        applyFilters();
+    });
+});
+
+function applyFilters() {
+    const activeSources = new Set();
+    const activeCountries = new Set();
+    document.querySelectorAll('.filter-btn[data-filter="source"].active').forEach(b => activeSources.add(b.dataset.value));
+    document.querySelectorAll('.filter-btn[data-filter="country"].active').forEach(b => activeCountries.add(b.dataset.value));
+
+    document.querySelectorAll('.card').forEach(card => {
+        const src = card.dataset.source || 'academictransfer';
+        const country = card.dataset.country || '';
+        const sourceOk = activeSources.size === 0 || activeSources.has(src);
+        const countryOk = activeCountries.size === 0 || activeCountries.has(country);
+        card.classList.toggle('filtered', !(sourceOk && countryOk));
+    });
+}
+
+// ── Deadlines ──
 document.querySelectorAll('.countdown').forEach(el => {
     const raw = el.dataset.deadline;
     if (!raw) return;
-    const normalized = raw.replace(/['‘’](\d{2})/, '20$1');
-    const deadline = new Date(normalized);
+    // Handle ISO dates (YYYY-MM-DD) and AT-style ("28 Oct '26")
+    let deadline;
+    if (/^\d{4}-\d{2}-\d{2}/.test(raw)) {
+        deadline = new Date(raw);
+    } else {
+        const normalized = raw.replace(/['\u2018\u2019](\d{2})/, '20$1');
+        deadline = new Date(normalized);
+    }
     if (isNaN(deadline)) return;
     const now = new Date();
     now.setHours(0,0,0,0);
     deadline.setHours(0,0,0,0);
     const diff = Math.ceil((deadline - now) / (1000 * 60 * 60 * 24));
     if (diff < 0) {
-        // Hide expired cards from main sections (not the archive)
         const card = el.closest('.card');
         if (card && !card.closest('.archive')) card.classList.add('dismissed');
         el.textContent = 'Expired';
@@ -1431,6 +1576,7 @@ document.querySelectorAll('.countdown').forEach(el => {
     }
 });
 
+// ── Dismissals ──
 const serverDismissed = new Set([]);
 let sessionDismissed = new Set();
 
