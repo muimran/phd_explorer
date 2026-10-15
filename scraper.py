@@ -386,14 +386,14 @@ def generate_site(scored: list[dict]):
         </details>"""
 
     # Build filter buttons
-    source_buttons = ""
+    source_buttons = '<button class="filter-btn active" data-filter="source" data-value="all">All</button>\n'
     for src in sources_used:
         info = SOURCE_META.get(src, {"label": src, "color": "#737373"})
-        source_buttons += f'<button class="filter-btn active" data-filter="source" data-value="{src}" style="--btn-color:{info["color"]}">{info["label"]}</button>\n'
+        source_buttons += f'<button class="filter-btn" data-filter="source" data-value="{src}" style="--btn-color:{info["color"]}">{info["label"]}</button>\n'
 
-    country_buttons = ""
+    country_buttons = '<button class="filter-btn active" data-filter="country" data-value="all">All</button>\n'
     for cc in countries_used:
-        country_buttons += f'<button class="filter-btn active" data-filter="country" data-value="{cc}">{cc}</button>\n'
+        country_buttons += f'<button class="filter-btn" data-filter="country" data-value="{cc}">{cc}</button>\n'
 
     dismissed_json = json.dumps(sorted(dismissed))
 
@@ -402,6 +402,7 @@ def generate_site(scored: list[dict]):
     source_links = {
         "academictransfer": '<a href="https://www.academictransfer.com">AcademicTransfer</a>',
         "euraxess": '<a href="https://euraxess.ec.europa.eu">EURAXESS</a>',
+        "jobsacuk": '<a href="https://www.jobs.ac.uk">jobs.ac.uk</a>',
     }
     footer_sources = " · ".join(source_links.get(s, s) for s in sources_used)
 
@@ -663,24 +664,45 @@ body {{
 
 <script>
 // ── Filters ──
+function handleFilterClick(btn) {{
+    const group = btn.dataset.filter;
+    const value = btn.dataset.value;
+    const siblings = document.querySelectorAll(`.filter-btn[data-filter="${{group}}"]`);
+    const allBtn = document.querySelector(`.filter-btn[data-filter="${{group}}"][data-value="all"]`);
+
+    if (value === 'all') {{
+        siblings.forEach(b => b.classList.remove('active'));
+        allBtn.classList.add('active');
+    }} else {{
+        allBtn.classList.remove('active');
+        if (btn.classList.contains('active')) {{
+            btn.classList.remove('active');
+            const anyActive = [...siblings].some(b => b.dataset.value !== 'all' && b.classList.contains('active'));
+            if (!anyActive) allBtn.classList.add('active');
+        }} else {{
+            btn.classList.add('active');
+        }}
+    }}
+    applyFilters();
+}}
+
 document.querySelectorAll('.filter-btn').forEach(btn => {{
-    btn.addEventListener('click', () => {{
-        btn.classList.toggle('active');
-        applyFilters();
-    }});
+    btn.addEventListener('click', () => handleFilterClick(btn));
 }});
 
 function applyFilters() {{
     const activeSources = new Set();
     const activeCountries = new Set();
-    document.querySelectorAll('.filter-btn[data-filter="source"].active').forEach(b => activeSources.add(b.dataset.value));
-    document.querySelectorAll('.filter-btn[data-filter="country"].active').forEach(b => activeCountries.add(b.dataset.value));
+    const srcAll = document.querySelector('.filter-btn[data-filter="source"][data-value="all"]').classList.contains('active');
+    const cntAll = document.querySelector('.filter-btn[data-filter="country"][data-value="all"]').classList.contains('active');
+    if (!srcAll) document.querySelectorAll('.filter-btn[data-filter="source"].active').forEach(b => activeSources.add(b.dataset.value));
+    if (!cntAll) document.querySelectorAll('.filter-btn[data-filter="country"].active').forEach(b => activeCountries.add(b.dataset.value));
 
     document.querySelectorAll('.card').forEach(card => {{
         const src = card.dataset.source || 'academictransfer';
         const country = card.dataset.country || '';
-        const sourceOk = activeSources.size === 0 || activeSources.has(src);
-        const countryOk = activeCountries.size === 0 || activeCountries.has(country);
+        const sourceOk = srcAll || activeSources.has(src);
+        const countryOk = cntAll || activeCountries.has(country);
         card.classList.toggle('filtered', !(sourceOk && countryOk));
     }});
 

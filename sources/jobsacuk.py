@@ -66,6 +66,25 @@ def _parse_deadline(text: str) -> str:
     return text
 
 
+def _fetch_description(url: str) -> str:
+    """Fetch the full description from a job page."""
+    try:
+        resp = requests.get(url, headers=HEADERS, timeout=30)
+        resp.raise_for_status()
+        soup = BeautifulSoup(resp.text, "lxml")
+        # Enhanced listings have a rich description
+        desc_el = soup.select_one(".j-enhanced__advert-text")
+        if desc_el:
+            return desc_el.get_text(" ", strip=True)[:8000]
+        # Basic listings: grab the main content area
+        content = soup.select_one(".sub-grid__2-col--large-left")
+        if content:
+            return content.get_text(" ", strip=True)[:8000]
+    except requests.RequestException:
+        pass
+    return ""
+
+
 def _parse_search_results(html: str) -> list[dict]:
     """Parse jobs.ac.uk search result cards from HTML."""
     soup = BeautifulSoup(html, "lxml")
@@ -90,14 +109,6 @@ def _parse_search_results(html: str) -> list[dict]:
             dept_el = card.select_one(".j-search-result__department")
             department = dept_el.get_text(strip=True) if dept_el else ""
 
-            location = ""
-            for div in card.select("div"):
-                text = div.get_text(strip=True)
-                if text and div.get("class") is None and not div.find("a"):
-                    if employer and text != employer and "PhD" not in text and len(text) < 100:
-                        location = text
-                        break
-
             salary_el = card.select_one(".j-search-result__info")
             salary = salary_el.get_text(strip=True) if salary_el else ""
 
@@ -116,11 +127,11 @@ def _parse_search_results(html: str) -> list[dict]:
                 "country": "GB",
                 "country_name": "United Kingdom",
                 "department": department,
-                "location": location,
+                "location": "",
                 "deadline": deadline,
                 "days_remaining": "",
                 "research_fields": "",
-                "description": f"{title}. {employer}. {department}. {salary}",
+                "description": "",
                 "metadata": {"salary": salary},
                 "scraped_at": datetime.now().isoformat(),
             })
@@ -200,6 +211,19 @@ def scrape(seen_ids: set[str], max_new: int = 0) -> list[dict]:
 
         if page < MAX_PAGES - 1:
             time.sleep(CRAWL_DELAY)
+
+    # Fetch full descriptions for new vacancies
+    if vacancies:
+        print(f"  Fetching descriptions for {len(vacancies)} vacancies...")
+        for i, v in enumerate(vacancies):
+            slug = v["title"][:50]
+            desc = _fetch_description(v["url"])
+            if desc:
+                v["description"] = desc
+            else:
+                v["description"] = f"{v['title']}. {v['employer']}. {v['department']}"
+            if i < len(vacancies) - 1:
+                time.sleep(CRAWL_DELAY)
 
     print(f"  ✓ {len(vacancies)} new vacancies from jobs.ac.uk")
     return vacancies
