@@ -288,15 +288,15 @@ def generate_site(scored: list[dict]):
 
     cards_html = ""
     if strong_list:
-        cards_html += f'<div class="section-header"><h2>Strong matches</h2><span class="section-count">{len(strong_list)}</span></div>\n'
+        cards_html += f'<div class="section-header"><h2>Strong matches</h2><span class="section-count">{len(strong_list)}</span><button class="collapse-btn" aria-label="Collapse section">&#x25B2;</button></div>\n'
         for v in strong_list:
             cards_html += vacancy_card(v)
     if investigate_list:
-        cards_html += f'<div class="section-header"><h2>Worth investigating</h2><span class="section-count">{len(investigate_list)}</span></div>\n'
+        cards_html += f'<div class="section-header"><h2>Worth investigating</h2><span class="section-count">{len(investigate_list)}</span><button class="collapse-btn" aria-label="Collapse section">&#x25B2;</button></div>\n'
         for v in investigate_list:
             cards_html += vacancy_card(v)
     if weak_list:
-        cards_html += f'<div class="section-header"><h2>Weak matches</h2><span class="section-count">{len(weak_list)}</span></div>\n'
+        cards_html += f'<div class="section-header"><h2>Weak matches</h2><span class="section-count">{len(weak_list)}</span><button class="collapse-btn" aria-label="Collapse section">&#x25B2;</button></div>\n'
         for v in weak_list:
             cards_html += vacancy_card(v)
     if zero_list:
@@ -418,11 +418,21 @@ body {{
     position: sticky; top: 0; z-index: 10;
     background: var(--bg); border-bottom: 1px solid var(--border);
 }}
+.section-header {{ cursor: pointer; }}
 .section-header h2 {{ font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }}
+.section-header.collapsed {{ margin-bottom: 0; }}
 .section-count {{
     font-size: 0.7rem; font-weight: 600; color: var(--accent);
     background: none; padding: 0;
 }}
+.collapse-btn {{
+    margin-left: auto; background: none; border: none; cursor: pointer;
+    font-size: 0.6rem; color: var(--muted); padding: 0.2rem 0.4rem;
+    transition: transform 0.2s ease;
+}}
+.collapse-btn:hover {{ color: var(--fg); }}
+.section-header.collapsed .collapse-btn {{ transform: rotate(180deg); }}
+.card.section-collapsed {{ display: none; }}
 
 /* Cards */
 .card {{
@@ -628,6 +638,18 @@ function applyFilters() {{
         if (badge) badge.textContent = visible;
     }});
 }}
+
+// ── Section collapse ──
+document.querySelectorAll('.section-header').forEach(header => {{
+    header.addEventListener('click', () => {{
+        const collapsed = header.classList.toggle('collapsed');
+        let el = header.nextElementSibling;
+        while (el && !el.classList.contains('section-header') && !el.classList.contains('archive')) {{
+            if (el.classList.contains('card')) el.classList.toggle('section-collapsed', collapsed);
+            el = el.nextElementSibling;
+        }}
+    }});
+}});
 
 // ── Deadlines ──
 document.querySelectorAll('.countdown').forEach(el => {{
