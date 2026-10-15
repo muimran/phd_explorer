@@ -67,7 +67,7 @@ body {
     background: color-mix(in srgb, var(--btn-color, var(--accent)) 8%, var(--bg));
 }
 .filter-btn:hover { opacity: 0.8; }
-.filter-btn.dimmed { opacity: 0.3; pointer-events: auto; }
+.filter-btn.dimmed { opacity: 0.15; transform: scale(0.9); pointer-events: auto; }
 
 /* Sections */
 .section-header {
@@ -204,7 +204,7 @@ body {
 
 <div class="header">
     <h1>PhD Radar</h1>
-    <div class="updated">Last scraped 15 October 2026, 12:39</div>
+    <div class="updated">Last scraped 15 October 2026, 14:47</div>
 </div>
 
 <div class="stats">
@@ -2942,22 +2942,59 @@ body {
 function handleFilterClick(btn) {
     const group = btn.dataset.filter;
     const value = btn.dataset.value;
+    const otherGroup = group === 'source' ? 'country' : 'source';
     const siblings = document.querySelectorAll(`.filter-btn[data-filter="${group}"]`);
     const allBtn = document.querySelector(`.filter-btn[data-filter="${group}"][data-value="all"]`);
 
     if (value === 'all') {
         siblings.forEach(b => b.classList.remove('active'));
         allBtn.classList.add('active');
+        // Reset the other group back to All too
+        const otherBtns = document.querySelectorAll(`.filter-btn[data-filter="${otherGroup}"]`);
+        otherBtns.forEach(b => { b.classList.remove('active'); b.style.display = ''; });
+        document.querySelector(`.filter-btn[data-filter="${otherGroup}"][data-value="all"]`).classList.add('active');
     } else {
         allBtn.classList.remove('active');
         if (btn.classList.contains('active')) {
             btn.classList.remove('active');
             const anyActive = [...siblings].some(b => b.dataset.value !== 'all' && b.classList.contains('active'));
-            if (!anyActive) allBtn.classList.add('active');
+            if (!anyActive) {
+                allBtn.classList.add('active');
+                // Reset other group too
+                const otherBtns = document.querySelectorAll(`.filter-btn[data-filter="${otherGroup}"]`);
+                otherBtns.forEach(b => { b.classList.remove('active'); b.style.display = ''; });
+                document.querySelector(`.filter-btn[data-filter="${otherGroup}"][data-value="all"]`).classList.add('active');
+            }
         } else {
             btn.classList.add('active');
         }
     }
+
+    // Cross-filter: update other group to show only relevant buttons
+    const thisAll = allBtn.classList.contains('active');
+    if (!thisAll) {
+        const activeValues = new Set();
+        siblings.forEach(b => { if (b.dataset.value !== 'all' && b.classList.contains('active')) activeValues.add(b.dataset.value); });
+        const relevantOther = new Set();
+        const field = group === 'source' ? 'source' : 'country';
+        const otherField = group === 'source' ? 'country' : 'source';
+        document.querySelectorAll('.card').forEach(card => {
+            const val = (field === 'source') ? (card.dataset.source || 'academictransfer') : (card.dataset.country || '');
+            if (activeValues.has(val)) {
+                const otherVal = (otherField === 'source') ? (card.dataset.source || 'academictransfer') : (card.dataset.country || '');
+                relevantOther.add(otherVal);
+            }
+        });
+        const otherAllBtn = document.querySelector(`.filter-btn[data-filter="${otherGroup}"][data-value="all"]`);
+        otherAllBtn.classList.remove('active');
+        document.querySelectorAll(`.filter-btn[data-filter="${otherGroup}"]`).forEach(b => {
+            if (b.dataset.value === 'all') return;
+            const relevant = relevantOther.has(b.dataset.value);
+            b.style.display = relevant ? '' : 'none';
+            b.classList.toggle('active', relevant);
+        });
+    }
+
     applyFilters();
 }
 
@@ -2999,27 +3036,6 @@ function applyFilters() {
         if (badge) badge.textContent = visible;
     });
 
-    // Cross-filter: dim buttons with zero visible cards
-    const allCards = [...document.querySelectorAll('.card')];
-    // Countries available given current source filter
-    const visibleCountries = new Set();
-    const visibleSources = new Set();
-    allCards.forEach(card => {
-        const src = card.dataset.source || 'academictransfer';
-        const country = card.dataset.country || '';
-        const sourceOk = srcAll || activeSources.has(src);
-        const countryOk = cntAll || activeCountries.has(country);
-        if (sourceOk) visibleCountries.add(country);
-        if (countryOk) visibleSources.add(src);
-    });
-    document.querySelectorAll('.filter-btn[data-filter="country"]').forEach(b => {
-        if (b.dataset.value === 'all') return;
-        b.classList.toggle('dimmed', !visibleCountries.has(b.dataset.value));
-    });
-    document.querySelectorAll('.filter-btn[data-filter="source"]').forEach(b => {
-        if (b.dataset.value === 'all') return;
-        b.classList.toggle('dimmed', !visibleSources.has(b.dataset.value));
-    });
 }
 
 // ── Section collapse ──
