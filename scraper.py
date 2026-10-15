@@ -54,6 +54,53 @@ def is_postdoc(vacancy: dict) -> bool:
     return any(t in title for t in ["postdoc", "post-doc", "postdoctoral", "post doc"])
 
 
+def _normalize_employer(emp: str) -> str:
+    """Normalize employer name for dedup comparison."""
+    emp = emp.lower().strip()
+    emp = emp.replace(" via academictransfer", "").replace("academictransfer", "")
+    emp = emp.strip().rstrip(",").strip()
+    return emp
+
+
+def deduplicate(vacancies: list[dict]) -> list[dict]:
+    """Remove duplicate vacancies: same ID, or same title+employer across/within sources."""
+    from difflib import SequenceMatcher
+
+    # Pass 1: deduplicate by ID (keep latest scraped)
+    by_id = {}
+    for v in vacancies:
+        vid = v["id"]
+        if vid not in by_id or v.get("scraped_at", "") > by_id[vid].get("scraped_at", ""):
+            by_id[vid] = v
+    unique = list(by_id.values())
+
+    # Pass 2: deduplicate by title+employer similarity (keep latest)
+    unique.sort(key=lambda v: v.get("scraped_at", ""), reverse=True)
+    kept = []
+    for v in unique:
+        title = v["title"].lower().strip()
+        emp = _normalize_employer(v.get("employer", ""))
+        is_dupe = False
+        for k in kept:
+            kt = k["title"].lower().strip()
+            ke = _normalize_employer(k.get("employer", ""))
+            title_sim = SequenceMatcher(None, title, kt).ratio()
+            if title_sim > 0.95:
+                is_dupe = True
+                break
+            if title_sim > 0.90:
+                if not emp or not ke or SequenceMatcher(None, emp, ke).ratio() > 0.5:
+                    is_dupe = True
+                    break
+        if not is_dupe:
+            kept.append(v)
+
+    removed = len(vacancies) - len(kept)
+    if removed:
+        print(f"  Dedup: removed {removed} duplicates ({len(vacancies)} → {len(kept)})")
+    return kept
+
+
 def hard_exclude(vacancy: dict) -> bool:
     """Exclude clearly unrelated fields unless there is a core social/media signal."""
     text = (vacancy["title"] + " " + vacancy["description"]).lower()
@@ -853,6 +900,7 @@ def main():
             if "country" not in v:
                 v["country"] = "NL"
                 v["country_name"] = "Netherlands"
+        all_v = deduplicate(all_v)
         relevant = [
             v for v in all_v
             if not is_postdoc(v) and (v.get("score", 0) >= MIN_SCORE or v.get("groq_score") == 0)
@@ -872,6 +920,7 @@ def main():
                 if "country" not in v:
                     v["country"] = "NL"
                     v["country_name"] = "Netherlands"
+            all_v = deduplicate(all_v)
             relevant = [
                 v for v in all_v
                 if not is_postdoc(v) and (v.get("score", 0) >= MIN_SCORE or v.get("groq_score") == 0)
