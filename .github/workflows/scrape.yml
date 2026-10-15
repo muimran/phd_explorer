@@ -28,6 +28,8 @@ jobs:
           CRAWL_DELAY: "5"
           EURAXESS_DELAY: "8"
           EURAXESS_PAGES: "3"
+          JOBSACUK_DELAY: "8"
+          JOBSACUK_PAGES: "3"
 
       - name: Run LLM scorer
         continue-on-error: true

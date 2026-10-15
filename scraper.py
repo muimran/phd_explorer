@@ -21,7 +21,7 @@ from profile import (
     JOURNALISM_MEDIA, TECH_DATA, JOURNALISM_ADJACENT, YOUR_SKILLS,
     REGEX_SKILLS, WEIGHTS, MIN_SCORE, EXCLUDE_TERMS, PROFILE_SUMMARY,
 )
-from sources import academictransfer, euraxess
+from sources import academictransfer, euraxess, jobsacuk
 
 # ── Paths ────────────────────────────────────────────────────────────────────
 DATA_DIR = Path(__file__).parent / "data"
@@ -31,7 +31,7 @@ DISMISSED_FILE = DATA_DIR / "dismissed.json"
 SITE_DIR = Path(__file__).parent / "docs"
 
 # All enabled source modules
-SOURCES = [academictransfer, euraxess]
+SOURCES = [academictransfer, euraxess, jobsacuk]
 
 
 # ── Seen IDs ────────────────────────────────────────────────────────────────
@@ -48,10 +48,26 @@ def save_seen(ids: set[str]):
 
 # ── Scoring ──────────────────────────────────────────────────────────────────
 
+_ALWAYS_EXCLUDE = ["postdoc", "post-doc", "postdoctoral", "post doc"]
+_EXCLUDE_UNLESS_PHD = [
+    "research associate", "research assistant", "senior research",
+    "lecturer", "professor", "reader", "teaching fellow", "technician",
+]
+_EXCLUDE_STANDALONE = ["research fellow"]
+
+
 def is_postdoc(vacancy: dict) -> bool:
-    """Detect postdoc positions — we're looking for PhD only."""
+    """Detect non-PhD positions — we're looking for PhD only."""
     title = vacancy["title"].lower()
-    return any(t in title for t in ["postdoc", "post-doc", "postdoctoral", "post doc"])
+    if any(t in title for t in _ALWAYS_EXCLUDE):
+        return True
+    if "phd" in title or "doctoral" in title:
+        return False
+    if any(t in title for t in _EXCLUDE_UNLESS_PHD):
+        return True
+    if any(t in title for t in _EXCLUDE_STANDALONE):
+        return True
+    return False
 
 
 def _normalize_employer(emp: str) -> str:
@@ -219,6 +235,7 @@ def deadline_date(value: str) -> date | None:
 SOURCE_META = {
     "academictransfer": {"label": "AcademicTransfer", "color": "#2563eb"},
     "euraxess": {"label": "EURAXESS", "color": "#059669"},
+    "jobsacuk": {"label": "jobs.ac.uk", "color": "#dc2626"},
 }
 
 
