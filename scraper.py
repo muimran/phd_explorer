@@ -475,6 +475,7 @@ body {{
     background: color-mix(in srgb, var(--btn-color, var(--accent)) 8%, var(--bg));
 }}
 .filter-btn:hover {{ opacity: 0.8; }}
+.filter-btn.dimmed {{ opacity: 0.3; pointer-events: auto; }}
 
 /* Sections */
 .section-header {{
@@ -722,6 +723,28 @@ function applyFilters() {{
         const visible = det.querySelectorAll('.card:not(.filtered):not(.dismissed)').length;
         const badge = det.querySelector('summary .section-count');
         if (badge) badge.textContent = visible;
+    }});
+
+    // Cross-filter: dim buttons with zero visible cards
+    const allCards = [...document.querySelectorAll('.card')];
+    // Countries available given current source filter
+    const visibleCountries = new Set();
+    const visibleSources = new Set();
+    allCards.forEach(card => {{
+        const src = card.dataset.source || 'academictransfer';
+        const country = card.dataset.country || '';
+        const sourceOk = srcAll || activeSources.has(src);
+        const countryOk = cntAll || activeCountries.has(country);
+        if (sourceOk) visibleCountries.add(country);
+        if (countryOk) visibleSources.add(src);
+    }});
+    document.querySelectorAll('.filter-btn[data-filter="country"]').forEach(b => {{
+        if (b.dataset.value === 'all') return;
+        b.classList.toggle('dimmed', !visibleCountries.has(b.dataset.value));
+    }});
+    document.querySelectorAll('.filter-btn[data-filter="source"]').forEach(b => {{
+        if (b.dataset.value === 'all') return;
+        b.classList.toggle('dimmed', !visibleSources.has(b.dataset.value));
     }});
 }}
 
