@@ -607,6 +607,24 @@ function applyFilters() {{
         const countryOk = activeCountries.size === 0 || activeCountries.has(country);
         card.classList.toggle('filtered', !(sourceOk && countryOk));
     }});
+
+    // Update section counts
+    document.querySelectorAll('.section-header').forEach(header => {{
+        let count = 0;
+        let el = header.nextElementSibling;
+        while (el && !el.classList.contains('section-header') && !el.classList.contains('archive')) {{
+            if (el.classList.contains('card') && !el.classList.contains('filtered') && !el.classList.contains('dismissed')) count++;
+            el = el.nextElementSibling;
+        }}
+        const badge = header.querySelector('.section-count');
+        if (badge) badge.textContent = count;
+    }});
+    // Update archive/details counts
+    document.querySelectorAll('details.archive').forEach(det => {{
+        const visible = det.querySelectorAll('.card:not(.filtered):not(.dismissed)').length;
+        const badge = det.querySelector('summary .section-count');
+        if (badge) badge.textContent = visible;
+    }});
 }}
 
 // ── Deadlines ──
