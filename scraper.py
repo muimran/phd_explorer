@@ -414,7 +414,9 @@ body {{
 /* Sections */
 .section-header {{
     display: flex; align-items: center; gap: 0.5rem;
-    margin: 2rem 0 0.75rem;
+    margin: 2rem 0 0rem; padding: 0.55rem 0;
+    position: sticky; top: 0; z-index: 10;
+    background: var(--bg); border-bottom: 1px solid var(--border);
 }}
 .section-header h2 {{ font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }}
 .section-count {{
