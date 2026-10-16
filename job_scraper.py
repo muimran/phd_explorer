@@ -19,13 +19,13 @@ from profile import (
     JOURNALISM_MEDIA, TECH_DATA, JOURNALISM_ADJACENT, YOUR_SKILLS,
     REGEX_SKILLS, WEIGHTS, PROFILE_SUMMARY,
 )
-from job_sources import guardian, greenhouse, workday, nytimes, bbc
+from job_sources import guardian, greenhouse, workday, nytimes, bbc, workable, bamboohr, dw
 
 DATA_DIR = Path(__file__).parent / "data"
 JOBS_FILE = DATA_DIR / "jobs.jsonl"
 JOBS_SEEN_FILE = DATA_DIR / "jobs_seen_ids.json"
 
-JOB_SOURCES = [guardian, greenhouse, workday, nytimes, bbc]
+JOB_SOURCES = [guardian, greenhouse, workday, nytimes, bbc, workable, bamboohr, dw]
 
 JOB_SOURCE_META = {
     "guardian": {"label": "The Guardian", "color": "#052962"},
@@ -35,6 +35,11 @@ JOB_SOURCE_META = {
     "reuters": {"label": "Reuters", "color": "#ff8000"},
     "nytimes": {"label": "NYT", "color": "#1a1a1a"},
     "bbc": {"label": "BBC", "color": "#bb1919"},
+    "semafor": {"label": "Semafor", "color": "#b45309"},
+    "axios": {"label": "Axios", "color": "#2563eb"},
+    "bellingcat": {"label": "Bellingcat", "color": "#0f766e"},
+    "occrp": {"label": "OCCRP", "color": "#7c2d12"},
+    "dw": {"label": "DW", "color": "#0284c7"},
 }
 
 
@@ -99,7 +104,7 @@ def is_relevant_job(job: dict) -> bool:
 TITLE_DATA = [
     "data", "visual", "graphics", "investigat", "interactive", "computational",
     "verify", "fact-check", "fact check", "osint", "open source", "insights",
-    "analytics", "ai ", "a.i.", "artificial intelligence",
+    "analytics", " ai ", " ai,", "a.i.", "artificial intelligence",
 ]
 TITLE_JOURNALISM = [
     "journalis", "reporter", "correspondent", "editor", "producer",

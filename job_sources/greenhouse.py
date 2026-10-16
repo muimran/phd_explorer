@@ -16,6 +16,8 @@ HEADERS = {
 BOARDS = {
     "propublica": {"employer": "ProPublica", "country": "US", "country_name": "United States"},
     "theeconomistgroup": {"employer": "The Economist", "country": "GB", "country_name": "United Kingdom"},
+    "semafor": {"employer": "Semafor", "country": "US", "country_name": "United States"},
+    "axios": {"employer": "Axios", "country": "US", "country_name": "United States"},
 }
 
 
@@ -43,7 +45,7 @@ def _location_to_country(location_name: str, default_country: str) -> tuple[str,
         return "HK", "Hong Kong"
     if "singapore" in loc:
         return "SG", "Singapore"
-    return default_country, dict(BOARDS.get("propublica", {})).get("country_name", "")
+    return default_country, ""
 
 
 def scrape_board(board_id: str, seen_ids: set[str], max_new: int = 0) -> list[dict]:

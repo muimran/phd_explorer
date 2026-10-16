@@ -16,7 +16,7 @@ COUNTRY_CODES = {
     "hungary": "HU", "iceland": "IS", "india": "IN", "indonesia": "ID",
     "ireland": "IE", "israel": "IL", "italy": "IT", "japan": "JP",
     "kazakhstan": "KZ", "korea": "KR", "latvia": "LV", "lithuania": "LT",
-    "luxembourg": "LU", "malaysia": "MY", "malta": "MT", "mexico": "MX",
+    "luxembourg": "LU", "malaysia": "MY", "malta": "MT", "mexico": "MX", "moldova": "MD",
     "morocco": "MA", "netherlands": "NL", "new zealand": "NZ", "nigeria": "NG",
     "norway": "NO", "pakistan": "PK", "poland": "PL", "portugal": "PT",
     "qatar": "QA", "romania": "RO", "saudi arabia": "SA", "serbia": "RS",
