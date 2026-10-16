@@ -34,6 +34,13 @@ body {
 .header { margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
 .header h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem; }
 .updated { font-size: 0.8rem; color: var(--muted); }
+.tabs { display: flex; gap: 1.25rem; margin-top: 1rem; }
+.tab {
+    font-size: 0.85rem; font-weight: 500; color: var(--muted); text-decoration: none;
+    padding-bottom: 0.35rem; border-bottom: 2px solid transparent;
+}
+.tab:hover { color: var(--fg); }
+.tab.active { color: var(--fg); border-bottom-color: var(--accent); }
 
 /* Stats */
 .stats {
@@ -204,24 +211,25 @@ body {
 
 <div class="header">
     <h1>PhD Radar</h1>
-    <div class="updated">Last scraped 15 October 2026, 12:49</div>
+    <div class="updated">Last scraped 16 October 2026, 17:31</div>
+    <nav class="tabs"><a class="tab active" href="index.html">PhD Positions</a><a class="tab" href="jobs.html">Jobs</a></nav>
 </div>
 
 <div class="stats">
     <div class="stat">
-        <div class="stat-num">103</div>
+        <div class="stat-num">97</div>
         <div class="stat-label">Total</div>
     </div>
     <div class="stat">
-        <div class="stat-num accent">20</div>
+        <div class="stat-num accent">19</div>
         <div class="stat-label">Strong</div>
     </div>
     <div class="stat">
-        <div class="stat-num">14</div>
+        <div class="stat-num">13</div>
         <div class="stat-label">Investigate</div>
     </div>
     <div class="stat">
-        <div class="stat-num">39</div>
+        <div class="stat-num">36</div>
         <div class="stat-label">Zero score</div>
     </div>
 </div>
@@ -259,7 +267,7 @@ body {
     </div>
 </div>
 
-<div class="section-header"><h2>Strong matches</h2><span class="section-count">20</span><button class="collapse-btn" aria-label="Collapse section">&#x25B2;</button></div>
+<div class="section-header"><h2>Strong matches</h2><span class="section-count">19</span><button class="collapse-btn" aria-label="Collapse section">&#x25B2;</button></div>
 
         <div class="card" data-id="364331" data-source="academictransfer" data-country="NL">
             <div class="card-top">
@@ -441,24 +449,6 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="euraxess_469493" data-source="euraxess" data-country="PT">
-            <div class="card-top">
-                <div class="score-col">
-                    <div class="score" title="Good fit as it aligns with journalism and communication research, matching the candidate's interests in data/computational journalism and media studies">73</div><div class="kw-score" title="Keyword score">kw 15</div>
-                </div>
-                <div class="card-body">
-                    <div class="badges"><span class="source-badge" style="border-color:#059669;color:#059669">EURAXESS</span> <span class="country-badge">PT</span></div>
-                    <h3><a href="https://euraxess.ec.europa.eu/jobs/469493" target="_blank" rel="noopener">Research Fellowship for doctoral student</a></h3>
-                    <div class="meta">Faculdade de Ciências Sociais e Humanas</div>
-                    <div class="tags">Journalism</div>
-                    <div class="terms">journalism</div>
-                </div>
-                <div class="card-right">
-                    <div class="countdown" data-deadline="2026-10-15" title="2026-10-15"></div>
-                    <button class="dismiss-btn" onclick="dismiss('euraxess_469493')" title="Not relevant">✕</button>
-                </div>
-            </div>
-        </div>
         <div class="card" data-id="jobsacuk_1090143" data-source="jobsacuk" data-country="GB">
             <div class="card-top">
                 <div class="score-col">
@@ -620,7 +610,7 @@ body {
                     <button class="dismiss-btn" onclick="dismiss('euraxess_472101')" title="Not relevant">✕</button>
                 </div>
             </div>
-        </div><div class="section-header"><h2>Worth investigating</h2><span class="section-count">14</span><button class="collapse-btn" aria-label="Collapse section">&#x25B2;</button></div>
+        </div><div class="section-header"><h2>Worth investigating</h2><span class="section-count">13</span><button class="collapse-btn" aria-label="Collapse section">&#x25B2;</button></div>
 
         <div class="card" data-id="euraxess_471910" data-source="euraxess" data-country="NL">
             <div class="card-top">
@@ -784,24 +774,6 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="euraxess_463550" data-source="euraxess" data-country="NO">
-            <div class="card-top">
-                <div class="score-col">
-                    <div class="score" title="Only a vague link via interactive storytelling; core focus on games/narratives does not match candidate's media/data journalism interests">30</div><div class="kw-score" title="Keyword score">kw 9</div>
-                </div>
-                <div class="card-body">
-                    <div class="badges"><span class="source-badge" style="border-color:#059669;color:#059669">EURAXESS</span> <span class="country-badge">NO</span></div>
-                    <h3><a href="https://euraxess.ec.europa.eu/jobs/463550" target="_blank" rel="noopener">PhD Research Fellowship in Games and Interactive Digital Narratives, Center for Digital Narrative</a></h3>
-                    <div class="meta">University of Bergen</div>
-                    <div class="tags">Adjacent</div>
-                    <div class="terms">democratic, interactive</div>
-                </div>
-                <div class="card-right">
-                    <div class="countdown" data-deadline="2026-10-15" title="2026-10-15"></div>
-                    <button class="dismiss-btn" onclick="dismiss('euraxess_463550')" title="Not relevant">✕</button>
-                </div>
-            </div>
-        </div>
         <div class="card" data-id="euraxess_472690" data-source="euraxess" data-country="IT">
             <div class="card-top">
                 <div class="score-col">
@@ -873,7 +845,7 @@ body {
                     <button class="dismiss-btn" onclick="dismiss('euraxess_471562')" title="Not relevant">✕</button>
                 </div>
             </div>
-        </div><div class="section-header"><h2>Weak matches</h2><span class="section-count">30</span><button class="collapse-btn" aria-label="Collapse section">&#x25B2;</button></div>
+        </div><div class="section-header"><h2>Weak matches</h2><span class="section-count">29</span><button class="collapse-btn" aria-label="Collapse section">&#x25B2;</button></div>
 
         <div class="card" data-id="euraxess_471653" data-source="euraxess" data-country="AE">
             <div class="card-top">
@@ -1070,24 +1042,6 @@ body {
                 <div class="card-right">
                     <div class="countdown" data-deadline="2026-11-08" title="2026-11-08"></div>
                     <button class="dismiss-btn" onclick="dismiss('euraxess_459674')" title="Not relevant">✕</button>
-                </div>
-            </div>
-        </div>
-        <div class="card" data-id="euraxess_464975" data-source="euraxess" data-country="SE">
-            <div class="card-top">
-                <div class="score-col">
-                    <div class="score" title="The focus on AI, creativity, and games lacks alignment with the candidate's media, journalism, and societal data interests.">15</div><div class="kw-score" title="Keyword score">kw 12</div>
-                </div>
-                <div class="card-body">
-                    <div class="badges"><span class="source-badge" style="border-color:#059669;color:#059669">EURAXESS</span> <span class="country-badge">SE</span></div>
-                    <h3><a href="https://euraxess.ec.europa.eu/jobs/464975" target="_blank" rel="noopener">Doctoral students in Artificial Intelligence</a></h3>
-                    <div class="meta">Academic Positions</div>
-                    <div class="tags">Tech & Data</div>
-                    <div class="terms">artificial intelligence</div>
-                </div>
-                <div class="card-right">
-                    <div class="countdown" data-deadline="2026-10-15" title="2026-10-15"></div>
-                    <button class="dismiss-btn" onclick="dismiss('euraxess_464975')" title="Not relevant">✕</button>
                 </div>
             </div>
         </div>
@@ -1416,7 +1370,7 @@ body {
             </div>
         </div>
         <details class="archive zero-archive">
-            <summary>Zero-score matches <span class="section-count">39</span></summary>
+            <summary>Zero-score matches <span class="section-count">36</span></summary>
             <p class="archive-note">These low-confidence matches are kept for review and sorted by the date they were added.</p>
             
         <div class="card" data-id="euraxess_421787" data-source="euraxess" data-country="">
@@ -1527,24 +1481,6 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="euraxess_463983" data-source="euraxess" data-country="SE">
-            <div class="card-top">
-                <div class="score-col">
-                    <div class="score" title="The role focuses on autonomous systems and engineering, unrelated to media, journalism, or computational social science">0</div><div class="kw-score" title="Keyword score">kw 15</div>
-                </div>
-                <div class="card-body">
-                    <div class="badges"><span class="source-badge" style="border-color:#059669;color:#059669">EURAXESS</span> <span class="country-badge">SE</span></div>
-                    <h3><a href="https://euraxess.ec.europa.eu/jobs/463983" target="_blank" rel="noopener">Doctoral Student in Human-in-the-Loop Autonomous Systems</a></h3>
-                    <div class="meta">Academic Positions · Added 15 Oct 2026</div>
-                    <div class="tags">Journalism</div>
-                    <div class="terms">bots</div>
-                </div>
-                <div class="card-right">
-                    <div class="countdown" data-deadline="2026-10-15" title="2026-10-15"></div>
-                    <button class="dismiss-btn" onclick="dismiss('euraxess_463983')" title="Not relevant">✕</button>
-                </div>
-            </div>
-        </div>
         <div class="card" data-id="euraxess_464267" data-source="euraxess" data-country="CH">
             <div class="card-top">
                 <div class="score-col">
@@ -1560,24 +1496,6 @@ body {
                 <div class="card-right">
                     <div class="countdown" data-deadline="2026-12-03" title="2026-12-03"></div>
                     <button class="dismiss-btn" onclick="dismiss('euraxess_464267')" title="Not relevant">✕</button>
-                </div>
-            </div>
-        </div>
-        <div class="card" data-id="euraxess_466188" data-source="euraxess" data-country="IT">
-            <div class="card-top">
-                <div class="score-col">
-                    <div class="score" title="The position focuses on LLM architecture and long-context reasoning in computer science, lacking relevance to media, journalism, or computational social science.">0</div><div class="kw-score" title="Keyword score">kw 16</div>
-                </div>
-                <div class="card-body">
-                    <div class="badges"><span class="source-badge" style="border-color:#059669;color:#059669">EURAXESS</span> <span class="country-badge">IT</span></div>
-                    <h3><a href="https://euraxess.ec.europa.eu/jobs/466188" target="_blank" rel="noopener">Adapting Large Language Models for Long-Context Reasoning in Challenging Domains</a></h3>
-                    <div class="meta">Italian Ministry of Education, University and Research · Added 15 Oct 2026</div>
-                    <div class="tags">Tech & Data</div>
-                    <div class="terms">LLM, large language models</div>
-                </div>
-                <div class="card-right">
-                    <div class="countdown" data-deadline="2026-10-15" title="2026-10-15"></div>
-                    <button class="dismiss-btn" onclick="dismiss('euraxess_466188')" title="Not relevant">✕</button>
                 </div>
             </div>
         </div>
@@ -1959,24 +1877,6 @@ body {
                 </div>
             </div>
         </div>
-        <div class="card" data-id="euraxess_471417" data-source="euraxess" data-country="ES">
-            <div class="card-top">
-                <div class="score-col">
-                    <div class="score" title="The role focuses on computer vision and robotics, unrelated to the candidate's media, journalism, or societal data interests">0</div><div class="kw-score" title="Keyword score">kw 12</div>
-                </div>
-                <div class="card-body">
-                    <div class="badges"><span class="source-badge" style="border-color:#059669;color:#059669">EURAXESS</span> <span class="country-badge">ES</span></div>
-                    <h3><a href="https://euraxess.ec.europa.eu/jobs/471417" target="_blank" rel="noopener">Call for a selection process calling for a competition for a position of pre-doctoral research staff in training with reference PRE68_2026 (Institute of Computer Vision and Robotics Research)</a></h3>
-                    <div class="meta">Universitat de Girona · Added 15 Oct 2026</div>
-                    <div class="tags">Tech & Data</div>
-                    <div class="terms">computer vision</div>
-                </div>
-                <div class="card-right">
-                    <div class="countdown" data-deadline="2026-10-15" title="2026-10-15"></div>
-                    <button class="dismiss-btn" onclick="dismiss('euraxess_471417')" title="Not relevant">✕</button>
-                </div>
-            </div>
-        </div>
         <div class="card" data-id="euraxess_471914" data-source="euraxess" data-country="NL">
             <div class="card-top">
                 <div class="score-col">
@@ -2124,9 +2024,117 @@ body {
         </details>
 
         <details class="archive">
-            <summary>Expired opportunities <span class="section-count">44</span></summary>
+            <summary>Expired opportunities <span class="section-count">50</span></summary>
             <p class="archive-note">These records are kept for reference but are no longer in the active opportunity list.</p>
             
+        <div class="card" data-id="euraxess_463550" data-source="euraxess" data-country="NO">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score" title="Only a vague link via interactive storytelling; core focus on games/narratives does not match candidate's media/data journalism interests">30</div><div class="kw-score" title="Keyword score">kw 9</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#059669;color:#059669">EURAXESS</span> <span class="country-badge">NO</span></div>
+                    <h3><a href="https://euraxess.ec.europa.eu/jobs/463550" target="_blank" rel="noopener">PhD Research Fellowship in Games and Interactive Digital Narratives, Center for Digital Narrative</a></h3>
+                    <div class="meta">University of Bergen</div>
+                    <div class="tags">Adjacent</div>
+                    <div class="terms">democratic, interactive</div>
+                </div>
+                <div class="card-right">
+                    <div class="countdown" data-deadline="2026-10-15" title="2026-10-15"></div>
+                    <button class="dismiss-btn" onclick="dismiss('euraxess_463550')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="euraxess_463983" data-source="euraxess" data-country="SE">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score" title="The role focuses on autonomous systems and engineering, unrelated to media, journalism, or computational social science">0</div><div class="kw-score" title="Keyword score">kw 15</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#059669;color:#059669">EURAXESS</span> <span class="country-badge">SE</span></div>
+                    <h3><a href="https://euraxess.ec.europa.eu/jobs/463983" target="_blank" rel="noopener">Doctoral Student in Human-in-the-Loop Autonomous Systems</a></h3>
+                    <div class="meta">Academic Positions</div>
+                    <div class="tags">Journalism</div>
+                    <div class="terms">bots</div>
+                </div>
+                <div class="card-right">
+                    <div class="countdown" data-deadline="2026-10-15" title="2026-10-15"></div>
+                    <button class="dismiss-btn" onclick="dismiss('euraxess_463983')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="euraxess_464975" data-source="euraxess" data-country="SE">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score" title="The focus on AI, creativity, and games lacks alignment with the candidate's media, journalism, and societal data interests.">15</div><div class="kw-score" title="Keyword score">kw 12</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#059669;color:#059669">EURAXESS</span> <span class="country-badge">SE</span></div>
+                    <h3><a href="https://euraxess.ec.europa.eu/jobs/464975" target="_blank" rel="noopener">Doctoral students in Artificial Intelligence</a></h3>
+                    <div class="meta">Academic Positions</div>
+                    <div class="tags">Tech & Data</div>
+                    <div class="terms">artificial intelligence</div>
+                </div>
+                <div class="card-right">
+                    <div class="countdown" data-deadline="2026-10-15" title="2026-10-15"></div>
+                    <button class="dismiss-btn" onclick="dismiss('euraxess_464975')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="euraxess_466188" data-source="euraxess" data-country="IT">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score" title="The position focuses on LLM architecture and long-context reasoning in computer science, lacking relevance to media, journalism, or computational social science.">0</div><div class="kw-score" title="Keyword score">kw 16</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#059669;color:#059669">EURAXESS</span> <span class="country-badge">IT</span></div>
+                    <h3><a href="https://euraxess.ec.europa.eu/jobs/466188" target="_blank" rel="noopener">Adapting Large Language Models for Long-Context Reasoning in Challenging Domains</a></h3>
+                    <div class="meta">Italian Ministry of Education, University and Research</div>
+                    <div class="tags">Tech & Data</div>
+                    <div class="terms">LLM, large language models</div>
+                </div>
+                <div class="card-right">
+                    <div class="countdown" data-deadline="2026-10-15" title="2026-10-15"></div>
+                    <button class="dismiss-btn" onclick="dismiss('euraxess_466188')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="euraxess_469493" data-source="euraxess" data-country="PT">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score" title="Good fit as it aligns with journalism and communication research, matching the candidate's interests in data/computational journalism and media studies">73</div><div class="kw-score" title="Keyword score">kw 15</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#059669;color:#059669">EURAXESS</span> <span class="country-badge">PT</span></div>
+                    <h3><a href="https://euraxess.ec.europa.eu/jobs/469493" target="_blank" rel="noopener">Research Fellowship for doctoral student</a></h3>
+                    <div class="meta">Faculdade de Ciências Sociais e Humanas</div>
+                    <div class="tags">Journalism</div>
+                    <div class="terms">journalism</div>
+                </div>
+                <div class="card-right">
+                    <div class="countdown" data-deadline="2026-10-15" title="2026-10-15"></div>
+                    <button class="dismiss-btn" onclick="dismiss('euraxess_469493')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="euraxess_471417" data-source="euraxess" data-country="ES">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score" title="The role focuses on computer vision and robotics, unrelated to the candidate's media, journalism, or societal data interests">0</div><div class="kw-score" title="Keyword score">kw 12</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#059669;color:#059669">EURAXESS</span> <span class="country-badge">ES</span></div>
+                    <h3><a href="https://euraxess.ec.europa.eu/jobs/471417" target="_blank" rel="noopener">Call for a selection process calling for a competition for a position of pre-doctoral research staff in training with reference PRE68_2026 (Institute of Computer Vision and Robotics Research)</a></h3>
+                    <div class="meta">Universitat de Girona</div>
+                    <div class="tags">Tech & Data</div>
+                    <div class="terms">computer vision</div>
+                </div>
+                <div class="card-right">
+                    <div class="countdown" data-deadline="2026-10-15" title="2026-10-15"></div>
+                    <button class="dismiss-btn" onclick="dismiss('euraxess_471417')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
         <div class="card" data-id="363620" data-source="academictransfer" data-country="NL">
             <div class="card-top">
                 <div class="score-col">

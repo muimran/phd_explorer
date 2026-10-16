@@ -22,6 +22,7 @@ from profile import (
     REGEX_SKILLS, WEIGHTS, MIN_SCORE, EXCLUDE_TERMS, PROFILE_SUMMARY,
 )
 from sources import academictransfer, euraxess, jobsacuk
+from job_scraper import JOB_SOURCE_META, load_jobs
 
 # ── Paths ────────────────────────────────────────────────────────────────────
 DATA_DIR = Path(__file__).parent / "data"
@@ -239,9 +240,44 @@ SOURCE_META = {
 }
 
 
-def generate_site(scored: list[dict]):
-    """Generate a static HTML site in /docs."""
+PAGES = {
+    "phd": {
+        "file": "index.html",
+        "label": "PhD Positions",
+        "title": "PhD Radar",
+        "source_meta": SOURCE_META,
+        "source_links": {
+            "academictransfer": '<a href="https://www.academictransfer.com">AcademicTransfer</a>',
+            "euraxess": '<a href="https://euraxess.ec.europa.eu">EURAXESS</a>',
+            "jobsacuk": '<a href="https://www.jobs.ac.uk">jobs.ac.uk</a>',
+        },
+        "strong": 60,
+        "investigate": 30,
+    },
+    "jobs": {
+        "file": "jobs.html",
+        "label": "Jobs",
+        "title": "Jobs · PhD Radar",
+        "source_meta": JOB_SOURCE_META,
+        "source_links": {},
+        "strong": 40,
+        "investigate": 15,
+    },
+}
+
+
+def _tabs_html(active: str) -> str:
+    return "".join(
+        f'<a class="tab{" active" if key == active else ""}" href="{cfg["file"]}">{cfg["label"]}</a>'
+        for key, cfg in PAGES.items()
+    )
+
+
+def generate_site(scored: list[dict], page: str = "phd"):
+    """Generate one tab of the static site in /docs."""
     SITE_DIR.mkdir(exist_ok=True)
+    cfg = PAGES[page]
+    SOURCE_META = cfg["source_meta"]
 
     now = datetime.now()
     updated_str = now.strftime("%d %B %Y, %H:%M")
@@ -265,9 +301,10 @@ def generate_site(scored: list[dict]):
 
     scored = sorted(scored, key=lambda x: (primary_score(x), x["score"]), reverse=True)
 
-    strong_list = [s for s in scored if primary_score(s) >= 60]
-    investigate_list = [s for s in scored if 30 <= primary_score(s) < 60]
-    weak_list = [s for s in scored if 0 < primary_score(s) < 30 and s["recommendation"] != "IGNORE"]
+    hi, mid = cfg["strong"], cfg["investigate"]
+    strong_list = [s for s in scored if primary_score(s) >= hi]
+    investigate_list = [s for s in scored if mid <= primary_score(s) < hi]
+    weak_list = [s for s in scored if 0 < primary_score(s) < mid and s["recommendation"] != "IGNORE"]
     zero_list = sorted(
         [s for s in scored if primary_score(s) == 0],
         key=lambda x: x.get("scraped_at", ""),
@@ -398,20 +435,18 @@ def generate_site(scored: list[dict]):
     dismissed_json = json.dumps(sorted(dismissed))
 
     # Source list for footer
-    source_labels = [SOURCE_META.get(s, {"label": s})["label"] for s in sources_used]
-    source_links = {
-        "academictransfer": '<a href="https://www.academictransfer.com">AcademicTransfer</a>',
-        "euraxess": '<a href="https://euraxess.ec.europa.eu">EURAXESS</a>',
-        "jobsacuk": '<a href="https://www.jobs.ac.uk">jobs.ac.uk</a>',
-    }
-    footer_sources = " · ".join(source_links.get(s, s) for s in sources_used)
+    source_links = cfg["source_links"]
+    footer_sources = " · ".join(
+        source_links.get(s, SOURCE_META.get(s, {"label": s})["label"]) for s in sources_used
+    )
+    tabs_html = _tabs_html(page)
 
     html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PhD Radar</title>
+<title>{cfg["title"]}</title>
 <style>
 :root {{
     --bg: #fff;
@@ -442,6 +477,13 @@ body {{
 .header {{ margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }}
 .header h1 {{ font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem; }}
 .updated {{ font-size: 0.8rem; color: var(--muted); }}
+.tabs {{ display: flex; gap: 1.25rem; margin-top: 1rem; }}
+.tab {{
+    font-size: 0.85rem; font-weight: 500; color: var(--muted); text-decoration: none;
+    padding-bottom: 0.35rem; border-bottom: 2px solid transparent;
+}}
+.tab:hover {{ color: var(--fg); }}
+.tab.active {{ color: var(--fg); border-bottom-color: var(--accent); }}
 
 /* Stats */
 .stats {{
@@ -613,6 +655,7 @@ body {{
 <div class="header">
     <h1>PhD Radar</h1>
     <div class="updated">Last scraped {updated_str}</div>
+    <nav class="tabs">{tabs_html}</nav>
 </div>
 
 <div class="stats">
@@ -913,8 +956,8 @@ async function syncDismissals() {{
 </body>
 </html>"""
 
-    (SITE_DIR / "index.html").write_text(html)
-    print(f"✓ Site generated at {SITE_DIR / 'index.html'}")
+    (SITE_DIR / cfg["file"]).write_text(html)
+    print(f"✓ Site generated at {SITE_DIR / cfg['file']}")
 
 
 # ── Main ─────────────────────────────────────────────────────────────────────
@@ -984,6 +1027,7 @@ def main():
             if not is_postdoc(v) and (v.get("score", 0) >= MIN_SCORE or v.get("groq_score") == 0)
         ]
         generate_site(relevant)
+        generate_site(load_jobs(), page="jobs")
         return
 
     relevant = scrape_all(max_new=args.max)
@@ -1004,6 +1048,7 @@ def main():
                 if not is_postdoc(v) and (v.get("score", 0) >= MIN_SCORE or v.get("groq_score") == 0)
             ]
         generate_site(relevant)
+        generate_site(load_jobs(), page="jobs")
 
 
 if __name__ == "__main__":

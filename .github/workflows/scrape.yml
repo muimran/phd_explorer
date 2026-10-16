@@ -31,6 +31,10 @@ jobs:
           JOBSACUK_DELAY: "8"
           JOBSACUK_PAGES: "3"
 
+      - name: Run job scraper (newsroom data roles)
+        continue-on-error: true
+        run: python job_scraper.py
+
       - name: Run LLM scorer
         continue-on-error: true
         run: python llm_scorer.py

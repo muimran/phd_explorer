@@ -1,0 +1,2709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jobs · PhD Radar</title>
+<style>
+:root {
+    --bg: #fff;
+    --fg: #1a1a1a;
+    --border: #e5e5e5;
+    --muted: #737373;
+    --accent: #7c3aed;
+    --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #111;
+        --fg: #e5e5e5;
+        --border: #2a2a2a;
+        --muted: #888;
+        --accent: #a78bfa;
+    }
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg); color: var(--fg);
+    line-height: 1.5; -webkit-font-smoothing: antialiased;
+}
+.container { max-width: 680px; margin: 0 auto; padding: 2.5rem 1.5rem 6rem; }
+
+/* Header */
+.header { margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+.header h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem; }
+.updated { font-size: 0.8rem; color: var(--muted); }
+.tabs { display: flex; gap: 1.25rem; margin-top: 1rem; }
+.tab {
+    font-size: 0.85rem; font-weight: 500; color: var(--muted); text-decoration: none;
+    padding-bottom: 0.35rem; border-bottom: 2px solid transparent;
+}
+.tab:hover { color: var(--fg); }
+.tab.active { color: var(--fg); border-bottom-color: var(--accent); }
+
+/* Stats */
+.stats {
+    display: flex; gap: 2rem; margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem; border-bottom: 1px solid var(--border);
+}
+.stat { }
+.stat-num { font-size: 1.75rem; font-weight: 600; line-height: 1; }
+.stat-num.accent { color: var(--accent); }
+.stat-label { font-size: 0.75rem; color: var(--muted); margin-top: 0.15rem; }
+
+/* Filters */
+.filters {
+    display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem; border-bottom: 1px solid var(--border);
+}
+.filter-group { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; }
+.filter-group::before { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-right: 0.25rem; }
+.filter-group.source-filters::before { content: "Source"; }
+.filter-group.country-filters::before { content: "Country"; }
+.filter-sep { width: 1px; height: 1.5rem; background: var(--border); margin: 0 0.5rem; }
+.filter-btn {
+    font-size: 0.7rem; font-weight: 500;
+    padding: 0.25rem 0.6rem; border-radius: 999px;
+    border: 1px solid var(--border); background: var(--bg); color: var(--muted);
+    cursor: pointer; transition: all 0.15s;
+}
+.filter-btn.active {
+    border-color: var(--btn-color, var(--accent));
+    color: var(--btn-color, var(--accent));
+    background: color-mix(in srgb, var(--btn-color, var(--accent)) 8%, var(--bg));
+}
+.filter-btn:hover { opacity: 0.8; }
+.filter-btn.dimmed { opacity: 0.15; transform: scale(0.9); pointer-events: auto; }
+
+/* Sections */
+.section-header {
+    display: flex; align-items: center; gap: 0.5rem;
+    margin: 2rem 0 0rem; padding: 0.55rem 0;
+    position: sticky; top: 0; z-index: 10;
+    background: var(--bg); border-bottom: 1px solid var(--border);
+}
+.section-header { cursor: pointer; }
+.section-header h2 { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.section-header.collapsed { margin-bottom: 0; }
+.section-count {
+    font-size: 0.7rem; font-weight: 600; color: var(--accent);
+    background: none; padding: 0;
+}
+.collapse-btn {
+    margin-left: auto; background: none; border: none; cursor: pointer;
+    font-size: 0.6rem; color: var(--muted); padding: 0.2rem 0.4rem;
+    transition: transform 0.2s ease;
+}
+.collapse-btn:hover { color: var(--fg); }
+.section-header.collapsed .collapse-btn { transform: rotate(180deg); }
+.card.section-collapsed { display: none; }
+
+/* Cards */
+.card {
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 0;
+    transition: opacity 0.3s;
+}
+.card:last-child { border-bottom: none; }
+.card.dismissed { opacity: 0; height: 0; overflow: hidden; padding: 0; border: none; }
+.card.filtered { display: none; }
+.card-top { display: flex; align-items: flex-start; gap: 1rem; }
+.score-col {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 0.2rem; min-width: 36px; padding-top: 0.15rem;
+}
+.score {
+    font-size: 0.8rem; font-weight: 600; color: var(--accent);
+    text-align: center;
+}
+.kw-score {
+    font-size: 0.6rem; color: var(--muted); white-space: nowrap;
+    text-align: center;
+}
+.card-body { flex: 1; min-width: 0; }
+.card h3 { font-size: 0.95rem; font-weight: 500; line-height: 1.4; margin-bottom: 0.2rem; }
+.card a { color: var(--fg); text-decoration: none; }
+.card a:hover { color: var(--accent); }
+.badges { display: flex; gap: 0.35rem; margin-bottom: 0.3rem; flex-wrap: wrap; }
+.source-badge {
+    font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;
+    padding: 0.1rem 0.4rem; border-radius: 3px;
+    border: 1px solid; background: transparent;
+}
+.country-badge {
+    font-size: 0.6rem; font-weight: 600;
+    padding: 0.1rem 0.4rem; border-radius: 3px;
+    background: var(--border); color: var(--fg);
+}
+.meta { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.2rem; }
+.tags { font-size: 0.75rem; color: var(--accent); margin-bottom: 0.15rem; }
+.terms { font-size: 0.75rem; color: var(--muted); opacity: 0.6; }
+.card-right {
+    display: flex; flex-direction: column; align-items: flex-end;
+    gap: 0.5rem; flex-shrink: 0; padding-top: 0.1rem;
+}
+.countdown {
+    font-size: 0.75rem; color: var(--muted); white-space: nowrap;
+    cursor: default;
+}
+.countdown.urgent { color: var(--accent); font-weight: 600; }
+.countdown.expired { color: var(--border); }
+.dismiss-btn {
+    background: none; border: none;
+    color: var(--border); cursor: pointer;
+    padding: 0.3rem; font-size: 1.1rem;
+    line-height: 1; transition: color 0.15s;
+}
+.dismiss-btn:hover { color: var(--fg); }
+
+/* Empty */
+.empty { text-align: center; padding: 3rem 1rem; color: var(--muted); }
+.archive { margin-top: 2rem; border-top: 1px solid var(--border); }
+.archive summary { cursor: pointer; list-style: none; padding: 1.25rem 0; font-size: 0.95rem; font-weight: 500; }
+.archive summary::-webkit-details-marker { display: none; }
+.archive summary::before { content: '>'; display: inline-block; margin-right: 0.5rem; color: var(--muted); }
+.archive[open] summary::before { transform: rotate(90deg); }
+.archive-note { margin: -0.4rem 0 1rem; color: var(--muted); font-size: 0.8rem; }
+
+
+/* Sync bar */
+#sync-bar {
+    display: none; position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--bg); border-top: 1px solid var(--border);
+    padding: 0.75rem 1.5rem; z-index: 100;
+}
+#sync-bar .inner {
+    max-width: 680px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 0.8rem; color: var(--muted);
+}
+.sync-actions { display: flex; gap: 0.5rem; }
+.sync-btn {
+    background: var(--accent); color: #fff; border: none;
+    border-radius: 6px; padding: 0.4rem 1rem;
+    cursor: pointer; font-size: 0.8rem; font-weight: 500;
+}
+.sync-btn:hover { opacity: 0.85; }
+.sync-btn.secondary {
+    background: transparent; color: var(--muted); border: 1px solid var(--border);
+}
+.count { font-weight: 600; color: var(--fg); }
+
+/* Footer */
+.footer {
+    margin-top: 2.5rem; padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.75rem; color: var(--muted);
+}
+.footer a { color: var(--muted); text-decoration: none; }
+.footer a:hover { color: var(--accent); }
+
+@media (max-width: 480px) {
+    .container { padding: 1.5rem 1rem 6rem; }
+    .stats { gap: 1.5rem; }
+    .stat-num { font-size: 1.4rem; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+    <h1>PhD Radar</h1>
+    <div class="updated">Last scraped 16 October 2026, 17:31</div>
+    <nav class="tabs"><a class="tab" href="index.html">PhD Positions</a><a class="tab active" href="jobs.html">Jobs</a></nav>
+</div>
+
+<div class="stats">
+    <div class="stat">
+        <div class="stat-num">121</div>
+        <div class="stat-label">Total</div>
+    </div>
+    <div class="stat">
+        <div class="stat-num accent">25</div>
+        <div class="stat-label">Strong</div>
+    </div>
+    <div class="stat">
+        <div class="stat-num">93</div>
+        <div class="stat-label">Investigate</div>
+    </div>
+    <div class="stat">
+        <div class="stat-num">0</div>
+        <div class="stat-label">Zero score</div>
+    </div>
+</div>
+
+<div class="filters">
+    <div class="filter-group source-filters">
+        <button class="filter-btn active" data-filter="source" data-value="all">All</button>
+<button class="filter-btn" data-filter="source" data-value="bbc" style="--btn-color:#bb1919">BBC</button>
+<button class="filter-btn" data-filter="source" data-value="guardian" style="--btn-color:#052962">The Guardian</button>
+<button class="filter-btn" data-filter="source" data-value="nytimes" style="--btn-color:#1a1a1a">NYT</button>
+<button class="filter-btn" data-filter="source" data-value="propublica" style="--btn-color:#000000">ProPublica</button>
+<button class="filter-btn" data-filter="source" data-value="reuters" style="--btn-color:#ff8000">Reuters</button>
+<button class="filter-btn" data-filter="source" data-value="theeconomistgroup" style="--btn-color:#e3120b">The Economist</button>
+<button class="filter-btn" data-filter="source" data-value="washpost" style="--btn-color:#231f20">Washington Post</button>
+
+    </div>
+    <div class="filter-sep"></div>
+    <div class="filter-group country-filters">
+        <button class="filter-btn active" data-filter="country" data-value="all">All</button>
+<button class="filter-btn" data-filter="country" data-value="AU">AU</button>
+<button class="filter-btn" data-filter="country" data-value="GB">GB</button>
+<button class="filter-btn" data-filter="country" data-value="IN">IN</button>
+<button class="filter-btn" data-filter="country" data-value="KE">KE</button>
+<button class="filter-btn" data-filter="country" data-value="US">US</button>
+
+    </div>
+</div>
+
+<div class="section-header"><h2>Strong matches</h2><span class="section-count">25</span><button class="collapse-btn" aria-label="Collapse section">&#x25B2;</button></div>
+
+        <div class="card" data-id="bbc_1374865457" data-source="bbc" data-country="GB">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">94</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#bb1919;color:#bb1919">BBC</span> <span class="country-badge">GB</span></div>
+                    <h3><a href="https://careers.bbc.co.uk/job/London-Senior-Data-Journalist%2C-BBC-Verify-W1A-1AA/1374865457/?feedId=null&utm_source=J2WRSS&utm_medium=rss&utm_campaign=J2W_RSS" target="_blank" rel="noopener">Senior Data Journalist, BBC Verify</a></h3>
+                    <div class="meta">BBC</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('bbc_1374865457')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="guardian_1358" data-source="guardian" data-country="GB">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">86</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#052962;color:#052962">The Guardian</span> <span class="country-badge">GB</span></div>
+                    <h3><a href="https://workwithus.theguardian.com/job-search/editorial/london-united-kingdom/visual-projects-editor/1358" target="_blank" rel="noopener">Visual Projects Editor</a></h3>
+                    <div class="meta">The Guardian</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('guardian_1358')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="guardian_1357" data-source="guardian" data-country="GB">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">82</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#052962;color:#052962">The Guardian</span> <span class="country-badge">GB</span></div>
+                    <h3><a href="https://workwithus.theguardian.com/job-search/editorial/london-united-kingdom/deputy-news-graphics-editor/1357" target="_blank" rel="noopener">Deputy News Graphics Editor</a></h3>
+                    <div class="meta">The Guardian</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('guardian_1357')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4732855005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">74</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4732855005-assistant-editor-data-journalism" target="_blank" rel="noopener">Assistant Editor, Data Journalism</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4732855005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="theeconomistgroup_5008767101" data-source="theeconomistgroup" data-country="GB">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">70</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#e3120b;color:#e3120b">The Economist</span> <span class="country-badge">GB</span></div>
+                    <h3><a href="https://job-boards.eu.greenhouse.io/theeconomistgroup/jobs/5008767101" target="_blank" rel="noopener">Editorial AI Transformation Lead</a></h3>
+                    <div class="meta">The Economist</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('theeconomistgroup_5008767101')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4743605005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">70</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4743605005-assistant-editor-visuals" target="_blank" rel="noopener">Assistant Editor, Visuals</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4743605005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4701630005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">70</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4701630005-business-correspondent-artificial-intelligence-and-emerging-technologies" target="_blank" rel="noopener">Business Correspondent, Artificial Intelligence and Emerging Technologies</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4701630005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4721753005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">70</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4721753005-data-reporter-texas" target="_blank" rel="noopener">Data Reporter, Texas</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4721753005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4710199005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">70</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4710199005-editor-at-large-opinion-a-i" target="_blank" rel="noopener">Editor at Large, Opinion, A.I.</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4710199005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4687532005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">70</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4687532005-editor-audience-a-i-and-emerging-platforms" target="_blank" rel="noopener">Editor, Audience — A.I. and Emerging Platforms</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4687532005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4706625005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">70</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4706625005-graphics-multimedia-editor-elections-data-developer-election-analytics" target="_blank" rel="noopener">Graphics/Multimedia Editor, Elections Data Developer (Election Analytics)</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4706625005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4741427005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">70</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4741427005-graphics-multimedia-editor-news" target="_blank" rel="noopener">Graphics/Multimedia Editor, News</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4741427005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4737730005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">70</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4737730005-graphics-multimedia-editor-open-source-reporting" target="_blank" rel="noopener">Graphics Multimedia Editor, Open-source Reporting</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4737730005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4704062005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">70</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4704062005-graphics-multimedia-editor-publishing-and-storytelling-tools" target="_blank" rel="noopener">Graphics/Multimedia Editor, Publishing and Storytelling Tools</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4704062005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4732198005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">70</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4732198005-graphics-multimedia-editor-shows" target="_blank" rel="noopener">Graphics Multimedia Editor, Shows</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4732198005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4728037005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">70</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4728037005-journalist-graphics-intensive" target="_blank" rel="noopener">Journalist, Graphics Intensive</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4728037005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4705165005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">70</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4705165005-reporter-fellow-local-investigations-mississippi-louisiana-arkansas" target="_blank" rel="noopener">Reporter Fellow, Local Investigations - Mississippi, Louisiana, & Arkansas</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4705165005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="bbc_1374863657" data-source="bbc" data-country="GB">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">60</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#bb1919;color:#bb1919">BBC</span> <span class="country-badge">GB</span></div>
+                    <h3><a href="https://careers.bbc.co.uk/job/London-Data-Scientist-W1A-1AA/1374863657/?feedId=null&utm_source=J2WRSS&utm_medium=rss&utm_campaign=J2W_RSS" target="_blank" rel="noopener">Data Scientist</a></h3>
+                    <div class="meta">BBC</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('bbc_1374863657')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="bbc_1374710757" data-source="bbc" data-country="GB">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">56</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#bb1919;color:#bb1919">BBC</span> <span class="country-badge">GB</span></div>
+                    <h3><a href="https://careers.bbc.co.uk/job/London-Principal-Data-Scientist-W12-7FA/1374710757/?feedId=null&utm_source=J2WRSS&utm_medium=rss&utm_campaign=J2W_RSS" target="_blank" rel="noopener">Principal Data Scientist</a></h3>
+                    <div class="meta">BBC</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('bbc_1374710757')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="theeconomistgroup_4996419101" data-source="theeconomistgroup" data-country="GB">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">48</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#e3120b;color:#e3120b">The Economist</span> <span class="country-badge">GB</span></div>
+                    <h3><a href="https://job-boards.eu.greenhouse.io/theeconomistgroup/jobs/4996419101" target="_blank" rel="noopener">Engineering Manager, AI Platform</a></h3>
+                    <div class="meta">The Economist</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('theeconomistgroup_4996419101')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="theeconomistgroup_4729605101" data-source="theeconomistgroup" data-country="GB">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">44</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#e3120b;color:#e3120b">The Economist</span> <span class="country-badge">GB</span></div>
+                    <h3><a href="https://job-boards.eu.greenhouse.io/theeconomistgroup/jobs/4729605101" target="_blank" rel="noopener">Senior AI Engineer, AI Lab</a></h3>
+                    <div class="meta">The Economist</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('theeconomistgroup_4729605101')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="guardian_1370" data-source="guardian" data-country="AU">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">40</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#052962;color:#052962">The Guardian</span> <span class="country-badge">AU</span></div>
+                    <h3><a href="https://workwithus.theguardian.com/job-search/editorial/sydney-new-south-wales-australia/motion-graphics-designer/1370" target="_blank" rel="noopener">Motion graphics designer</a></h3>
+                    <div class="meta">The Guardian</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('guardian_1370')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="theeconomistgroup_4996371101" data-source="theeconomistgroup" data-country="GB">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">40</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#e3120b;color:#e3120b">The Economist</span> <span class="country-badge">GB</span></div>
+                    <h3><a href="https://job-boards.eu.greenhouse.io/theeconomistgroup/jobs/4996371101" target="_blank" rel="noopener">Head of Product & Engineering - AI Lab</a></h3>
+                    <div class="meta">The Economist</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('theeconomistgroup_4996371101')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="washpost_Senior-Director--Artificial-Intelligence_JR-90275929" data-source="washpost" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">40</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#231f20;color:#231f20">Washington Post</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://washpost.wd5.myworkdayjobs.com/en-US/job/DC-Washington-TWP-Headquarters/Senior-Director--Artificial-Intelligence_JR-90275929" target="_blank" rel="noopener">Senior Director, Artificial Intelligence</a></h3>
+                    <div class="meta">Washington Post</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('washpost_Senior-Director--Artificial-Intelligence_JR-90275929')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="reuters_Lead-Applied-Scientist--Search---NLP-GenAI_JREQ201521-1" data-source="reuters" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">40</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#ff8000;color:#ff8000">Reuters</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://thomsonreuters.wd5.myworkdayjobs.com/en-US/job/Switzerland-Zug-Zug/Lead-Applied-Scientist--Search---NLP-GenAI_JREQ201521-1" target="_blank" rel="noopener">Lead Applied Scientist, Search - NLP/GenAI</a></h3>
+                    <div class="meta">Reuters / Thomson Reuters</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('reuters_Lead-Applied-Scientist--Search---NLP-GenAI_JREQ201521-1')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div><div class="section-header"><h2>Worth investigating</h2><span class="section-count">93</span><button class="collapse-btn" aria-label="Collapse section">&#x25B2;</button></div>
+
+        <div class="card" data-id="guardian_1153" data-source="guardian" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">34</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#052962;color:#052962">The Guardian</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://workwithus.theguardian.com/job-search/editorial/washington-dc-united-states/white-house-enterprise-reporter/1153" target="_blank" rel="noopener">White House Enterprise Reporter</a></h3>
+                    <div class="meta">The Guardian</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('guardian_1153')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="guardian_1362" data-source="guardian" data-country="GB">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">34</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#052962;color:#052962">The Guardian</span> <span class="country-badge">GB</span></div>
+                    <h3><a href="https://workwithus.theguardian.com/job-search/editorial/london-united-kingdom/executive-producer-today-in-focus-the-latest/1362" target="_blank" rel="noopener">Executive Producer, Today in Focus: The Latest</a></h3>
+                    <div class="meta">The Guardian</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('guardian_1362')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="guardian_1367" data-source="guardian" data-country="GB">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">34</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#052962;color:#052962">The Guardian</span> <span class="country-badge">GB</span></div>
+                    <h3><a href="https://workwithus.theguardian.com/job-search/editorial/london-united-kingdom/senior-video-producer-today-in-focus-the-latest/1367" target="_blank" rel="noopener">Senior Video Producer, Today in Focus: The Latest</a></h3>
+                    <div class="meta">The Guardian</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('guardian_1367')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="guardian_1269" data-source="guardian" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">34</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#052962;color:#052962">The Guardian</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://workwithus.theguardian.com/job-search/editorial/new-york-new-york-united-states/global-head-of-technology-journalism/1269" target="_blank" rel="noopener">Global Head of Technology Journalism</a></h3>
+                    <div class="meta">The Guardian</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('guardian_1269')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="propublica_4617572006" data-source="propublica" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">34</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#000000;color:#000000">ProPublica</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://job-boards.greenhouse.io/propublica/jobs/4617572006" target="_blank" rel="noopener">Local Reporting Network Fellow</a></h3>
+                    <div class="meta">ProPublica</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('propublica_4617572006')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="propublica_4718540006" data-source="propublica" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">34</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#000000;color:#000000">ProPublica</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://job-boards.greenhouse.io/propublica/jobs/4718540006" target="_blank" rel="noopener">Video Editor and Motion Designer, Temporary</a></h3>
+                    <div class="meta">ProPublica</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('propublica_4718540006')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4739684005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">34</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4739684005-foia-editor" target="_blank" rel="noopener">FOIA Editor</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4739684005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="guardian_1303" data-source="guardian" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#052962;color:#052962">The Guardian</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://workwithus.theguardian.com/job-search/editorial/new-york-new-york-united-states/audience-editor-video-platforms/1303" target="_blank" rel="noopener">Audience Editor, Video Platforms</a></h3>
+                    <div class="meta">The Guardian</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('guardian_1303')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="guardian_1288" data-source="guardian" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#052962;color:#052962">The Guardian</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://workwithus.theguardian.com/job-search/editorial/washington-dc-united-states/political-enterprise-reporter/1288" target="_blank" rel="noopener">Political Enterprise Reporter</a></h3>
+                    <div class="meta">The Guardian</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('guardian_1288')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="guardian_1371" data-source="guardian" data-country="AU">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#052962;color:#052962">The Guardian</span> <span class="country-badge">AU</span></div>
+                    <h3><a href="https://workwithus.theguardian.com/job-search/editorial/sydney-new-south-wales-australia/supporter-editor/1371" target="_blank" rel="noopener">Supporter editor</a></h3>
+                    <div class="meta">The Guardian</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('guardian_1371')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="guardian_1292" data-source="guardian" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#052962;color:#052962">The Guardian</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://workwithus.theguardian.com/job-search/editorial/los-angeles-california-united-states/part-time-copy-editor-west-coast/1292" target="_blank" rel="noopener">Part-Time Copy Editor,  West Coast</a></h3>
+                    <div class="meta">The Guardian</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('guardian_1292')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="theeconomistgroup_4956407101" data-source="theeconomistgroup" data-country="GB">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#e3120b;color:#e3120b">The Economist</span> <span class="country-badge">GB</span></div>
+                    <h3><a href="https://job-boards.eu.greenhouse.io/theeconomistgroup/jobs/4956407101" target="_blank" rel="noopener">Senior Programme Editor / Senior Events Producer (12-month contract)</a></h3>
+                    <div class="meta">The Economist</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('theeconomistgroup_4956407101')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="washpost_Social-Video-Editor_JR-90275945" data-source="washpost" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#231f20;color:#231f20">Washington Post</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://washpost.wd5.myworkdayjobs.com/en-US/job/DC-Washington-TWP-Headquarters/Social-Video-Editor_JR-90275945" target="_blank" rel="noopener">Social Video Editor</a></h3>
+                    <div class="meta">Washington Post</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('washpost_Social-Video-Editor_JR-90275945')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="washpost_Style-Politics-and-Culture-Editor_JR-90275932" data-source="washpost" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#231f20;color:#231f20">Washington Post</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://washpost.wd5.myworkdayjobs.com/en-US/job/DC-Washington-TWP-Headquarters/Style-Politics-and-Culture-Editor_JR-90275932" target="_blank" rel="noopener">Style Politics and Culture Editor</a></h3>
+                    <div class="meta">Washington Post</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('washpost_Style-Politics-and-Culture-Editor_JR-90275932')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="washpost_Senior-Photo-Assignment-Editor_JR-90275931-1" data-source="washpost" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#231f20;color:#231f20">Washington Post</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://washpost.wd5.myworkdayjobs.com/en-US/job/DC-Washington-TWP-Headquarters/Senior-Photo-Assignment-Editor_JR-90275931-1" target="_blank" rel="noopener">Senior Photo Assignment Editor</a></h3>
+                    <div class="meta">Washington Post</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('washpost_Senior-Photo-Assignment-Editor_JR-90275931-1')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="washpost_Medical-Science-Reporter_JR-90275928" data-source="washpost" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#231f20;color:#231f20">Washington Post</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://washpost.wd5.myworkdayjobs.com/en-US/job/DC-Washington-TWP-Headquarters/Medical-Science-Reporter_JR-90275928" target="_blank" rel="noopener">Medical Science Reporter</a></h3>
+                    <div class="meta">Washington Post</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('washpost_Medical-Science-Reporter_JR-90275928')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="washpost_National-Business-Reporter_JR-90275927" data-source="washpost" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#231f20;color:#231f20">Washington Post</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://washpost.wd5.myworkdayjobs.com/en-US/job/DC-Washington-TWP-Headquarters/National-Business-Reporter_JR-90275927" target="_blank" rel="noopener">National Business Reporter</a></h3>
+                    <div class="meta">Washington Post</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('washpost_National-Business-Reporter_JR-90275927')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="washpost_Information-and-Influence-Reporter_JR-90275925-1" data-source="washpost" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#231f20;color:#231f20">Washington Post</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://washpost.wd5.myworkdayjobs.com/en-US/job/DC-Washington-TWP-Headquarters/Information-and-Influence-Reporter_JR-90275925-1" target="_blank" rel="noopener">Information and Influence Reporter</a></h3>
+                    <div class="meta">Washington Post</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('washpost_Information-and-Influence-Reporter_JR-90275925-1')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="washpost_General-Assignment-Reporter--Business-and-Technology_JR-90275926-1" data-source="washpost" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#231f20;color:#231f20">Washington Post</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://washpost.wd5.myworkdayjobs.com/en-US/job/DC-Washington-TWP-Headquarters/General-Assignment-Reporter--Business-and-Technology_JR-90275926-1" target="_blank" rel="noopener">General Assignment Reporter, Business and Technology</a></h3>
+                    <div class="meta">Washington Post</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('washpost_General-Assignment-Reporter--Business-and-Technology_JR-90275926-1')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="washpost_Executive-Multimedia-Producer_JR-90275883" data-source="washpost" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#231f20;color:#231f20">Washington Post</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://washpost.wd5.myworkdayjobs.com/en-US/job/DC-Washington-TWP-Headquarters/Executive-Multimedia-Producer_JR-90275883" target="_blank" rel="noopener">Executive Multimedia Producer</a></h3>
+                    <div class="meta">Washington Post</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('washpost_Executive-Multimedia-Producer_JR-90275883')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="washpost_Features-Editorial-Aide_JR-90275908" data-source="washpost" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#231f20;color:#231f20">Washington Post</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://washpost.wd5.myworkdayjobs.com/en-US/job/DC-Washington-TWP-Headquarters/Features-Editorial-Aide_JR-90275908" target="_blank" rel="noopener">Features Editorial Aide</a></h3>
+                    <div class="meta">Washington Post</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('washpost_Features-Editorial-Aide_JR-90275908')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="washpost_Editor--The-7-Live_JR-90275879-1" data-source="washpost" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#231f20;color:#231f20">Washington Post</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://washpost.wd5.myworkdayjobs.com/en-US/job/DC-Washington-TWP-Headquarters/Editor--The-7-Live_JR-90275879-1" target="_blank" rel="noopener">Editor, The 7 Live</a></h3>
+                    <div class="meta">Washington Post</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('washpost_Editor--The-7-Live_JR-90275879-1')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="washpost_Op-Ed-Editor_JR-90275877" data-source="washpost" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#231f20;color:#231f20">Washington Post</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://washpost.wd5.myworkdayjobs.com/en-US/job/DC-Washington-TWP-Headquarters/Op-Ed-Editor_JR-90275877" target="_blank" rel="noopener">Op-Ed Editor</a></h3>
+                    <div class="meta">Washington Post</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('washpost_Op-Ed-Editor_JR-90275877')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="washpost_Economics-Editor_JR-90275855" data-source="washpost" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#231f20;color:#231f20">Washington Post</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://washpost.wd5.myworkdayjobs.com/en-US/job/DC-Washington-TWP-Headquarters/Economics-Editor_JR-90275855" target="_blank" rel="noopener">Economics Editor</a></h3>
+                    <div class="meta">Washington Post</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('washpost_Economics-Editor_JR-90275855')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="washpost_Video-Editor--Opinions_JR-90275650-1" data-source="washpost" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#231f20;color:#231f20">Washington Post</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://washpost.wd5.myworkdayjobs.com/en-US/job/DC-Washington-TWP-Headquarters/Video-Editor--Opinions_JR-90275650-1" target="_blank" rel="noopener">Video Editor, Opinions</a></h3>
+                    <div class="meta">Washington Post</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('washpost_Video-Editor--Opinions_JR-90275650-1')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="washpost_DC-City-Hall-Reporter_JR-90275837" data-source="washpost" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#231f20;color:#231f20">Washington Post</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://washpost.wd5.myworkdayjobs.com/en-US/job/DC-Washington-TWP-Headquarters/DC-City-Hall-Reporter_JR-90275837" target="_blank" rel="noopener">D.C. City Hall Reporter</a></h3>
+                    <div class="meta">Washington Post</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('washpost_DC-City-Hall-Reporter_JR-90275837')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="washpost_Talent-Producer--Opinions_JR-90275832" data-source="washpost" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#231f20;color:#231f20">Washington Post</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://washpost.wd5.myworkdayjobs.com/en-US/job/DC-Washington-TWP-Headquarters/Talent-Producer--Opinions_JR-90275832" target="_blank" rel="noopener">Talent Producer, Opinions</a></h3>
+                    <div class="meta">Washington Post</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('washpost_Talent-Producer--Opinions_JR-90275832')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="washpost_Opinion-Journalist_JR-90275514" data-source="washpost" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#231f20;color:#231f20">Washington Post</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://washpost.wd5.myworkdayjobs.com/en-US/job/DC-Washington-TWP-Headquarters/Opinion-Journalist_JR-90275514" target="_blank" rel="noopener">Opinion Journalist</a></h3>
+                    <div class="meta">Washington Post</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('washpost_Opinion-Journalist_JR-90275514')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="washpost_Social-Video-Producer--Opinions_JR-90275565" data-source="washpost" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#231f20;color:#231f20">Washington Post</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://washpost.wd5.myworkdayjobs.com/en-US/job/DC-Washington-TWP-Headquarters/Social-Video-Producer--Opinions_JR-90275565" target="_blank" rel="noopener">Social Video Producer, Opinions</a></h3>
+                    <div class="meta">Washington Post</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('washpost_Social-Video-Producer--Opinions_JR-90275565')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="reuters_VJ-Cameraperson--Level-1-Journalist---Temp-Guild--_JREQ204105" data-source="reuters" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#ff8000;color:#ff8000">Reuters</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://thomsonreuters.wd5.myworkdayjobs.com/en-US/job/United-States-of-America-Washington-District-of-Columbia/VJ-Cameraperson--Level-1-Journalist---Temp-Guild--_JREQ204105" target="_blank" rel="noopener">VJ/Cameraperson (Level 1 Journalist - Temp Guild),</a></h3>
+                    <div class="meta">Reuters / Thomson Reuters</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('reuters_VJ-Cameraperson--Level-1-Journalist---Temp-Guild--_JREQ204105')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="reuters_Associate-Picture-Editor--Global-Pictures-Desk--fixed-term-_JREQ204363-1" data-source="reuters" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#ff8000;color:#ff8000">Reuters</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://thomsonreuters.wd5.myworkdayjobs.com/en-US/job/Poland-Gdansk/Associate-Picture-Editor--Global-Pictures-Desk--fixed-term-_JREQ204363-1" target="_blank" rel="noopener">Associate Picture Editor, Global Pictures Desk (fixed-term)</a></h3>
+                    <div class="meta">Reuters / Thomson Reuters</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('reuters_Associate-Picture-Editor--Global-Pictures-Desk--fixed-term-_JREQ204363-1')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="reuters_Agricultural-Commodities-Correspondent_JREQ203881" data-source="reuters" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#ff8000;color:#ff8000">Reuters</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://thomsonreuters.wd5.myworkdayjobs.com/en-US/job/United-Kingdom-London/Agricultural-Commodities-Correspondent_JREQ203881" target="_blank" rel="noopener">Agricultural Commodities Correspondent</a></h3>
+                    <div class="meta">Reuters / Thomson Reuters</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('reuters_Agricultural-Commodities-Correspondent_JREQ203881')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="reuters_News-Reporter-with-French--Reuters_JREQ204079" data-source="reuters" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#ff8000;color:#ff8000">Reuters</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://thomsonreuters.wd5.myworkdayjobs.com/en-US/job/Poland-Gdansk/News-Reporter-with-French--Reuters_JREQ204079" target="_blank" rel="noopener">News Reporter with French, Reuters</a></h3>
+                    <div class="meta">Reuters / Thomson Reuters</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('reuters_News-Reporter-with-French--Reuters_JREQ204079')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="reuters_Social-Video-Journalist--LGBTQ--News_JREQ203074" data-source="reuters" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#ff8000;color:#ff8000">Reuters</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://thomsonreuters.wd5.myworkdayjobs.com/en-US/job/Philippines-Manila/Social-Video-Journalist--LGBTQ--News_JREQ203074" target="_blank" rel="noopener">Social Video Journalist, LGBTQ+ News</a></h3>
+                    <div class="meta">Reuters / Thomson Reuters</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('reuters_Social-Video-Journalist--LGBTQ--News_JREQ203074')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="reuters_Video-Desk-Producer_JREQ199082" data-source="reuters" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#ff8000;color:#ff8000">Reuters</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://thomsonreuters.wd5.myworkdayjobs.com/en-US/job/Philippines-Manila/Video-Desk-Producer_JREQ199082" target="_blank" rel="noopener">Video Desk Producer</a></h3>
+                    <div class="meta">Reuters / Thomson Reuters</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('reuters_Video-Desk-Producer_JREQ199082')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="reuters_Commissioning-Editor-Korea-12-months-contract-_JREQ201757-1" data-source="reuters" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#ff8000;color:#ff8000">Reuters</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://thomsonreuters.wd5.myworkdayjobs.com/en-US/job/Korea-Republic-of-Seoul/Commissioning-Editor-Korea-12-months-contract-_JREQ201757-1" target="_blank" rel="noopener">Commissioning Editor,Korea(12 months contract)</a></h3>
+                    <div class="meta">Reuters / Thomson Reuters</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('reuters_Commissioning-Editor-Korea-12-months-contract-_JREQ201757-1')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4705028005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4705028005-assistant-editor-fine-arts" target="_blank" rel="noopener">Assistant Editor, Fine Arts</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4705028005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4722913005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4722913005-business-editor" target="_blank" rel="noopener">Business Editor</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4722913005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4711308005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4711308005-china-correspondent" target="_blank" rel="noopener">China Correspondent</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4711308005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4697797005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4697797005-china-correspondent-science" target="_blank" rel="noopener">China Correspondent, Science</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4697797005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4709872005" data-source="nytimes" data-country="GB">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">GB</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4709872005-conflict-operations-editor" target="_blank" rel="noopener">Conflict Operations Editor</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4709872005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4724406005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4724406005-correspondent-the-economics-of-a-warming-world" target="_blank" rel="noopener">Correspondent, The Economics of a Warming World</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4724406005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4710689005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4710689005-dealbook-reporter-dc" target="_blank" rel="noopener">Dealbook Reporter, DC</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4710689005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4742451005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4742451005-deputy-editor-well" target="_blank" rel="noopener">Deputy Editor, Well</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4742451005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4710203005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4710203005-editor-at-large-opinion" target="_blank" rel="noopener">Editor at Large, Opinion</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4710203005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4720514005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4720514005-editor-books-desk" target="_blank" rel="noopener">Editor, Books Desk</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4720514005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4734530005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4734530005-editor-cannonball" target="_blank" rel="noopener">Editor, Cannonball</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4734530005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4739477005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4739477005-editor-the-interview" target="_blank" rel="noopener">Editor, The Interview</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4739477005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4730709005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4730709005-editor-weekend-audience" target="_blank" rel="noopener">Editor, Weekend Audience</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4730709005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4740569005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4740569005-executive-assistant-newsroom" target="_blank" rel="noopener">Executive Assistant, Newsroom</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4740569005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4739676005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4739676005-executive-producer-the-interview" target="_blank" rel="noopener">Executive Producer, The Interview</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4739676005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4740968005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4740968005-hollywood-news-and-awards-reporter-culture" target="_blank" rel="noopener">Hollywood News and Awards Reporter, Culture</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4740968005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4716635005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4716635005-midwest-correspondent-national" target="_blank" rel="noopener">Midwest Correspondent, National</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4716635005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4742441005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4742441005-multimedia-reporter-space" target="_blank" rel="noopener">Multimedia Reporter, Space</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4742441005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4735154005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4735154005-newsroom-operations-manager" target="_blank" rel="noopener">Newsroom Operations Manager</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4735154005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4713001005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4713001005-night-editor-politics" target="_blank" rel="noopener">Night Editor, Politics</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4713001005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4717703005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4717703005-senior-community-editor" target="_blank" rel="noopener">Senior Community Editor</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4717703005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4717027005" data-source="nytimes" data-country="GB">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">GB</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4717027005-senior-editor-b2b-t-brand-international-london" target="_blank" rel="noopener">Senior Editor B2B, T Brand International, London</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4717027005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4722909005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4722909005-senior-editor-style-nyt-wirecutter" target="_blank" rel="noopener">Senior Editor, Style, NYT Wirecutter</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4722909005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4727145005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4727145005-senior-multimedia-producer-svj-serial" target="_blank" rel="noopener">Senior Multimedia Producer/ SVJ, Serial</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4727145005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4709971005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4709971005-senior-producer-international" target="_blank" rel="noopener">Senior Producer, International</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4709971005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4676925005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4676925005-senior-producer-reporter-video" target="_blank" rel="noopener">Senior Producer, Reporter Video</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4676925005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4724969005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4724969005-senior-producer-svj-shows" target="_blank" rel="noopener">Senior Producer / SVJ, Shows</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4724969005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4654009005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4654009005-senior-producer-vertical-video-opinion-shows" target="_blank" rel="noopener">Senior Producer, Vertical Video, Opinion Shows</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4654009005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4732816005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4732816005-senior-staff-editor-temporary" target="_blank" rel="noopener">Senior Staff Editor (Temporary)</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4732816005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4716367005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4716367005-senior-staff-editor-well" target="_blank" rel="noopener">Senior Staff Editor, Well</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4716367005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4733730005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4733730005-senior-video-editor-reporter-video" target="_blank" rel="noopener">Senior Video Editor, Reporter Video</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4733730005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4742670005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4742670005-senior-video-editor-shows" target="_blank" rel="noopener">Senior Video Editor, Shows</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4742670005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4709967005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4709967005-senior-video-journalist-international" target="_blank" rel="noopener">Senior Video Journalist, International</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4709967005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4630813005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4630813005-senior-video-journalist-nyt-magazine" target="_blank" rel="noopener">Senior Video Journalist, NYT Magazine</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4630813005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4737734005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4737734005-senior-video-journalist-opinion" target="_blank" rel="noopener">Senior Video Journalist, Opinion</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4737734005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4643808005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4643808005-senior-video-journalist-podcast-video-popcast" target="_blank" rel="noopener">Senior Video Journalist, Podcast Video, Popcast</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4643808005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4722108005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4722108005-senior-video-journalist-reporter-video" target="_blank" rel="noopener">Senior Video Journalist, Reporter Video</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4722108005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4691625005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4691625005-social-media-editor" target="_blank" rel="noopener">Social Media Editor</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4691625005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4742447005" data-source="nytimes" data-country="GB">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">GB</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4742447005-staff-editor" target="_blank" rel="noopener">Staff Editor</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4742447005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4735197005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4735197005-temporary-social-media-editor-nyt-cooking" target="_blank" rel="noopener">Temporary Social Media Editor, NYT Cooking</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4735197005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4713489005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4713489005-video-journalist-international" target="_blank" rel="noopener">Video Journalist, International</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4713489005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4699543005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4699543005-video-journalist-nyt-cooking" target="_blank" rel="noopener">Video Journalist, NYT Cooking</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4699543005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4734615005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4734615005-video-journalist-reporter-video" target="_blank" rel="noopener">Video Journalist, Reporter Video</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4734615005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="nyt_4625373005" data-source="nytimes" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#1a1a1a;color:#1a1a1a">NYT</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.nytco.com/careers/job-listings/4625373005-video-reporter-texas" target="_blank" rel="noopener">Video Reporter, Texas</a></h3>
+                    <div class="meta">The New York Times</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('nyt_4625373005')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="bbc_1375085357" data-source="bbc" data-country="AU">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#bb1919;color:#bb1919">BBC</span> <span class="country-badge">AU</span></div>
+                    <h3><a href="https://careers.bbc.co.uk/job/Sydney-Journalist%2C-Digital-and-Social%2C-Sydney-NSW-2065/1375085357/?feedId=null&utm_source=J2WRSS&utm_medium=rss&utm_campaign=J2W_RSS" target="_blank" rel="noopener">Journalist, Digital and Social, Sydney</a></h3>
+                    <div class="meta">BBC</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('bbc_1375085357')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="bbc_1374985757" data-source="bbc" data-country="GB">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#bb1919;color:#bb1919">BBC</span> <span class="country-badge">GB</span></div>
+                    <h3><a href="https://careers.bbc.co.uk/job/Tbilisi-Journalist%2C-BBC-Monitoring-%28Tbilisi%29-105/1374985757/?feedId=null&utm_source=J2WRSS&utm_medium=rss&utm_campaign=J2W_RSS" target="_blank" rel="noopener">Journalist, BBC Monitoring (Tbilisi)</a></h3>
+                    <div class="meta">BBC</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('bbc_1374985757')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="bbc_1374724257" data-source="bbc" data-country="GB">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#bb1919;color:#bb1919">BBC</span> <span class="country-badge">GB</span></div>
+                    <h3><a href="https://careers.bbc.co.uk/job/Plymouth-Journalist%2C-BBC-Radio-Cornwall-PL3-5BD/1374724257/?feedId=null&utm_source=J2WRSS&utm_medium=rss&utm_campaign=J2W_RSS" target="_blank" rel="noopener">Journalist, BBC Radio Cornwall</a></h3>
+                    <div class="meta">BBC</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('bbc_1374724257')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="bbc_1374083757" data-source="bbc" data-country="KE">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#bb1919;color:#bb1919">BBC</span> <span class="country-badge">KE</span></div>
+                    <h3><a href="https://careers.bbc.co.uk/job/Nairobi-Journalist%2C-Tigrinya-0-0100/1374083757/?feedId=null&utm_source=J2WRSS&utm_medium=rss&utm_campaign=J2W_RSS" target="_blank" rel="noopener">Journalist, Tigrinya</a></h3>
+                    <div class="meta">BBC</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('bbc_1374083757')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="bbc_1374082057" data-source="bbc" data-country="KE">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#bb1919;color:#bb1919">BBC</span> <span class="country-badge">KE</span></div>
+                    <h3><a href="https://careers.bbc.co.uk/job/Nairobi-Journalist%2C-Afaan-Oromo-0-0100/1374082057/?feedId=null&utm_source=J2WRSS&utm_medium=rss&utm_campaign=J2W_RSS" target="_blank" rel="noopener">Journalist, Afaan Oromo</a></h3>
+                    <div class="meta">BBC</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('bbc_1374082057')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="bbc_1374084757" data-source="bbc" data-country="GB">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#bb1919;color:#bb1919">BBC</span> <span class="country-badge">GB</span></div>
+                    <h3><a href="https://careers.bbc.co.uk/job/London-Culture-Editor-W12-7FA/1374084757/?feedId=null&utm_source=J2WRSS&utm_medium=rss&utm_campaign=J2W_RSS" target="_blank" rel="noopener">Culture Editor</a></h3>
+                    <div class="meta">BBC</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('bbc_1374084757')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="bbc_1374619057" data-source="bbc" data-country="GB">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#bb1919;color:#bb1919">BBC</span> <span class="country-badge">GB</span></div>
+                    <h3><a href="https://careers.bbc.co.uk/job/Leeds-Online-Journalist-Leeds-LS9-8AH/1374619057/?feedId=null&utm_source=J2WRSS&utm_medium=rss&utm_campaign=J2W_RSS" target="_blank" rel="noopener">Online Journalist - Leeds</a></h3>
+                    <div class="meta">BBC</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('bbc_1374619057')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="bbc_1374466857" data-source="bbc" data-country="GB">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#bb1919;color:#bb1919">BBC</span> <span class="country-badge">GB</span></div>
+                    <h3><a href="https://careers.bbc.co.uk/job/St-Helier-Journalist%2C-BBC-Radio-Jersey-JE2-3PL/1374466857/?feedId=null&utm_source=J2WRSS&utm_medium=rss&utm_campaign=J2W_RSS" target="_blank" rel="noopener">Journalist, BBC Radio Jersey</a></h3>
+                    <div class="meta">BBC</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('bbc_1374466857')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="bbc_1374343957" data-source="bbc" data-country="IN">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#bb1919;color:#bb1919">BBC</span> <span class="country-badge">IN</span></div>
+                    <h3><a href="https://careers.bbc.co.uk/job/Delhi-Senior-Journalist-News-Content-Producer-ND-110001/1374343957/?feedId=null&utm_source=J2WRSS&utm_medium=rss&utm_campaign=J2W_RSS" target="_blank" rel="noopener">Senior Journalist –News Content Producer</a></h3>
+                    <div class="meta">BBC</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('bbc_1374343957')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="bbc_1374223957" data-source="bbc" data-country="GB">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#bb1919;color:#bb1919">BBC</span> <span class="country-badge">GB</span></div>
+                    <h3><a href="https://careers.bbc.co.uk/job/Cardiff-Journalist%2C-BBC-Wales-News-CF10-1FT/1374223957/?feedId=null&utm_source=J2WRSS&utm_medium=rss&utm_campaign=J2W_RSS" target="_blank" rel="noopener">Journalist, BBC Wales News</a></h3>
+                    <div class="meta">BBC</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('bbc_1374223957')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="bbc_1373788157" data-source="bbc" data-country="GB">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#bb1919;color:#bb1919">BBC</span> <span class="country-badge">GB</span></div>
+                    <h3><a href="https://careers.bbc.co.uk/job/Tunis-Senior-Journalist-Reporter-0/1373788157/?feedId=null&utm_source=J2WRSS&utm_medium=rss&utm_campaign=J2W_RSS" target="_blank" rel="noopener">Senior Journalist Reporter</a></h3>
+                    <div class="meta">BBC</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('bbc_1373788157')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="bbc_1373621657" data-source="bbc" data-country="GB">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#bb1919;color:#bb1919">BBC</span> <span class="country-badge">GB</span></div>
+                    <h3><a href="https://careers.bbc.co.uk/job/Bristol-Producer%2C-BBC-Audio-Bristol-BS8-2LR/1373621657/?feedId=null&utm_source=J2WRSS&utm_medium=rss&utm_campaign=J2W_RSS" target="_blank" rel="noopener">Producer, BBC Audio Bristol</a></h3>
+                    <div class="meta">BBC</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('bbc_1373621657')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="bbc_1374733757" data-source="bbc" data-country="GB">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#bb1919;color:#bb1919">BBC</span> <span class="country-badge">GB</span></div>
+                    <h3><a href="https://careers.bbc.co.uk/job/Salford-YouTube-Entertainment-Editor-MAN-M50-2QH/1374733757/?feedId=null&utm_source=J2WRSS&utm_medium=rss&utm_campaign=J2W_RSS" target="_blank" rel="noopener">YouTube Entertainment Editor</a></h3>
+                    <div class="meta">BBC</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('bbc_1374733757')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div><div class="section-header"><h2>Weak matches</h2><span class="section-count">3</span><button class="collapse-btn" aria-label="Collapse section">&#x25B2;</button></div>
+
+        <div class="card" data-id="guardian_1373" data-source="guardian" data-country="AU">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">8</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#052962;color:#052962">The Guardian</span> <span class="country-badge">AU</span></div>
+                    <h3><a href="https://workwithus.theguardian.com/job-search/editorial/sydney-new-south-wales-australia/head-of-design/1373" target="_blank" rel="noopener">Head of design</a></h3>
+                    <div class="meta">The Guardian</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('guardian_1373')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="guardian_1359" data-source="guardian" data-country="GB">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">8</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#052962;color:#052962">The Guardian</span> <span class="country-badge">GB</span></div>
+                    <h3><a href="https://workwithus.theguardian.com/job-search/strategy-delivery/london-united-kingdom/commercial-strategy-analyst/1359" target="_blank" rel="noopener">Commercial Strategy Analyst</a></h3>
+                    <div class="meta">The Guardian</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('guardian_1359')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="theeconomistgroup_4941845101" data-source="theeconomistgroup" data-country="GB">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">8</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#e3120b;color:#e3120b">The Economist</span> <span class="country-badge">GB</span></div>
+                    <h3><a href="https://job-boards.eu.greenhouse.io/theeconomistgroup/jobs/4941845101" target="_blank" rel="noopener">Senior Cloud Engineer</a></h3>
+                    <div class="meta">The Economist</div>
+                    <div class="tags"></div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('theeconomistgroup_4941845101')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+
+
+<div id="sync-bar">
+    <div class="inner">
+        <span><span class="count" id="dismiss-count">0</span> dismissed</span>
+        <div class="sync-actions">
+            <button class="sync-btn secondary" onclick="undoAll()">Undo</button>
+            <button class="sync-btn" onclick="syncDismissals()">Save</button>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    Sources: BBC · The Guardian · NYT · ProPublica · Reuters · The Economist · Washington Post · Updates every 2 days · AI scored by Llama 3.3
+</div>
+
+</div>
+
+<script>
+// ── Filters ──
+function handleFilterClick(btn) {
+    const group = btn.dataset.filter;
+    const value = btn.dataset.value;
+    const otherGroup = group === 'source' ? 'country' : 'source';
+    const siblings = document.querySelectorAll(`.filter-btn[data-filter="${group}"]`);
+    const allBtn = document.querySelector(`.filter-btn[data-filter="${group}"][data-value="all"]`);
+
+    if (value === 'all') {
+        siblings.forEach(b => b.classList.remove('active'));
+        allBtn.classList.add('active');
+        // Reset the other group back to All too
+        const otherBtns = document.querySelectorAll(`.filter-btn[data-filter="${otherGroup}"]`);
+        otherBtns.forEach(b => { b.classList.remove('active'); b.style.display = ''; });
+        document.querySelector(`.filter-btn[data-filter="${otherGroup}"][data-value="all"]`).classList.add('active');
+    } else {
+        allBtn.classList.remove('active');
+        if (btn.classList.contains('active')) {
+            btn.classList.remove('active');
+            const anyActive = [...siblings].some(b => b.dataset.value !== 'all' && b.classList.contains('active'));
+            if (!anyActive) {
+                allBtn.classList.add('active');
+                // Reset other group too
+                const otherBtns = document.querySelectorAll(`.filter-btn[data-filter="${otherGroup}"]`);
+                otherBtns.forEach(b => { b.classList.remove('active'); b.style.display = ''; });
+                document.querySelector(`.filter-btn[data-filter="${otherGroup}"][data-value="all"]`).classList.add('active');
+            }
+        } else {
+            btn.classList.add('active');
+        }
+    }
+
+    // Cross-filter: update other group to show only relevant buttons
+    const thisAll = allBtn.classList.contains('active');
+    if (!thisAll) {
+        const activeValues = new Set();
+        siblings.forEach(b => { if (b.dataset.value !== 'all' && b.classList.contains('active')) activeValues.add(b.dataset.value); });
+        const relevantOther = new Set();
+        const field = group === 'source' ? 'source' : 'country';
+        const otherField = group === 'source' ? 'country' : 'source';
+        document.querySelectorAll('.card').forEach(card => {
+            const val = (field === 'source') ? (card.dataset.source || 'academictransfer') : (card.dataset.country || '');
+            if (activeValues.has(val)) {
+                const otherVal = (otherField === 'source') ? (card.dataset.source || 'academictransfer') : (card.dataset.country || '');
+                relevantOther.add(otherVal);
+            }
+        });
+        const otherAllBtn = document.querySelector(`.filter-btn[data-filter="${otherGroup}"][data-value="all"]`);
+        otherAllBtn.classList.remove('active');
+        document.querySelectorAll(`.filter-btn[data-filter="${otherGroup}"]`).forEach(b => {
+            if (b.dataset.value === 'all') return;
+            const relevant = relevantOther.has(b.dataset.value);
+            b.style.display = relevant ? '' : 'none';
+            b.classList.toggle('active', relevant);
+        });
+    }
+
+    applyFilters();
+}
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => handleFilterClick(btn));
+});
+
+function applyFilters() {
+    const activeSources = new Set();
+    const activeCountries = new Set();
+    const srcAll = document.querySelector('.filter-btn[data-filter="source"][data-value="all"]').classList.contains('active');
+    const cntAll = document.querySelector('.filter-btn[data-filter="country"][data-value="all"]').classList.contains('active');
+    if (!srcAll) document.querySelectorAll('.filter-btn[data-filter="source"].active').forEach(b => activeSources.add(b.dataset.value));
+    if (!cntAll) document.querySelectorAll('.filter-btn[data-filter="country"].active').forEach(b => activeCountries.add(b.dataset.value));
+
+    document.querySelectorAll('.card').forEach(card => {
+        const src = card.dataset.source || 'academictransfer';
+        const country = card.dataset.country || '';
+        const sourceOk = srcAll || activeSources.has(src);
+        const countryOk = cntAll || activeCountries.has(country);
+        card.classList.toggle('filtered', !(sourceOk && countryOk));
+    });
+
+    // Update section counts
+    document.querySelectorAll('.section-header').forEach(header => {
+        let count = 0;
+        let el = header.nextElementSibling;
+        while (el && !el.classList.contains('section-header') && !el.classList.contains('archive')) {
+            if (el.classList.contains('card') && !el.classList.contains('filtered') && !el.classList.contains('dismissed')) count++;
+            el = el.nextElementSibling;
+        }
+        const badge = header.querySelector('.section-count');
+        if (badge) badge.textContent = count;
+    });
+    // Update archive/details counts
+    document.querySelectorAll('details.archive').forEach(det => {
+        const visible = det.querySelectorAll('.card:not(.filtered):not(.dismissed)').length;
+        const badge = det.querySelector('summary .section-count');
+        if (badge) badge.textContent = visible;
+    });
+
+}
+
+// ── Section collapse ──
+document.querySelectorAll('.section-header').forEach(header => {
+    header.addEventListener('click', () => {
+        const collapsed = header.classList.toggle('collapsed');
+        let el = header.nextElementSibling;
+        while (el && !el.classList.contains('section-header') && !el.classList.contains('archive')) {
+            if (el.classList.contains('card')) el.classList.toggle('section-collapsed', collapsed);
+            el = el.nextElementSibling;
+        }
+    });
+});
+
+// ── Deadlines ──
+document.querySelectorAll('.countdown').forEach(el => {
+    const raw = el.dataset.deadline;
+    if (!raw) return;
+    // Handle ISO dates (YYYY-MM-DD) and AT-style ("28 Oct '26")
+    let deadline;
+    if (/^\d{4}-\d{2}-\d{2}/.test(raw)) {
+        deadline = new Date(raw);
+    } else {
+        const normalized = raw.replace(/['\u2018\u2019](\d{2})/, '20$1');
+        deadline = new Date(normalized);
+    }
+    if (isNaN(deadline)) return;
+    const now = new Date();
+    now.setHours(0,0,0,0);
+    deadline.setHours(0,0,0,0);
+    const diff = Math.ceil((deadline - now) / (1000 * 60 * 60 * 24));
+    if (diff < 0) {
+        const card = el.closest('.card');
+        if (card && !card.closest('.archive')) card.classList.add('dismissed');
+        el.textContent = 'Expired';
+        el.classList.add('expired');
+        return;
+    } else if (diff === 0) {
+        el.textContent = 'Today';
+        el.classList.add('urgent');
+    } else if (diff === 1) {
+        el.textContent = '1 day';
+        el.classList.add('urgent');
+    } else {
+        el.textContent = diff + ' days';
+        if (diff <= 7) el.classList.add('urgent');
+    }
+});
+
+// ── Dismissals ──
+const serverDismissed = new Set([]);
+let sessionDismissed = new Set();
+
+const stored = JSON.parse(localStorage.getItem('phd_dismissed') || '[]');
+stored.forEach(id => {
+    const card = document.querySelector(`.card[data-id="${id}"]`);
+    if (card) { card.classList.add('dismissed'); sessionDismissed.add(id); }
+});
+updateBar();
+
+function dismiss(id) {
+    const card = document.querySelector(`.card[data-id="${id}"]`);
+    if (card) card.classList.add('dismissed');
+    sessionDismissed.add(id);
+    localStorage.setItem('phd_dismissed', JSON.stringify([...sessionDismissed]));
+    updateBar();
+}
+
+function undoAll() {
+    sessionDismissed.forEach(id => {
+        const card = document.querySelector(`.card[data-id="${id}"]`);
+        if (card) card.classList.remove('dismissed');
+    });
+    sessionDismissed.clear();
+    localStorage.removeItem('phd_dismissed');
+    updateBar();
+}
+
+function updateBar() {
+    const bar = document.getElementById('sync-bar');
+    const count = document.getElementById('dismiss-count');
+    if (sessionDismissed.size > 0) {
+        bar.style.display = 'block';
+        count.textContent = sessionDismissed.size;
+    } else {
+        bar.style.display = 'none';
+    }
+}
+
+async function syncDismissals() {
+    const all = [...new Set([...serverDismissed, ...sessionDismissed])].sort();
+    const content = JSON.stringify(all, null, 2);
+    let token = localStorage.getItem('phd_github_token');
+    let repo = localStorage.getItem('phd_github_repo');
+
+    if (!token || !repo) {
+        const setup = prompt(
+            'To save dismissals, enter: owner/repo,your_personal_access_token\n' +
+            '(Token needs "contents" write permission. Stored in your browser only.)\n\n' +
+            'Or press Cancel to copy JSON to clipboard.'
+        );
+        if (!setup) {
+            navigator.clipboard.writeText(content).then(() => alert('Copied! Paste into data/dismissed.json.'));
+            return;
+        }
+        const parts = setup.split(',');
+        if (parts.length < 2) { alert('Format: owner/repo,token'); return; }
+        repo = parts[0].trim();
+        token = parts.slice(1).join(',').trim();
+        localStorage.setItem('phd_github_repo', repo);
+        localStorage.setItem('phd_github_token', token);
+    }
+
+    try {
+        const getResp = await fetch(
+            `https://api.github.com/repos/${repo}/contents/data/dismissed.json`,
+            { headers: { 'Authorization': `Bearer ${token}` } }
+        );
+        let sha = null;
+        if (getResp.ok) { sha = (await getResp.json()).sha; }
+
+        const body = { message: `Dismiss ${sessionDismissed.size} vacancies`, content: btoa(content) };
+        if (sha) body.sha = sha;
+
+        const putResp = await fetch(
+            `https://api.github.com/repos/${repo}/contents/data/dismissed.json`,
+            { method: 'PUT', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
+        );
+
+        if (putResp.ok) {
+            localStorage.removeItem('phd_dismissed');
+            sessionDismissed.clear();
+            updateBar();
+            alert('Saved! Dismissed vacancies will be hidden on the next build.');
+        } else {
+            throw new Error((await putResp.json()).message || putResp.statusText);
+        }
+    } catch (e) {
+        if (confirm(`Save failed: ${e.message}\n\nCopy JSON to clipboard instead?`)) {
+            navigator.clipboard.writeText(content).then(() => alert('Copied!'));
+        }
+        if (e.message.includes('Bad credentials')) {
+            localStorage.removeItem('phd_github_token');
+            localStorage.removeItem('phd_github_repo');
+        }
+    }
+}
+</script>
+</body>
+</html>
