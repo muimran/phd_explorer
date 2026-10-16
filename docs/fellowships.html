@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fellowships · PhD Radar</title>
+<style>
+:root {
+    --bg: #fff;
+    --fg: #1a1a1a;
+    --border: #e5e5e5;
+    --muted: #737373;
+    --accent: #7c3aed;
+    --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #111;
+        --fg: #e5e5e5;
+        --border: #2a2a2a;
+        --muted: #888;
+        --accent: #a78bfa;
+    }
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg); color: var(--fg);
+    line-height: 1.5; -webkit-font-smoothing: antialiased;
+}
+.container { max-width: 680px; margin: 0 auto; padding: 2.5rem 1.5rem 6rem; }
+
+/* Header */
+.header { margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+.header h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem; }
+.updated { font-size: 0.8rem; color: var(--muted); }
+.tabs { display: flex; gap: 1.25rem; margin-top: 1rem; }
+.tab {
+    font-size: 0.85rem; font-weight: 500; color: var(--muted); text-decoration: none;
+    padding-bottom: 0.35rem; border-bottom: 2px solid transparent;
+}
+.tab:hover { color: var(--fg); }
+.tab.active { color: var(--fg); border-bottom-color: var(--accent); }
+
+/* Stats */
+.stats {
+    display: flex; gap: 2rem; margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem; border-bottom: 1px solid var(--border);
+}
+.stat { }
+.stat-num { font-size: 1.75rem; font-weight: 600; line-height: 1; }
+.stat-num.accent { color: var(--accent); }
+.stat-label { font-size: 0.75rem; color: var(--muted); margin-top: 0.15rem; }
+
+/* Filters */
+.filters {
+    display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem; border-bottom: 1px solid var(--border);
+}
+.filter-group { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; }
+.filter-group::before { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-right: 0.25rem; }
+.filter-group.source-filters::before { content: "Source"; }
+.filter-group.country-filters::before { content: "Country"; }
+.filter-sep { width: 1px; height: 1.5rem; background: var(--border); margin: 0 0.5rem; }
+.filter-btn {
+    font-size: 0.7rem; font-weight: 500;
+    padding: 0.25rem 0.6rem; border-radius: 999px;
+    border: 1px solid var(--border); background: var(--bg); color: var(--muted);
+    cursor: pointer; transition: all 0.15s;
+}
+.filter-btn.active {
+    border-color: var(--btn-color, var(--accent));
+    color: var(--btn-color, var(--accent));
+    background: color-mix(in srgb, var(--btn-color, var(--accent)) 8%, var(--bg));
+}
+.filter-btn:hover { opacity: 0.8; }
+.filter-btn.dimmed { opacity: 0.15; transform: scale(0.9); pointer-events: auto; }
+
+/* Sections */
+.section-header {
+    display: flex; align-items: center; gap: 0.5rem;
+    margin: 2rem 0 0rem; padding: 0.55rem 0;
+    position: sticky; top: 0; z-index: 10;
+    background: var(--bg); border-bottom: 1px solid var(--border);
+}
+.section-header { cursor: pointer; }
+.section-header h2 { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.section-header.collapsed { margin-bottom: 0; }
+.section-count {
+    font-size: 0.7rem; font-weight: 600; color: var(--accent);
+    background: none; padding: 0;
+}
+.collapse-btn {
+    margin-left: auto; background: none; border: none; cursor: pointer;
+    font-size: 0.6rem; color: var(--muted); padding: 0.2rem 0.4rem;
+    transition: transform 0.2s ease;
+}
+.collapse-btn:hover { color: var(--fg); }
+.section-header.collapsed .collapse-btn { transform: rotate(180deg); }
+.card.section-collapsed { display: none; }
+
+/* Cards */
+.card {
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 0;
+    transition: opacity 0.3s;
+}
+.card:last-child { border-bottom: none; }
+.card.dismissed { opacity: 0; height: 0; overflow: hidden; padding: 0; border: none; }
+.card.filtered { display: none; }
+.card-top { display: flex; align-items: flex-start; gap: 1rem; }
+.score-col {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 0.2rem; min-width: 36px; padding-top: 0.15rem;
+}
+.score {
+    font-size: 0.8rem; font-weight: 600; color: var(--accent);
+    text-align: center;
+}
+.kw-score {
+    font-size: 0.6rem; color: var(--muted); white-space: nowrap;
+    text-align: center;
+}
+.card-body { flex: 1; min-width: 0; }
+.card h3 { font-size: 0.95rem; font-weight: 500; line-height: 1.4; margin-bottom: 0.2rem; }
+.card a { color: var(--fg); text-decoration: none; }
+.card a:hover { color: var(--accent); }
+.badges { display: flex; gap: 0.35rem; margin-bottom: 0.3rem; flex-wrap: wrap; }
+.source-badge {
+    font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;
+    padding: 0.1rem 0.4rem; border-radius: 3px;
+    border: 1px solid; background: transparent;
+}
+.country-badge {
+    font-size: 0.6rem; font-weight: 600;
+    padding: 0.1rem 0.4rem; border-radius: 3px;
+    background: var(--border); color: var(--fg);
+}
+.meta { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.2rem; }
+.tags { font-size: 0.75rem; color: var(--accent); margin-bottom: 0.15rem; }
+.terms { font-size: 0.75rem; color: var(--muted); opacity: 0.6; }
+.card-right {
+    display: flex; flex-direction: column; align-items: flex-end;
+    gap: 0.5rem; flex-shrink: 0; padding-top: 0.1rem;
+}
+.countdown {
+    font-size: 0.75rem; color: var(--muted); white-space: nowrap;
+    cursor: default;
+}
+.countdown.urgent { color: var(--accent); font-weight: 600; }
+.countdown.expired { color: var(--border); }
+.dismiss-btn {
+    background: none; border: none;
+    color: var(--border); cursor: pointer;
+    padding: 0.3rem; font-size: 1.1rem;
+    line-height: 1; transition: color 0.15s;
+}
+.dismiss-btn:hover { color: var(--fg); }
+
+/* Empty */
+.empty { text-align: center; padding: 3rem 1rem; color: var(--muted); }
+.archive { margin-top: 2rem; border-top: 1px solid var(--border); }
+.archive summary { cursor: pointer; list-style: none; padding: 1.25rem 0; font-size: 0.95rem; font-weight: 500; }
+.archive summary::-webkit-details-marker { display: none; }
+.archive summary::before { content: '>'; display: inline-block; margin-right: 0.5rem; color: var(--muted); }
+.archive[open] summary::before { transform: rotate(90deg); }
+.archive-note { margin: -0.4rem 0 1rem; color: var(--muted); font-size: 0.8rem; }
+
+
+/* Sync bar */
+#sync-bar {
+    display: none; position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--bg); border-top: 1px solid var(--border);
+    padding: 0.75rem 1.5rem; z-index: 100;
+}
+#sync-bar .inner {
+    max-width: 680px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 0.8rem; color: var(--muted);
+}
+.sync-actions { display: flex; gap: 0.5rem; }
+.sync-btn {
+    background: var(--accent); color: #fff; border: none;
+    border-radius: 6px; padding: 0.4rem 1rem;
+    cursor: pointer; font-size: 0.8rem; font-weight: 500;
+}
+.sync-btn:hover { opacity: 0.85; }
+.sync-btn.secondary {
+    background: transparent; color: var(--muted); border: 1px solid var(--border);
+}
+.count { font-weight: 600; color: var(--fg); }
+
+/* Footer */
+.footer {
+    margin-top: 2.5rem; padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.75rem; color: var(--muted);
+}
+.footer a { color: var(--muted); text-decoration: none; }
+.footer a:hover { color: var(--accent); }
+
+@media (max-width: 480px) {
+    .container { padding: 1.5rem 1rem 6rem; }
+    .stats { gap: 1.5rem; }
+    .stat-num { font-size: 1.4rem; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+    <h1>PhD Radar</h1>
+    <div class="updated">Last scraped 16 October 2026, 18:38</div>
+    <nav class="tabs"><a class="tab" href="index.html">PhD Positions</a><a class="tab" href="jobs.html">Jobs</a><a class="tab active" href="fellowships.html">Fellowships</a></nav>
+</div>
+
+<div class="stats">
+    <div class="stat">
+        <div class="stat-num">18</div>
+        <div class="stat-label">Total</div>
+    </div>
+    <div class="stat">
+        <div class="stat-num accent">13</div>
+        <div class="stat-label">Strong</div>
+    </div>
+    <div class="stat">
+        <div class="stat-num">5</div>
+        <div class="stat-label">Investigate</div>
+    </div>
+    <div class="stat">
+        <div class="stat-num">0</div>
+        <div class="stat-label">Zero score</div>
+    </div>
+</div>
+
+<div class="filters">
+    <div class="filter-group source-filters">
+        <button class="filter-btn active" data-filter="source" data-value="all">All</button>
+<button class="filter-btn" data-filter="source" data-value="curated" style="--btn-color:#7c3aed">Programme</button>
+<button class="filter-btn" data-filter="source" data-value="ijnet" style="--btn-color:#0e7490">IJNet</button>
+
+    </div>
+    <div class="filter-sep"></div>
+    <div class="filter-group country-filters">
+        <button class="filter-btn active" data-filter="country" data-value="all">All</button>
+<button class="filter-btn" data-filter="country" data-value="Europe">Europe</button>
+<button class="filter-btn" data-filter="country" data-value="GB">GB</button>
+<button class="filter-btn" data-filter="country" data-value="Global">Global</button>
+<button class="filter-btn" data-filter="country" data-value="US">US</button>
+
+    </div>
+</div>
+
+<div class="section-header"><h2>Strong matches</h2><span class="section-count">13</span><button class="collapse-btn" aria-label="Collapse section">&#x25B2;</button></div>
+
+        <div class="card" data-id="fel_tarbell" data-source="curated" data-country="Global">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">95</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#7c3aed;color:#7c3aed">Programme</span> <span class="country-badge">Global</span></div>
+                    <h3><a href="https://www.tarbellcenter.org/fellowship" target="_blank" rel="noopener">Tarbell Fellowship in AI Journalism</a></h3>
+                    <div class="meta">Tarbell Center for AI Journalism · <span class="note">2027-28 cohort; training from June 2027 then a 9-month newsroom placement (US, UK, Hong Kong)</span></div>
+                    <div class="tags">AI journalism</div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    <div class="countdown" data-deadline="2026-11-22" title="2026-11-22"></div>
+                    <button class="dismiss-btn" onclick="dismiss('fel_tarbell')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="fel_pulitzer_ai" data-source="curated" data-country="Global">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">90</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#7c3aed;color:#7c3aed">Programme</span> <span class="country-badge">Global</span></div>
+                    <h3><a href="https://pulitzercenter.org/grants-fellowships/opportunities-journalists/ai-accountability-fellowships" target="_blank" rel="noopener">Pulitzer Center AI Accountability Fellowship</a></h3>
+                    <div class="meta">Pulitzer Center · <span class="note">Annual; the 2026-27 round closed 12 July 2026, so expect the next call around mid-2027</span></div>
+                    <div class="tags">AI journalism</div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('fel_pulitzer_ai')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="fel_govai_summer" data-source="curated" data-country="GB">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">88</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#7c3aed;color:#7c3aed">Programme</span> <span class="country-badge">GB</span></div>
+                    <h3><a href="https://www.governance.ai/opportunities" target="_blank" rel="noopener">GovAI Summer Fellowship</a></h3>
+                    <div class="meta">Centre for the Governance of AI · <span class="note">The Summer 2026 round closed 4 January 2026; a Summer 2027 round is not yet announced</span></div>
+                    <div class="tags">AI governance</div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('fel_govai_summer')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="fel_iaps" data-source="curated" data-country="Global">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">82</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#7c3aed;color:#7c3aed">Programme</span> <span class="country-badge">Global</span></div>
+                    <h3><a href="https://www.iaps.ai/fellowship" target="_blank" rel="noopener">IAPS AI Policy Fellowship</a></h3>
+                    <div class="meta">Institute for AI Policy and Strategy · <span class="note">Spring 2027 round closed 27 Sep 2026; DC, London or remote</span></div>
+                    <div class="tags">AI governance</div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('fel_iaps')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="fel_era" data-source="curated" data-country="GB">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">80</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#7c3aed;color:#7c3aed">Programme</span> <span class="country-badge">GB</span></div>
+                    <h3><a href="https://erafellowship.org" target="_blank" rel="noopener">Cambridge ERA:AI Fellowship (AI Governance track)</a></h3>
+                    <div class="meta">ERA Cambridge · <span class="note">Winter 2027 round closed 13 Sep 2026; 10 weeks in Cambridge, open to all nationalities</span></div>
+                    <div class="tags">AI governance</div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('fel_era')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="fel_berkman" data-source="curated" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">78</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#7c3aed;color:#7c3aed">Programme</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://cyber.harvard.edu/getinvolved/fellowships" target="_blank" rel="noopener">Berkman Klein Center Fellowship</a></h3>
+                    <div class="meta">Berkman Klein Center, Harvard · <span class="note">The last open call closed 5 Dec 2025; watch for an autumn call</span></div>
+                    <div class="tags">Research</div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('fel_berkman')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="fel_oii_sdp" data-source="curated" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">75</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#7c3aed;color:#7c3aed">Programme</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://www.ischool.berkeley.edu/programs/oxford-berkeley-summer-doctoral-program" target="_blank" rel="noopener">Oxford-Berkeley Summer Doctoral Programme</a></h3>
+                    <div class="meta">Oxford Internet Institute / UC Berkeley · <span class="note">For PhD students; the 2027 edition is in Berkeley, and the 2026 round closed 2 Feb</span></div>
+                    <div class="tags">Research</div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('fel_oii_sdp')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="fel_turing_enrichment" data-source="curated" data-country="GB">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">72</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#7c3aed;color:#7c3aed">Programme</span> <span class="country-badge">GB</span></div>
+                    <h3><a href="https://www.turing.ac.uk/opportunities/doctoral-student-opportunities/phd-enrichment-scheme" target="_blank" rel="noopener">Turing PhD Enrichment Scheme</a></h3>
+                    <div class="meta">The Alan Turing Institute · <span class="note">6-9 month placement for UK-based PhD students; check the site for the current round</span></div>
+                    <div class="tags">Research</div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('fel_turing_enrichment')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="fel_tow" data-source="curated" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">70</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#7c3aed;color:#7c3aed">Programme</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://towcenter.columbia.edu" target="_blank" rel="noopener">Tow Center Research Fellowship</a></h3>
+                    <div class="meta">Tow Center for Digital Journalism, Columbia · <span class="note">No open call at the moment; past calls covered computational and data journalism</span></div>
+                    <div class="tags">Research</div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('fel_tow')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="fel_reuters_institute" data-source="curated" data-country="GB">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">70</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#7c3aed;color:#7c3aed">Programme</span> <span class="country-badge">GB</span></div>
+                    <h3><a href="https://reutersinstitute.politics.ox.ac.uk/journalist-fellowship-programme" target="_blank" rel="noopener">Reuters Institute Journalist Fellowship</a></h3>
+                    <div class="meta">Reuters Institute, University of Oxford · <span class="note">Opens January 2027; last deadline was 13 Feb 2026; needs 5+ years in journalism</span></div>
+                    <div class="tags">Journalism</div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('fel_reuters_institute')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="fel_ksj_mit" data-source="curated" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">62</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#7c3aed;color:#7c3aed">Programme</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://ksj.mit.edu/fellowships/academic-year-fellowship/" target="_blank" rel="noopener">Knight Science Journalism Fellowship</a></h3>
+                    <div class="meta">MIT · <span class="note">Last deadline was 9 Jan 2026; the 2027-28 call is expected late 2026; covers science and tech reporting</span></div>
+                    <div class="tags">Journalism</div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('fel_ksj_mit')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="fel_jsk" data-source="curated" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">62</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#7c3aed;color:#7c3aed">Programme</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://jsk.stanford.edu/become-a-fellow" target="_blank" rel="noopener">JSK Journalism Fellowship</a></h3>
+                    <div class="meta">Stanford University · <span class="note">2027-28 cohort (deadline listed by IJNet); needs 5+ years in journalism</span></div>
+                    <div class="tags">Journalism</div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    <div class="countdown" data-deadline="2026-12-02" title="2026-12-02"></div>
+                    <button class="dismiss-btn" onclick="dismiss('fel_jsk')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="fel_horizon" data-source="curated" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">60</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#7c3aed;color:#7c3aed">Programme</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://horizonpublicservice.org" target="_blank" rel="noopener">Horizon Fellowship</a></h3>
+                    <div class="meta">Horizon Institute for Public Service · <span class="note">Places fellows in US government and think tanks; the 2027 round closed 30 Aug 2026</span></div>
+                    <div class="tags">AI governance</div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('fel_horizon')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div><div class="section-header"><h2>Worth investigating</h2><span class="section-count">5</span><button class="collapse-btn" aria-label="Collapse section">&#x25B2;</button></div>
+
+        <div class="card" data-id="fel_nieman" data-source="curated" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">58</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#7c3aed;color:#7c3aed">Programme</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://nieman.harvard.edu/fellowships/" target="_blank" rel="noopener">Nieman Fellowship (international)</a></h3>
+                    <div class="meta">Nieman Foundation, Harvard · <span class="note">Deadline is for non-US citizens; needs 5+ years in media</span></div>
+                    <div class="tags">Journalism</div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    <div class="countdown" data-deadline="2026-12-01" title="2026-12-01"></div>
+                    <button class="dismiss-btn" onclick="dismiss('fel_nieman')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="fel_knight_wallace" data-source="curated" data-country="US">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">56</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#7c3aed;color:#7c3aed">Programme</span> <span class="country-badge">US</span></div>
+                    <h3><a href="https://wallacehouse.umich.edu/knight-wallace/" target="_blank" rel="noopener">Knight-Wallace Fellowship (international)</a></h3>
+                    <div class="meta">Wallace House, University of Michigan · <span class="note">Deadline reported for non-US applicants (US applicants: 1 Feb 2027); confirm on the site</span></div>
+                    <div class="tags">Journalism</div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    <div class="countdown" data-deadline="2026-12-01" title="2026-12-01"></div>
+                    <button class="dismiss-btn" onclick="dismiss('fel_knight_wallace')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="fel_fli_phd" data-source="curated" data-country="Global">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">40</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#7c3aed;color:#7c3aed">Programme</span> <span class="country-badge">Global</span></div>
+                    <h3><a href="https://futureoflife.org/grant-program/phd-fellowships/" target="_blank" rel="noopener">FLI Vitalik Buterin PhD Fellowship in AI Existential Safety</a></h3>
+                    <div class="meta">Future of Life Institute · <span class="note">Paused: FLI is not accepting applications in autumn 2026 while it reviews the programme</span></div>
+                    <div class="tags">AI governance</div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    
+                    <button class="dismiss-btn" onclick="dismiss('fel_fli_phd')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="ijnet_technical-programme-ai-integration-media-outlets" data-source="ijnet" data-country="Europe">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">30</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#0e7490;color:#0e7490">IJNet</span> <span class="country-badge">Europe</span></div>
+                    <h3><a href="https://ijnet.org/en/opportunity/technical-programme-ai-integration-media-outlets" target="_blank" rel="noopener">Technical programme for AI-integration for media outlets</a></h3>
+                    <div class="meta">A digital support programme for journalists from North Macedonia</div>
+                    <div class="tags">AI journalism</div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    <div class="countdown" data-deadline="2026-10-16" title="2026-10-16"></div>
+                    <button class="dismiss-btn" onclick="dismiss('ijnet_technical-programme-ai-integration-media-outlets')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="card" data-id="ijnet_reporting-technology-and-its-various-implications" data-source="ijnet" data-country="Europe">
+            <div class="card-top">
+                <div class="score-col">
+                    <div class="score">25</div><div class="kw-score">kw</div>
+                </div>
+                <div class="card-body">
+                    <div class="badges"><span class="source-badge" style="border-color:#0e7490;color:#0e7490">IJNet</span> <span class="country-badge">Europe</span></div>
+                    <h3><a href="https://ijnet.org/en/opportunity/reporting-technology-and-its-various-implications" target="_blank" rel="noopener">Reporting on technology and its various implications</a></h3>
+                    <div class="meta">A fellowship programme for journalists from Germany and Switzerland</div>
+                    <div class="tags">Journalism</div>
+                    <div class="terms"></div>
+                </div>
+                <div class="card-right">
+                    <div class="countdown" data-deadline="2026-11-15" title="2026-11-15"></div>
+                    <button class="dismiss-btn" onclick="dismiss('ijnet_reporting-technology-and-its-various-implications')" title="Not relevant">✕</button>
+                </div>
+            </div>
+        </div>
+
+
+<div id="sync-bar">
+    <div class="inner">
+        <span><span class="count" id="dismiss-count">0</span> dismissed</span>
+        <div class="sync-actions">
+            <button class="sync-btn secondary" onclick="undoAll()">Undo</button>
+            <button class="sync-btn" onclick="syncDismissals()">Save</button>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    Sources: Programme · <a href="https://ijnet.org/en/opportunities">IJNet</a> · Updates every 2 days · AI scored by Llama 3.3
+</div>
+
+</div>
+
+<script>
+// ── Filters ──
+function handleFilterClick(btn) {
+    const group = btn.dataset.filter;
+    const value = btn.dataset.value;
+    const otherGroup = group === 'source' ? 'country' : 'source';
+    const siblings = document.querySelectorAll(`.filter-btn[data-filter="${group}"]`);
+    const allBtn = document.querySelector(`.filter-btn[data-filter="${group}"][data-value="all"]`);
+
+    if (value === 'all') {
+        siblings.forEach(b => b.classList.remove('active'));
+        allBtn.classList.add('active');
+        // Reset the other group back to All too
+        const otherBtns = document.querySelectorAll(`.filter-btn[data-filter="${otherGroup}"]`);
+        otherBtns.forEach(b => { b.classList.remove('active'); b.style.display = ''; });
+        document.querySelector(`.filter-btn[data-filter="${otherGroup}"][data-value="all"]`).classList.add('active');
+    } else {
+        allBtn.classList.remove('active');
+        if (btn.classList.contains('active')) {
+            btn.classList.remove('active');
+            const anyActive = [...siblings].some(b => b.dataset.value !== 'all' && b.classList.contains('active'));
+            if (!anyActive) {
+                allBtn.classList.add('active');
+                // Reset other group too
+                const otherBtns = document.querySelectorAll(`.filter-btn[data-filter="${otherGroup}"]`);
+                otherBtns.forEach(b => { b.classList.remove('active'); b.style.display = ''; });
+                document.querySelector(`.filter-btn[data-filter="${otherGroup}"][data-value="all"]`).classList.add('active');
+            }
+        } else {
+            btn.classList.add('active');
+        }
+    }
+
+    // Cross-filter: update other group to show only relevant buttons
+    const thisAll = allBtn.classList.contains('active');
+    if (!thisAll) {
+        const activeValues = new Set();
+        siblings.forEach(b => { if (b.dataset.value !== 'all' && b.classList.contains('active')) activeValues.add(b.dataset.value); });
+        const relevantOther = new Set();
+        const field = group === 'source' ? 'source' : 'country';
+        const otherField = group === 'source' ? 'country' : 'source';
+        document.querySelectorAll('.card').forEach(card => {
+            const val = (field === 'source') ? (card.dataset.source || 'academictransfer') : (card.dataset.country || '');
+            if (activeValues.has(val)) {
+                const otherVal = (otherField === 'source') ? (card.dataset.source || 'academictransfer') : (card.dataset.country || '');
+                relevantOther.add(otherVal);
+            }
+        });
+        const otherAllBtn = document.querySelector(`.filter-btn[data-filter="${otherGroup}"][data-value="all"]`);
+        otherAllBtn.classList.remove('active');
+        document.querySelectorAll(`.filter-btn[data-filter="${otherGroup}"]`).forEach(b => {
+            if (b.dataset.value === 'all') return;
+            const relevant = relevantOther.has(b.dataset.value);
+            b.style.display = relevant ? '' : 'none';
+            b.classList.toggle('active', relevant);
+        });
+    }
+
+    applyFilters();
+}
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => handleFilterClick(btn));
+});
+
+function applyFilters() {
+    const activeSources = new Set();
+    const activeCountries = new Set();
+    const srcAll = document.querySelector('.filter-btn[data-filter="source"][data-value="all"]').classList.contains('active');
+    const cntAll = document.querySelector('.filter-btn[data-filter="country"][data-value="all"]').classList.contains('active');
+    if (!srcAll) document.querySelectorAll('.filter-btn[data-filter="source"].active').forEach(b => activeSources.add(b.dataset.value));
+    if (!cntAll) document.querySelectorAll('.filter-btn[data-filter="country"].active').forEach(b => activeCountries.add(b.dataset.value));
+
+    document.querySelectorAll('.card').forEach(card => {
+        const src = card.dataset.source || 'academictransfer';
+        const country = card.dataset.country || '';
+        const sourceOk = srcAll || activeSources.has(src);
+        const countryOk = cntAll || activeCountries.has(country);
+        card.classList.toggle('filtered', !(sourceOk && countryOk));
+    });
+
+    // Update section counts
+    document.querySelectorAll('.section-header').forEach(header => {
+        let count = 0;
+        let el = header.nextElementSibling;
+        while (el && !el.classList.contains('section-header') && !el.classList.contains('archive')) {
+            if (el.classList.contains('card') && !el.classList.contains('filtered') && !el.classList.contains('dismissed')) count++;
+            el = el.nextElementSibling;
+        }
+        const badge = header.querySelector('.section-count');
+        if (badge) badge.textContent = count;
+    });
+    // Update archive/details counts
+    document.querySelectorAll('details.archive').forEach(det => {
+        const visible = det.querySelectorAll('.card:not(.filtered):not(.dismissed)').length;
+        const badge = det.querySelector('summary .section-count');
+        if (badge) badge.textContent = visible;
+    });
+
+}
+
+// ── Section collapse ──
+document.querySelectorAll('.section-header').forEach(header => {
+    header.addEventListener('click', () => {
+        const collapsed = header.classList.toggle('collapsed');
+        let el = header.nextElementSibling;
+        while (el && !el.classList.contains('section-header') && !el.classList.contains('archive')) {
+            if (el.classList.contains('card')) el.classList.toggle('section-collapsed', collapsed);
+            el = el.nextElementSibling;
+        }
+    });
+});
+
+// ── Deadlines ──
+document.querySelectorAll('.countdown').forEach(el => {
+    const raw = el.dataset.deadline;
+    if (!raw) return;
+    // Handle ISO dates (YYYY-MM-DD) and AT-style ("28 Oct '26")
+    let deadline;
+    if (/^\d{4}-\d{2}-\d{2}/.test(raw)) {
+        deadline = new Date(raw);
+    } else {
+        const normalized = raw.replace(/['\u2018\u2019](\d{2})/, '20$1');
+        deadline = new Date(normalized);
+    }
+    if (isNaN(deadline)) return;
+    const now = new Date();
+    now.setHours(0,0,0,0);
+    deadline.setHours(0,0,0,0);
+    const diff = Math.ceil((deadline - now) / (1000 * 60 * 60 * 24));
+    if (diff < 0) {
+        const card = el.closest('.card');
+        if (card && !card.closest('.archive')) card.classList.add('dismissed');
+        el.textContent = 'Expired';
+        el.classList.add('expired');
+        return;
+    } else if (diff === 0) {
+        el.textContent = 'Today';
+        el.classList.add('urgent');
+    } else if (diff === 1) {
+        el.textContent = '1 day';
+        el.classList.add('urgent');
+    } else {
+        el.textContent = diff + ' days';
+        if (diff <= 7) el.classList.add('urgent');
+    }
+});
+
+// ── Dismissals ──
+const serverDismissed = new Set([]);
+let sessionDismissed = new Set();
+
+const stored = JSON.parse(localStorage.getItem('phd_dismissed') || '[]');
+stored.forEach(id => {
+    const card = document.querySelector(`.card[data-id="${id}"]`);
+    if (card) { card.classList.add('dismissed'); sessionDismissed.add(id); }
+});
+updateBar();
+
+function dismiss(id) {
+    const card = document.querySelector(`.card[data-id="${id}"]`);
+    if (card) card.classList.add('dismissed');
+    sessionDismissed.add(id);
+    localStorage.setItem('phd_dismissed', JSON.stringify([...sessionDismissed]));
+    updateBar();
+}
+
+function undoAll() {
+    sessionDismissed.forEach(id => {
+        const card = document.querySelector(`.card[data-id="${id}"]`);
+        if (card) card.classList.remove('dismissed');
+    });
+    sessionDismissed.clear();
+    localStorage.removeItem('phd_dismissed');
+    updateBar();
+}
+
+function updateBar() {
+    const bar = document.getElementById('sync-bar');
+    const count = document.getElementById('dismiss-count');
+    if (sessionDismissed.size > 0) {
+        bar.style.display = 'block';
+        count.textContent = sessionDismissed.size;
+    } else {
+        bar.style.display = 'none';
+    }
+}
+
+async function syncDismissals() {
+    const all = [...new Set([...serverDismissed, ...sessionDismissed])].sort();
+    const content = JSON.stringify(all, null, 2);
+    let token = localStorage.getItem('phd_github_token');
+    let repo = localStorage.getItem('phd_github_repo');
+
+    if (!token || !repo) {
+        const setup = prompt(
+            'To save dismissals, enter: owner/repo,your_personal_access_token\n' +
+            '(Token needs "contents" write permission. Stored in your browser only.)\n\n' +
+            'Or press Cancel to copy JSON to clipboard.'
+        );
+        if (!setup) {
+            navigator.clipboard.writeText(content).then(() => alert('Copied! Paste into data/dismissed.json.'));
+            return;
+        }
+        const parts = setup.split(',');
+        if (parts.length < 2) { alert('Format: owner/repo,token'); return; }
+        repo = parts[0].trim();
+        token = parts.slice(1).join(',').trim();
+        localStorage.setItem('phd_github_repo', repo);
+        localStorage.setItem('phd_github_token', token);
+    }
+
+    try {
+        const getResp = await fetch(
+            `https://api.github.com/repos/${repo}/contents/data/dismissed.json`,
+            { headers: { 'Authorization': `Bearer ${token}` } }
+        );
+        let sha = null;
+        if (getResp.ok) { sha = (await getResp.json()).sha; }
+
+        const body = { message: `Dismiss ${sessionDismissed.size} vacancies`, content: btoa(content) };
+        if (sha) body.sha = sha;
+
+        const putResp = await fetch(
+            `https://api.github.com/repos/${repo}/contents/data/dismissed.json`,
+            { method: 'PUT', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
+        );
+
+        if (putResp.ok) {
+            localStorage.removeItem('phd_dismissed');
+            sessionDismissed.clear();
+            updateBar();
+            alert('Saved! Dismissed vacancies will be hidden on the next build.');
+        } else {
+            throw new Error((await putResp.json()).message || putResp.statusText);
+        }
+    } catch (e) {
+        if (confirm(`Save failed: ${e.message}\n\nCopy JSON to clipboard instead?`)) {
+            navigator.clipboard.writeText(content).then(() => alert('Copied!'));
+        }
+        if (e.message.includes('Bad credentials')) {
+            localStorage.removeItem('phd_github_token');
+            localStorage.removeItem('phd_github_repo');
+        }
+    }
+}
+</script>
+</body>
+</html>

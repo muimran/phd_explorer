@@ -35,6 +35,10 @@ jobs:
         continue-on-error: true
         run: python job_scraper.py
 
+      - name: Run fellowship scraper (IJNet)
+        continue-on-error: true
+        run: python fellowship_scraper.py
+
       - name: Run LLM scorer
         continue-on-error: true
         run: python llm_scorer.py

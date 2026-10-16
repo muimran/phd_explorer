@@ -23,6 +23,7 @@ from profile import (
 )
 from sources import academictransfer, euraxess, jobsacuk
 from job_scraper import JOB_SOURCE_META, load_jobs
+from fellowship_scraper import FELLOWSHIP_SOURCE_META, load_fellowships
 
 # ── Paths ────────────────────────────────────────────────────────────────────
 DATA_DIR = Path(__file__).parent / "data"
@@ -263,6 +264,15 @@ PAGES = {
         "strong": 40,
         "investigate": 15,
     },
+    "fellowships": {
+        "file": "fellowships.html",
+        "label": "Fellowships",
+        "title": "Fellowships · PhD Radar",
+        "source_meta": FELLOWSHIP_SOURCE_META,
+        "source_links": {"ijnet": '<a href="https://ijnet.org/en/opportunities">IJNet</a>'},
+        "strong": 60,
+        "investigate": 25,
+    },
 }
 
 
@@ -341,7 +351,7 @@ def generate_site(scored: list[dict], page: str = "phd"):
             fam_parts.append("Tech & Data")
         if families.get("journalism_adjacent"):
             fam_parts.append("Adjacent")
-        fam_str = " · ".join(fam_parts)
+        fam_str = v.get("label") or " · ".join(fam_parts)
 
         deadline_html = ""
         if v.get("deadline"):
@@ -359,6 +369,8 @@ def generate_site(scored: list[dict], page: str = "phd"):
             score_html += f'<div class="kw-score">kw</div>'
 
         meta_text = employer_html
+        if v.get("note"):
+            meta_text += f' · <span class="note">{v["note"]}</span>'
         if show_added:
             meta_text += f" · Added {added_label}"
 
@@ -1028,6 +1040,7 @@ def main():
         ]
         generate_site(relevant)
         generate_site(load_jobs(), page="jobs")
+        generate_site(load_fellowships(), page="fellowships")
         return
 
     relevant = scrape_all(max_new=args.max)
@@ -1049,6 +1062,7 @@ def main():
             ]
         generate_site(relevant)
         generate_site(load_jobs(), page="jobs")
+        generate_site(load_fellowships(), page="fellowships")
 
 
 if __name__ == "__main__":

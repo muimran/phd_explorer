@@ -1,0 +1,178 @@
+[
+  {
+    "id": "fel_tarbell",
+    "title": "Tarbell Fellowship in AI Journalism",
+    "employer": "Tarbell Center for AI Journalism",
+    "url": "https://www.tarbellcenter.org/fellowship",
+    "label": "AI journalism",
+    "country": "Global",
+    "deadline": "2026-11-22",
+    "note": "2027-28 cohort; training from June 2027 then a 9-month newsroom placement (US, UK, Hong Kong)",
+    "score": 95
+  },
+  {
+    "id": "fel_pulitzer_ai",
+    "title": "Pulitzer Center AI Accountability Fellowship",
+    "employer": "Pulitzer Center",
+    "url": "https://pulitzercenter.org/grants-fellowships/opportunities-journalists/ai-accountability-fellowships",
+    "label": "AI journalism",
+    "country": "Global",
+    "deadline": "",
+    "note": "Annual; the 2026-27 round closed 12 July 2026, so expect the next call around mid-2027",
+    "score": 90
+  },
+  {
+    "id": "fel_govai_summer",
+    "title": "GovAI Summer Fellowship",
+    "employer": "Centre for the Governance of AI",
+    "url": "https://www.governance.ai/opportunities",
+    "label": "AI governance",
+    "country": "GB",
+    "deadline": "",
+    "note": "The Summer 2026 round closed 4 January 2026; a Summer 2027 round is not yet announced",
+    "score": 88
+  },
+  {
+    "id": "fel_iaps",
+    "title": "IAPS AI Policy Fellowship",
+    "employer": "Institute for AI Policy and Strategy",
+    "url": "https://www.iaps.ai/fellowship",
+    "label": "AI governance",
+    "country": "Global",
+    "deadline": "",
+    "note": "Spring 2027 round closed 27 Sep 2026; DC, London or remote",
+    "score": 82
+  },
+  {
+    "id": "fel_era",
+    "title": "Cambridge ERA:AI Fellowship (AI Governance track)",
+    "employer": "ERA Cambridge",
+    "url": "https://erafellowship.org",
+    "label": "AI governance",
+    "country": "GB",
+    "deadline": "",
+    "note": "Winter 2027 round closed 13 Sep 2026; 10 weeks in Cambridge, open to all nationalities",
+    "score": 80
+  },
+  {
+    "id": "fel_berkman",
+    "title": "Berkman Klein Center Fellowship",
+    "employer": "Berkman Klein Center, Harvard",
+    "url": "https://cyber.harvard.edu/getinvolved/fellowships",
+    "label": "Research",
+    "country": "US",
+    "deadline": "",
+    "note": "The last open call closed 5 Dec 2025; watch for an autumn call",
+    "score": 78
+  },
+  {
+    "id": "fel_oii_sdp",
+    "title": "Oxford-Berkeley Summer Doctoral Programme",
+    "employer": "Oxford Internet Institute / UC Berkeley",
+    "url": "https://www.ischool.berkeley.edu/programs/oxford-berkeley-summer-doctoral-program",
+    "label": "Research",
+    "country": "US",
+    "deadline": "",
+    "note": "For PhD students; the 2027 edition is in Berkeley, and the 2026 round closed 2 Feb",
+    "score": 75
+  },
+  {
+    "id": "fel_turing_enrichment",
+    "title": "Turing PhD Enrichment Scheme",
+    "employer": "The Alan Turing Institute",
+    "url": "https://www.turing.ac.uk/opportunities/doctoral-student-opportunities/phd-enrichment-scheme",
+    "label": "Research",
+    "country": "GB",
+    "deadline": "",
+    "note": "6-9 month placement for UK-based PhD students; check the site for the current round",
+    "score": 72
+  },
+  {
+    "id": "fel_tow",
+    "title": "Tow Center Research Fellowship",
+    "employer": "Tow Center for Digital Journalism, Columbia",
+    "url": "https://towcenter.columbia.edu",
+    "label": "Research",
+    "country": "US",
+    "deadline": "",
+    "note": "No open call at the moment; past calls covered computational and data journalism",
+    "score": 70
+  },
+  {
+    "id": "fel_reuters_institute",
+    "title": "Reuters Institute Journalist Fellowship",
+    "employer": "Reuters Institute, University of Oxford",
+    "url": "https://reutersinstitute.politics.ox.ac.uk/journalist-fellowship-programme",
+    "label": "Journalism",
+    "country": "GB",
+    "deadline": "",
+    "note": "Opens January 2027; last deadline was 13 Feb 2026; needs 5+ years in journalism",
+    "score": 70
+  },
+  {
+    "id": "fel_ksj_mit",
+    "title": "Knight Science Journalism Fellowship",
+    "employer": "MIT",
+    "url": "https://ksj.mit.edu/fellowships/academic-year-fellowship/",
+    "label": "Journalism",
+    "country": "US",
+    "deadline": "",
+    "note": "Last deadline was 9 Jan 2026; the 2027-28 call is expected late 2026; covers science and tech reporting",
+    "score": 62
+  },
+  {
+    "id": "fel_jsk",
+    "title": "JSK Journalism Fellowship",
+    "employer": "Stanford University",
+    "url": "https://jsk.stanford.edu/become-a-fellow",
+    "label": "Journalism",
+    "country": "US",
+    "deadline": "2026-12-02",
+    "note": "2027-28 cohort (deadline listed by IJNet); needs 5+ years in journalism",
+    "score": 62
+  },
+  {
+    "id": "fel_horizon",
+    "title": "Horizon Fellowship",
+    "employer": "Horizon Institute for Public Service",
+    "url": "https://horizonpublicservice.org",
+    "label": "AI governance",
+    "country": "US",
+    "deadline": "",
+    "note": "Places fellows in US government and think tanks; the 2027 round closed 30 Aug 2026",
+    "score": 60
+  },
+  {
+    "id": "fel_nieman",
+    "title": "Nieman Fellowship (international)",
+    "employer": "Nieman Foundation, Harvard",
+    "url": "https://nieman.harvard.edu/fellowships/",
+    "label": "Journalism",
+    "country": "US",
+    "deadline": "2026-12-01",
+    "note": "Deadline is for non-US citizens; needs 5+ years in media",
+    "score": 58
+  },
+  {
+    "id": "fel_knight_wallace",
+    "title": "Knight-Wallace Fellowship (international)",
+    "employer": "Wallace House, University of Michigan",
+    "url": "https://wallacehouse.umich.edu/knight-wallace/",
+    "label": "Journalism",
+    "country": "US",
+    "deadline": "2026-12-01",
+    "note": "Deadline reported for non-US applicants (US applicants: 1 Feb 2027); confirm on the site",
+    "score": 56
+  },
+  {
+    "id": "fel_fli_phd",
+    "title": "FLI Vitalik Buterin PhD Fellowship in AI Existential Safety",
+    "employer": "Future of Life Institute",
+    "url": "https://futureoflife.org/grant-program/phd-fellowships/",
+    "label": "AI governance",
+    "country": "Global",
+    "deadline": "",
+    "note": "Paused: FLI is not accepting applications in autumn 2026 while it reviews the programme",
+    "score": 40
+  }
+]
